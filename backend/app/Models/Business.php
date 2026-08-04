@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Business extends Model
+{
+    protected $fillable = [
+        'name',
+        'slug',
+        'email',
+        'phone',
+        'logo_url',
+        'address',
+        'city',
+        'state',
+        'country',
+        'business_type',
+        'business_category',
+        'modules',
+        'currency',
+        'timezone',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'modules' => 'array',
+        'is_active' => 'boolean',
+    ];
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'business_user')
+            ->withPivot('role_id', 'branch_id', 'status', 'created_by', 'joined_at');
+    }
+
+    public function branches(): HasMany
+    {
+        return $this->hasMany(Branch::class);
+    }
+
+    public function warehouses(): HasMany
+    {
+        return $this->hasMany(Warehouse::class);
+    }
+
+    public function roles(): HasMany
+    {
+        return $this->hasMany(Role::class);
+    }
+
+    public function productCategories(): HasMany
+    {
+        return $this->hasMany(ProductCategory::class);
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function primaryBranch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'primary_branch_id');
+    }
+
+    public function defaultWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'default_warehouse_id');
+    }
+
+    public function isModuleEnabled(string $module): bool
+    {
+        $modules = $this->modules ?? [];
+        return in_array($module, $modules);
+    }
+
+    public function subscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(BusinessSubscription::class, 'business_id');
+    }
+
+    public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(BusinessSubscription::class, 'business_id')
+            ->whereIn('status', [
+                BusinessSubscription::STATUS_TRIAL,
+                BusinessSubscription::STATUS_ACTIVE,
+            ]);
+    }
+
+    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Invoice::class, 'business_id');
+    }
+
+    public function paymentMethods(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PaymentMethod::class, 'business_id');
+    }
+
+    public function billingNotifications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(BillingNotification::class, 'business_id');
+    }
+
+    public function autoRenewConsent(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(AutoRenewConsent::class, 'business_id');
+    }
+
+    public function referralAgents(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReferralAgent::class, 'business_id');
+    }
+
+    public function referredBusinesses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReferralTracking::class, 'referred_business_id');
+    }
+}

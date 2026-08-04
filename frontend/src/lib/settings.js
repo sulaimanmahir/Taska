@@ -1,0 +1,131 @@
+export const settingsTabs = [
+  { key: 'profile', label: 'Profile' },
+  { key: 'business', label: 'Business' },
+  { key: 'users', label: 'Users & Roles' },
+  { key: 'branches', label: 'Branches' },
+];
+
+export function buildSettingsMetrics({ user = null, business = null, linkedBusinesses = 0 } = {}) {
+  return [
+    {
+      label: 'Active Workspace',
+      value: business?.name || 'No business selected',
+      helper: 'This is the tenant currently powering your dashboard and workflows',
+      tone: 'violet',
+    },
+    {
+      label: 'Linked Businesses',
+      value: linkedBusinesses.toLocaleString(),
+      helper: linkedBusinesses === 1
+        ? 'One workspace is connected to this login'
+        : 'Multiple workspaces can share one secure login',
+      tone: 'sky',
+    },
+    {
+      label: 'Signed-in Identity',
+      value: user?.name || 'Unknown user',
+      helper: user?.email || 'Profile email not available yet',
+      tone: 'emerald',
+    },
+  ];
+}
+
+export function buildSettingsProfileFields(user = {}) {
+  return [
+    { label: 'Full name', value: user?.name },
+    { label: 'Email address', value: user?.email },
+    {
+      label: 'Phone number',
+      value: user?.phone,
+      helper: 'Optional. Used for support follow-up, recovery, and cleaner account handoff.',
+    },
+    {
+      label: 'Current business ID',
+      value: user?.current_business_id,
+      helper: 'Useful for support and tenant troubleshooting.',
+    },
+  ];
+}
+
+export function buildSettingsBusinessFields(business = {}) {
+  return [
+    {
+      label: 'Business type',
+      value: business?.business_type_label || business?.business_type,
+      helper: 'This controls industry-aware workflows, navigation, and AI behavior.',
+    },
+    { label: 'Business email', value: business?.email },
+    { label: 'Phone', value: business?.phone },
+    { label: 'Currency', value: business?.currency },
+    {
+      label: 'Location',
+      value: business?.location || business?.address,
+      fullWidth: true,
+    },
+  ];
+}
+
+export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
+  if (tab === 'profile') {
+    return {
+      asideToneClassName: 'border-violet-200 bg-violet-50/60',
+      asideTitle: 'Profile updates are live',
+      asideSubtitle: 'Changes now save directly into your authenticated Taska identity',
+      asideParagraphs: [
+        'Name, email, and phone changes now persist immediately and refresh the active session, so one login stays aligned across linked workspaces.',
+        'Role assignment, current business selection, and branch-aware permissions still come from workspace access controls and remain read-only here.',
+      ],
+      asideParagraphToneClassNames: ['', 'text-violet-700'],
+    };
+  }
+
+  if (tab === 'business') {
+    return {
+      multiBusinessTitle: 'Multi-business ready',
+      multiBusinessSubtitle: 'One login can securely manage multiple businesses',
+      multiBusinessCopy: `Your account currently has ${linkedBusinesses} linked business${linkedBusinesses === 1 ? '' : 'es'}. Use workspace switching when you want to move between brands, branches, or operating models without signing out.`,
+      actionsTitle: 'Next business actions',
+      actionsSubtitle: 'Useful paths that are already live',
+    };
+  }
+
+  if (tab === 'users') {
+    return {
+      intro:
+        'Manage who can operate in the current workspace, which branch they belong to, and how much module access each role opens up.',
+      calloutTitle: 'Access model',
+      calloutCopy:
+        'Roles are business-scoped, branch-aware, and intentionally separate from personal profile settings so multi-tenant access stays clean and explainable.',
+      roadmapTitle: 'Still ahead',
+      roadmapSubtitle: 'High-value access controls that build on this foundation',
+      roadmapItems: [
+        'Email-based invite acceptance instead of owner-set initial passwords',
+        'Owner visibility into recent access changes and audit history',
+        'Branch-level approval rules for sensitive finance and stock actions',
+      ],
+      roadmapClassName: 'border-amber-200 bg-amber-50/60',
+      roadmapTextClassName: 'text-amber-900',
+    };
+  }
+
+  if (tab === 'branches') {
+    return {
+      intro:
+        'Create operating locations, choose which branch is primary, and pause branches that no longer need active team coverage.',
+      calloutTitle: 'Branch operating model',
+      calloutCopy:
+        'Branches remain business-scoped, primary location changes stay explicit, and inactive branches are blocked until active member assignments are cleared.',
+      roadmapTitle: 'Still ahead',
+      roadmapSubtitle: 'Higher-order location controls that build on this foundation',
+      roadmapItems: [
+        'Branch-level inventory routing and warehouse setup flows',
+        'Location-specific approval rules for stock and finance actions',
+        'AI-led branch comparison alerts for performance, demand, and staffing',
+      ],
+      roadmapClassName: 'border-emerald-200 bg-emerald-50/60',
+      roadmapTextClassName: 'text-emerald-900',
+    };
+  }
+
+  return null;
+}

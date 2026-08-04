@@ -1,0 +1,86 @@
+# TASKa - Premium Business Operating System
+# by Result Seekers Ltd
+
+# ============================================
+# SHARED
+# ============================================
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.backup
+.env.production
+*.local
+auth.json
+
+# IDE & Editors
+.idea/
+.vscode/
+.zed/
+.cursor/
+.nova/
+*.swp
+*.swo
+*~
+._*
+
+# ============================================
+# FRONTEND
+# ============================================
+node_modules/
+dist/
+.env.local
+.env*.local
+*.local
+coverage/
+.playwright/
+
+# Build outputs
+frontend/dist/
+frontend/build/
+
+# ============================================
+# BACKEND
+# ============================================
+vendor/
+.phpunit.cache/
+.phpactor.json
+.phpunit.result.cache
+storage/*.key
+storage/app/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+storage/pail/
+bootstrap/cache/*
+!storage/app/public
+!storage/framework/views
+!storage/framework/cache
+!storage/framework/sessions
+
+# Laravel
+Homestead.json
+Homestead.yaml
+
+# Build
+public/build/
+public/hot
+
+# Database
+*.sqlite
+*.sqlite3
+
+# ============================================
+# ASSETS
+# ============================================
+frontend/public/*.png
+frontend/public/*.jpg
+!frontend/public/favicon.svg
+!frontend/public/icon-192.svg
+
+# ============================================
+# DOCS (exclude large generated docs)
+# ============================================
+docs/MAKARANTA-DOCUMENTATION.md
+docs/API-DOCUMENTATION.md
