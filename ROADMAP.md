@@ -1,6 +1,6 @@
 # TASKA Roadmap
 
-Last updated: 2026-05-27
+Last updated: 2026-08-05
 
 ## Snapshot
 
@@ -73,8 +73,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 
 ### Platform Hardening
 
-- Password reset / account recovery flow is not implemented yet.
-- Tenant isolation is enforced mainly through business-context scoping in services and controllers; a more unified policy/global-scope pattern is still pending.
+- Tenant isolation is enforced mainly through business-context scoping in services and controllers; a unified global-scope pattern now exists (`app/Concerns/BelongsToBusiness.php`) and is applied to the highest-risk models (`Order`, `Product`, `InventoryItem`, `Customer`), with the rest to be migrated incrementally.
 - Notification center and push notifications are not live yet.
 - Access-change audit history for workspace team and branch administration is still ahead.
 

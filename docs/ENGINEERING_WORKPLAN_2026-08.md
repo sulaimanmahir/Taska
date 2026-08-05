@@ -13,7 +13,7 @@ Ordered by blast radius and how much everything else depends on it, not by effor
 1. **Version control** — the project had no `.git` repository at all. No history, no diffs, no revert path, no code review, no CI possible. Blocks everything else below.
 2. **CI pipeline** — once git exists, get both test suites running on every push so regressions are caught automatically instead of relying on manual runs.
 3. **Tenant-scoping enforcement** — currently done by convention (`where('business_id', ...)` hand-written in 44+ controllers, zero Eloquent global scopes). One missed line is a cross-tenant data leak. Already flagged in [ROADMAP.md](../ROADMAP.md) as an active gap.
-4. **Password reset / account recovery** — missing entirely; blocks real (non-demo) usage.
+4. **Password reset / account recovery** — *correction*: this was flagged as missing based on `ROADMAP.md`'s own "Active Gaps" section, without checking the actual code first — the same mistake as item 6 below, now made twice. It is fully implemented: backend uses Laravel's standard `Password` broker (`AuthController::forgotPassword`/`resetPassword`, `password_reset_tokens` migration present, both flows covered in `tests/Feature/AuthFlowTest.php`); frontend has `ForgotPassword.jsx` and `ResetPassword.jsx`, routed in `App.jsx`, linked from `Login.jsx`, and covered by `tests/forgotPasswordPage.test.js` / `tests/resetPasswordPage.test.js` (6 passing tests). Nothing to build here — `ROADMAP.md` should be corrected instead.
 5. **Oversized page components** — several frontend pages are 40–66KB single files mixing data-fetching, business logic, and rendering (`TaskaCooperative.jsx`, `Adashe.jsx`, `TrustFund.jsx`, `Partners.jsx`, `Deliveries.jsx`). Hard to review, hard to test, high regression risk per change.
 6. **Frontend test coverage gaps** — *correction after fuller review*: the initial assessment only checked `frontend/src` and missed `frontend/tests/`, which holds 129 test files and 502 passing tests (`npm test`), covering most page-level and lib-level logic already. Coverage is not thin overall. The real, narrower gap is a specific set of untested `lib/` modules — mostly the finance-adjacent helpers (`financeFormatters`, `financeActionRouting`, `financeFieldBuilders`, `financeLensItems`, `financeRecommendationPresenter`) and dashboard summary builders (`dashboardFinanceSummaries`, `dashboardAiSummaries`, `dashboardOwnerFocus*`, `dashboardVertical*`). Config/wiring files (`api.js`, `config.js`, `queryClient.js`) legitimately don't need tests and are excluded from this gap.
 7. **Purchases/payables workflow** — real product gap (no PO → GRN → supplier-payment flow), not just polish; matters more than new vertical modules at this point.
@@ -62,10 +62,11 @@ The third original failure (`MobileAgentOperationsTest` foreign-tenant reversal 
 - [ ] Migrate remaining high-risk models (finance: `Expense`, `Supplier`, `Debtors`/receivables; inventory: `InventoryMovement`, `Warehouse`) onto the trait
 - [ ] Sweep remaining models incrementally (not a single big-bang PR — safer to verify each in isolation against the full suite, as happened here)
 
-### 4. Password reset flow — Not started
-- [ ] Backend: forgot-password request + signed reset-token email + reset endpoint (Laravel's built-in `Illuminate\Auth\Passwords` broker)
-- [ ] Frontend: "Forgot password" entry point, request form, reset form
-- [ ] Tests: token expiry, invalid token, successful reset invalidates old sessions
+### 4. Password reset flow — Already done (verified 2026-08-05)
+- [x] Backend: forgot-password request + reset-token flow via Laravel's `Password` broker, `password_reset_tokens` table present
+- [x] Frontend: "Forgot password" entry point (linked from `Login.jsx`), request form, reset form, both routed
+- [x] Tests: request-link flow and reset-with-valid-token flow covered (`AuthFlowTest.php`); frontend wiring covered (`forgotPasswordPage.test.js`, `resetPasswordPage.test.js`)
+- [ ] `ROADMAP.md` still lists this under "Active Gaps > Platform Hardening" — should be corrected there too, since it's stale
 
 ### 5. Oversized page components — Not started
 - [ ] Start with the two largest: `TaskaCooperative.jsx` (66KB), `Adashe.jsx` (61KB)
