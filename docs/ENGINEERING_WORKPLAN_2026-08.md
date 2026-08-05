@@ -32,18 +32,19 @@ Ordered by blast radius and how much everything else depends on it, not by effor
   - Frontend job: `npm ci`, `npm run lint`, `npm test` (Node's built-in test runner via `node --test`)
   - Backend job: `composer install`, run PHPUnit (`tests/Unit`, `tests/Feature`) against in-memory SQLite (matches `phpunit.xml`, no external DB service needed)
 - [x] Frontend job passes locally (502 tests)
-- [ ] Backend job: 3 known pre-existing failures remain (see below) — CI will show red until these are fixed; intentionally not suppressed
+- [x] Backend job: all 3 originally-discovered pre-existing failures are now fixed — full suite passes (242 passing / 0 failing)
 
 **Found while wiring this up:** running the backend suite for the first time (it had never run in CI) surfaced 11 pre-existing failing tests, unrelated to any of the assessment items. Root cause for 8 of them: **19 controllers returned a bare `JsonResource` instance**, which Laravel auto-wraps in `{"data": ...}` — but the "Operations" test files for those modules asserted flat JSON (matching the convention already used in `OrderController`, which explicitly calls `->resolve()`). Separately, 9 "WorkflowState" test files for the *same* modules asserted the opposite (`data.`-prefixed), because they were written against the actual (wrapped) behavior rather than the intended convention. Fixed by:
 - Standardizing on the `OrderController` convention (`->resolve()` / unwrapped JSON) across all 33 bare-resource-return call sites in: AgroDealerController, BeautyController, ConstructionMaterialsController, FuelController, MobileAgentController, PureWaterRetailController, RestaurantController, ServiceBusinessController, TextileController.
 - Updating the 9 `*WorkflowStateTest.php` files that had encoded the old (wrapped) behavior to match.
 - Result: backend suite went from 229 passing / 11 failing to 237 passing / 3 failing.
 
-**2 remaining failures, each a distinct unrelated bug — not fixed yet:**
-- [ ] `ConstructionOperationsTest`: converting a quotation to an order fails with "Insufficient stock for this product." — looks like a real stock-validation bug in the quotation→order conversion flow, needs investigation in `ConstructionMaterialsService`.
-- [ ] `FarmOperationsTest`: harvest-log creation fails with "The planting cycle id field is required." — likely a variable/field-name mismatch between what the planting-cycle endpoint returns and what the harvest-log endpoint expects.
+**All 3 remaining failures are now fixed, each a genuinely distinct bug:**
+- [x] `FarmOperationsTest`: same resource-wrapping bug as above, just not caught in the first pass — `FarmController`'s 3 create endpoints (`storePlantingCycle`, `storeInputLog`, `storeHarvestLog`) still used bare `Resource->response()`. Fixed the same way, and stripped the matching `data.` prefixes from `FarmWorkflowStateTest.php`.
+- [x] `ConstructionOperationsTest`: real bug, not wrapping. `ConstructionMaterialsService::ensureSetup()` unconditionally seeded a second "Main Warehouse" with `is_default => true` on every call, even when the business already had a default warehouse from onboarding (as `CreatesTenantContext` provisions in tests, and normal business onboarding provisions in production). Two `is_default = true` warehouses made `defaultWarehouseId()`'s query pick an arbitrary one — often the newly-seeded, empty one — so the quotation→order conversion checked stock in the wrong warehouse. Fixed by only marking the seeded warehouse default when the business doesn't already have one.
+- [x] `MobileAgentOperationsTest` (foreign-tenant reversal 403-vs-422) — fixed as part of item 3 below.
 
-The third original failure (`MobileAgentOperationsTest` foreign-tenant reversal returning 403 instead of 422) was fixed as part of item 3 below — see that section.
+Backend suite: **242 passing / 0 failing.**
 
 **Also found while wiring this up (frontend side):** `npm run lint` had never been run in CI either. Fixed the ESLint config gap (`frontend/tests/**` used Node globals like `process` but the flat config only declared browser globals) and cleaned up 6 trivial pre-existing unused-var errors. One of those unused imports (`validateInventoryAdjustmentPayload` in `Inventory.jsx`) turned out to be genuinely unfinished wiring — the validator existed, the error-display JSX existed, but nothing called the validator or ever set the error state — so that's now wired into the adjustment form's submit handler instead of just deleted.
 

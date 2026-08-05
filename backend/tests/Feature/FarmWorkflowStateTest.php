@@ -38,10 +38,10 @@ class FarmWorkflowStateTest extends TestCase
             'planted_area_hectares' => 3.5,
             'status' => 'growing',
         ])->assertCreated()
-            ->assertJsonPath('data.crop_name', 'Maize')
-            ->assertJsonPath('data.plot.name', 'North Field');
+            ->assertJsonPath('crop_name', 'Maize')
+            ->assertJsonPath('plot.name', 'North Field');
 
-        $cycleId = $plantingResponse->json('data.id');
+        $cycleId = $plantingResponse->json('id');
 
         $this->postJson('/api/farm/input-logs', [
             'planting_cycle_id' => $cycleId,
@@ -52,8 +52,8 @@ class FarmWorkflowStateTest extends TestCase
             'cost' => 96000,
             'applied_on' => now()->subDays(10)->toDateString(),
         ])->assertCreated()
-            ->assertJsonPath('data.input_name', 'NPK 15-15-15')
-            ->assertJsonPath('data.planting_cycle.status', 'growing');
+            ->assertJsonPath('input_name', 'NPK 15-15-15')
+            ->assertJsonPath('planting_cycle.status', 'growing');
 
         $this->postJson('/api/farm/harvest-logs', [
             'planting_cycle_id' => $cycleId,
@@ -63,7 +63,7 @@ class FarmWorkflowStateTest extends TestCase
             'loss_quantity' => 120,
             'harvested_on' => now()->toDateString(),
         ])->assertCreated()
-            ->assertJsonPath('data.quantity_harvested', '4200.000')
-            ->assertJsonPath('data.planting_cycle.status', 'harvested');
+            ->assertJsonPath('quantity_harvested', '4200.000')
+            ->assertJsonPath('planting_cycle.status', 'harvested');
     }
 }

@@ -64,6 +64,8 @@ class ConstructionMaterialsService
             );
         }
 
+        $hasDefaultWarehouse = Warehouse::where('business_id', $businessId)->where('is_default', true)->exists();
+
         $warehouseSeed = [
             ['name' => 'Main Warehouse', 'slug' => 'main-warehouse', 'is_default' => true],
             ['name' => 'Shop Floor', 'slug' => 'shop-floor', 'is_default' => false],
@@ -77,7 +79,10 @@ class ConstructionMaterialsService
                     'branch_id' => $branchId,
                     'name' => $warehouseData['name'],
                     'description' => $warehouseData['name'] . ' for building materials operations',
-                    'is_default' => $warehouseData['is_default'],
+                    // Only mark this seeded warehouse as the default when the business
+                    // doesn't already have one (e.g. from onboarding) - otherwise two
+                    // is_default=true rows make defaultWarehouseId() ambiguous.
+                    'is_default' => $warehouseData['is_default'] && !$hasDefaultWarehouse,
                     'is_active' => true,
                 ]
             );

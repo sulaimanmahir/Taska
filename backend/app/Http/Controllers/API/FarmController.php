@@ -44,23 +44,23 @@ class FarmController extends Controller
 
     public function storePlantingCycle(StoreFarmPlantingCycleRequest $request)
     {
-        return (new FarmPlantingCycleResource(
+        return response()->json((new FarmPlantingCycleResource(
             $this->service->createPlantingCycle($request->validated(), $request->user()->current_business_id)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function storeInputLog(StoreFarmInputLogRequest $request)
     {
-        return (new FarmInputLogResource(
+        return response()->json((new FarmInputLogResource(
             $this->service->createInputLog($request->validated(), $request->user()->current_business_id)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function storeHarvestLog(StoreFarmHarvestLogRequest $request)
     {
-        return (new FarmHarvestLogResource(
+        return response()->json((new FarmHarvestLogResource(
             $this->service->createHarvestLog($request->validated(), $request->user()->current_business_id)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     private function businessOwnedRule(string $table, int $businessId): Exists
