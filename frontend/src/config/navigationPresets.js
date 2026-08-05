@@ -16,7 +16,7 @@ export const navigationPresets = {
       { path: '/pharmacy', label: 'Expiry & Batch Alerts', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.16 17c-.78 1.333.192 3 1.732 3z' },
     ]},
     { section: 'Finance', items: [
-      { path: '/cooperative', label: 'Coorperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
+      { path: '/cooperative', label: 'Cooperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
       { path: '/expenses', label: 'Expenses', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V4m0 0L9 6m3-2l3 2m0 0v6.5m0-6.5l-3-3' },
       { path: '/reports', label: 'Reports', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     ]},
@@ -353,7 +353,7 @@ export const navigationPresets = {
       { path: '/reports', label: 'Reports', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     ]},
     { section: 'Finance', items: [
-      { path: '/cooperative', label: 'Coorperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
+      { path: '/cooperative', label: 'Cooperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
       { path: '/adashe', label: 'Adashe', icon: 'M12 8c-2 0-3.5 1.1-3.5 2.4s1.5 2.4 3.5 2.4 3.5 1.1 3.5 2.4-1.5 2.4-3.5 2.4m0-12V4m0 16v-1' },
       { path: '/expenses', label: 'Expenses', icon: 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1' },
       { path: '/billing', label: 'Billing', icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
@@ -374,7 +374,7 @@ export const navigationPresets = {
       { path: '/customers', label: 'Clients', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
     ]},
     { section: 'Finance', items: [
-      { path: '/cooperative', label: 'Coorperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
+      { path: '/cooperative', label: 'Cooperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
       { path: '/reports', label: 'Reports', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
       { path: '/expenses', label: 'Expenses', icon: 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1' },
     ]},
@@ -394,7 +394,7 @@ export const navigationPresets = {
       { path: '/reports', label: 'Reports', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     ]},
     { section: 'Finance', items: [
-      { path: '/cooperative', label: 'Coorperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
+      { path: '/cooperative', label: 'Cooperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
       { path: '/adashe', label: 'Adashe', icon: 'M12 8c-2 0-3.5 1.1-3.5 2.4s1.5 2.4 3.5 2.4 3.5 1.1 3.5 2.4-1.5 2.4-3.5 2.4m0-12V4m0 16v-1' },
       { path: '/expenses', label: 'Expenses', icon: 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1' },
     ]},
@@ -556,7 +556,7 @@ export const navigationPresets = {
       { path: '/suppliers', label: 'Suppliers', icon: 'M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3m3 0h6m-6 0v-2.25m0 2.25v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25M3 18.75h15' },
     ]},
     { section: 'Finance', items: [
-      { path: '/cooperative', label: 'Coorperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
+      { path: '/cooperative', label: 'Cooperative', icon: 'M12 4l2.2 4.45 4.91.72-3.55 3.46.84 4.89L12 15.9 7.6 18.52l.84-4.89L4.89 10.17l4.91-.72L12 4z' },
       { path: '/adashe', label: 'Adashe', icon: 'M12 8c-2 0-3.5 1.1-3.5 2.4s1.5 2.4 3.5 2.4 3.5 1.1 3.5 2.4-1.5 2.4-3.5 2.4m0-12V4m0 16v-1' },
       { path: '/expenses', label: 'Expenses', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V4m0 0L9 6m3-2l3 2m0 0v6.5m0-6.5l-3-3' },
       { path: '/reports', label: 'Reports', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
