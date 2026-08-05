@@ -15,7 +15,6 @@ import {
   buildFuelDeskMetrics,
   buildFuelDipPayload,
   buildFuelLossMetrics,
-  buildFuelOverviewMetrics,
   buildFuelPriceChangePayload,
   buildFuelPumpCard,
   buildFuelPumpPayload,

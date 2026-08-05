@@ -310,7 +310,16 @@ export default function Inventory() {
               className="space-y-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                adjustInventory.mutate(buildInventoryAdjustmentPayload(adjustmentForm));
+                const payload = buildInventoryAdjustmentPayload(adjustmentForm);
+                const validation = validateInventoryAdjustmentPayload(payload);
+
+                if (!validation.isValid) {
+                  setAdjustmentError(validation.error);
+                  return;
+                }
+
+                setAdjustmentError('');
+                adjustInventory.mutate(payload);
               }}
             >
               <select

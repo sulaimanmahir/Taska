@@ -17,7 +17,6 @@ import {
   buildHotelInspectionPayload,
   buildHotelMaintenancePayload,
   buildHotelMaintenanceRequestCard,
-  buildHotelOverviewMetrics,
   buildHotelRoomBlockPayload,
   buildHotelRoomCard,
   buildHotelRoomDeskMetrics,

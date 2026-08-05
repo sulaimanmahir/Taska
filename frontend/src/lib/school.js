@@ -105,7 +105,7 @@ export function buildSchoolOverviewMetrics(summary = {}) {
   ];
 }
 
-export function buildSchoolResultDeskMetrics(summary = {}, results = [], students = [], formatCurrency) {
+export function buildSchoolResultDeskMetrics(summary = {}, results = [], students = []) {
   const averageScore = results.length
     ? Math.round(results.reduce((sum, entry) => sum + Number(entry.score || 0), 0) / results.length)
     : 0;

@@ -1,6 +1,6 @@
 import { useDeferredValue, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Card, { CardHeader } from '../components/Card';
 import InsightCardList from '../components/InsightCardList';
 import InsightGroupFilters from '../components/InsightGroupFilters';
@@ -116,7 +116,6 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function AIInsights() {
-  const queryClient = useQueryClient();
   const { toast: shareToast, setToast: setShareToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = usePersistentState('taska.ai-insights-search-term', '');
