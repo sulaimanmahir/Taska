@@ -102,36 +102,36 @@ class PureWaterRetailController extends Controller
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new PureWaterRetailPackageMovementResource(
+        return response()->json((new PureWaterRetailPackageMovementResource(
             $this->service->recordPackageMovement(
                 $request->validated(),
                 $businessId,
                 $request->user()->current_branch_id,
                 $request->user()->id
             )
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function storeCrateMovement(StorePureWaterCrateMovementRequest $request)
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new PureWaterRetailCrateLedgerResource(
+        return response()->json((new PureWaterRetailCrateLedgerResource(
             $this->service->recordCrateMovement(
                 $request->validated(),
                 $businessId,
                 $request->user()->current_branch_id,
                 $request->user()->id
             )
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function transfer(StorePureWaterTransferRequest $request)
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new PureWaterRetailTransferResource(
+        return response()->json((new PureWaterRetailTransferResource(
             $this->service->transferStock($request->validated(), $businessId, $request->user()->id)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 }

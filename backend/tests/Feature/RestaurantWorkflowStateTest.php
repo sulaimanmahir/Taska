@@ -99,22 +99,22 @@ class RestaurantWorkflowStateTest extends TestCase
             'station' => 'pass',
             'notes' => 'Plate for pickup',
         ])->assertOk()
-            ->assertJsonPath('data.service_status', 'ready')
-            ->assertJsonPath('data.kitchen_ticket.status', 'ready')
-            ->assertJsonPath('data.kitchen_ticket.station', 'pass')
-            ->assertJsonPath('data.items.0.service_status', 'ready');
+            ->assertJsonPath('service_status', 'ready')
+            ->assertJsonPath('kitchen_ticket.status', 'ready')
+            ->assertJsonPath('kitchen_ticket.station', 'pass')
+            ->assertJsonPath('items.0.service_status', 'ready');
 
         $this->postJson("/api/restaurant/tickets/{$ticket->id}/close", [
             'amount_paid' => 7500,
             'waste_cost_total' => 300,
         ])->assertOk()
-            ->assertJsonPath('data.service_status', 'closed')
-            ->assertJsonPath('data.payment_status', 'paid')
-            ->assertJsonPath('data.amount_paid', '7500.00')
-            ->assertJsonPath('data.waste_cost_total', '300.00')
-            ->assertJsonPath('data.gross_margin', '3600.00')
-            ->assertJsonPath('data.table.status', 'available')
-            ->assertJsonPath('data.kitchen_ticket.status', 'served');
+            ->assertJsonPath('service_status', 'closed')
+            ->assertJsonPath('payment_status', 'paid')
+            ->assertJsonPath('amount_paid', '7500.00')
+            ->assertJsonPath('waste_cost_total', '300.00')
+            ->assertJsonPath('gross_margin', '3600.00')
+            ->assertJsonPath('table.status', 'available')
+            ->assertJsonPath('kitchen_ticket.status', 'served');
     }
 
     public function test_restaurant_ticket_state_actions_are_hidden_from_other_businesses(): void

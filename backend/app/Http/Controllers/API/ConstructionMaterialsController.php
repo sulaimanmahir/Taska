@@ -146,18 +146,18 @@ class ConstructionMaterialsController extends Controller
     {
         $this->authorize('update', $delivery);
 
-        return new ConstructionDeliveryResource(
+        return (new ConstructionDeliveryResource(
             $this->service->updateDelivery($delivery, $request->validated())
-        );
+        ))->resolve();
     }
 
     public function recordCreditPayment(RecordConstructionCreditPaymentRequest $request, ConstructionCreditAccount $account)
     {
         $this->authorize('update', $account);
 
-        return (new ConstructionCreditPaymentResource(
+        return response()->json((new ConstructionCreditPaymentResource(
             $this->service->recordCreditPayment($account, $request->validated(), $request->user())
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function storePriceChange(Request $request)

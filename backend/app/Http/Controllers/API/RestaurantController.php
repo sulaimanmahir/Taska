@@ -284,18 +284,18 @@ class RestaurantController extends Controller
     {
         $this->authorize('update', $ticket);
 
-        return new RestaurantTicketResource(
+        return (new RestaurantTicketResource(
             $restaurantService->updateKitchenStatus($ticket, $request->validated())
-        );
+        ))->resolve();
     }
 
     public function closeTicket(CloseRestaurantTicketRequest $request, RestaurantTicket $ticket, RestaurantService $restaurantService)
     {
         $this->authorize('update', $ticket);
 
-        return new RestaurantTicketResource(
+        return (new RestaurantTicketResource(
             $restaurantService->closeTicket($ticket, $request->validated())
-        );
+        ))->resolve();
     }
 
     public function wasteLogs(Request $request)

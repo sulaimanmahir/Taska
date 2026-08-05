@@ -73,9 +73,9 @@ class BeautyController extends Controller
     {
         $this->authorize('update', $appointment);
 
-        return new BeautyAppointmentResource(
+        return (new BeautyAppointmentResource(
             $this->service->completeAppointment($appointment, $request->validated())
-        );
+        ))->resolve();
     }
 
     private function businessOwnedRule(string $table, int $businessId): Exists

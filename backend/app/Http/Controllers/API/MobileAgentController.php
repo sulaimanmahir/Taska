@@ -113,9 +113,9 @@ class MobileAgentController extends Controller
     {
         $this->authorize('update', $floatRequest);
 
-        return new MobileAgentFloatRequestResource(
+        return (new MobileAgentFloatRequestResource(
             $service->approveFloatRequest($floatRequest, $request->validated())
-        );
+        ))->resolve();
     }
 
     public function transactions(Request $request)
@@ -132,9 +132,9 @@ class MobileAgentController extends Controller
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new MobileAgentTransactionResource(
+        return response()->json((new MobileAgentTransactionResource(
             $service->createTransaction($request->validated(), $businessId)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function reversals(Request $request)
@@ -155,9 +155,9 @@ class MobileAgentController extends Controller
 
         $this->authorize('view', $transaction);
 
-        return (new MobileAgentReversalResource(
+        return response()->json((new MobileAgentReversalResource(
             $service->createReversal($validated, $businessId)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function shortages(Request $request)
@@ -173,9 +173,9 @@ class MobileAgentController extends Controller
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new MobileAgentShortageResource(
+        return response()->json((new MobileAgentShortageResource(
             $service->createShortage($request->validated(), $businessId)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function fraudAlerts(Request $request)

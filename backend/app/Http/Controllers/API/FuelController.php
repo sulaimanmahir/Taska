@@ -135,9 +135,9 @@ class FuelController extends Controller
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new FuelNozzleReadingResource(
+        return response()->json((new FuelNozzleReadingResource(
             $service->createNozzleReading($request->validated(), $businessId)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function tankDips(Request $request)
@@ -175,9 +175,9 @@ class FuelController extends Controller
     {
         $businessId = $request->user()->current_business_id;
 
-        return (new FuelShiftLogResource(
+        return response()->json((new FuelShiftLogResource(
             $service->createShiftLog($request->validated(), $businessId)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function priceChanges(Request $request)

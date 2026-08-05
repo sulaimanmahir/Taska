@@ -151,9 +151,9 @@ class TextileController extends Controller
     {
         $this->authorize('update', $job);
 
-        return new TailoringJobResource(
+        return (new TailoringJobResource(
             $service->updateTailoringJob($job, $request->validated())
-        );
+        ))->resolve();
     }
 
     public function consignments(Request $request)

@@ -103,9 +103,9 @@ class AgroDealerController extends Controller
 
     public function storeSubsidySale(StoreAgroSubsidySaleRequest $request, AgroDealerService $service)
     {
-        return (new AgroSubsidySaleResource(
+        return response()->json((new AgroSubsidySaleResource(
             $service->createSubsidySale($request->validated(), $request->user()->current_business_id)
-        ))->response()->setStatusCode(201);
+        ))->resolve(), 201);
     }
 
     public function recoveries(Request $request)
@@ -142,9 +142,9 @@ class AgroDealerController extends Controller
     {
         $this->authorize('update', $recovery);
 
-        return new AgroFarmerCreditRecoveryResource(
+        return (new AgroFarmerCreditRecoveryResource(
             $service->updateRecovery($recovery, $request->validated())
-        );
+        ))->resolve();
     }
 
     public function advisories(Request $request)

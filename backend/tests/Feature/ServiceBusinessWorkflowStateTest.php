@@ -69,10 +69,10 @@ class ServiceBusinessWorkflowStateTest extends TestCase
             'amount_paid' => 35000,
             'notes' => 'Resolved and collected on-site',
         ])->assertOk()
-            ->assertJsonPath('data.staff_profile.name', 'Usman Engineer')
-            ->assertJsonPath('data.status', 'completed')
-            ->assertJsonPath('data.amount_paid', 35000)
-            ->assertJsonPath('data.notes', 'Resolved and collected on-site');
+            ->assertJsonPath('staff_profile.name', 'Usman Engineer')
+            ->assertJsonPath('status', 'completed')
+            ->assertJsonPath('amount_paid', 35000)
+            ->assertJsonPath('notes', 'Resolved and collected on-site');
     }
 
     public function test_service_job_updates_are_hidden_from_other_businesses(): void

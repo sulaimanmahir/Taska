@@ -91,9 +91,9 @@ class ServiceBusinessController extends Controller
     {
         $this->authorize('update', $job);
 
-        return new ServiceJobResource(
+        return (new ServiceJobResource(
             $this->service->updateJob($job, $request->validated())
-        );
+        ))->resolve();
     }
 
     private function businessOwnedRule(string $table, int $businessId): Exists

@@ -62,11 +62,11 @@ class TextileWorkflowStateTest extends TestCase
             'priority' => 'urgent',
             'notes' => 'Final fitting approved',
         ])->assertOk()
-            ->assertJsonPath('data.assigned_tailor', 'Maryam')
-            ->assertJsonPath('data.stage', 'completed')
-            ->assertJsonPath('data.priority', 'urgent')
-            ->assertJsonPath('data.style_order.status', 'ready')
-            ->assertJsonPath('data.style_order.customer.name', 'Hadiza Bello');
+            ->assertJsonPath('assigned_tailor', 'Maryam')
+            ->assertJsonPath('stage', 'completed')
+            ->assertJsonPath('priority', 'urgent')
+            ->assertJsonPath('style_order.status', 'ready')
+            ->assertJsonPath('style_order.customer.name', 'Hadiza Bello');
     }
 
     public function test_textile_job_updates_are_hidden_from_other_businesses(): void

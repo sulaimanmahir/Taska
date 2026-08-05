@@ -69,9 +69,9 @@ class PureWaterRetailWorkflowStateTest extends TestCase
             'units_per_package' => 20,
             'notes' => 'Damaged in transit',
         ])->assertCreated()
-            ->assertJsonPath('data.movement_type', 'wastage')
-            ->assertJsonPath('data.unit_equivalent_quantity', '40.000')
-            ->assertJsonPath('data.customer.name', 'Retail Outlet A');
+            ->assertJsonPath('movement_type', 'wastage')
+            ->assertJsonPath('unit_equivalent_quantity', '40.000')
+            ->assertJsonPath('customer.name', 'Retail Outlet A');
 
         $this->postJson('/api/pure-water-retail/crates', [
             'customer_id' => $customer->id,
@@ -81,8 +81,8 @@ class PureWaterRetailWorkflowStateTest extends TestCase
             'deposit_amount' => 7500,
             'notes' => 'Crates issued to outlet',
         ])->assertCreated()
-            ->assertJsonPath('data.balance_after', '15.000')
-            ->assertJsonPath('data.customer.name', 'Retail Outlet A');
+            ->assertJsonPath('balance_after', '15.000')
+            ->assertJsonPath('customer.name', 'Retail Outlet A');
 
         $this->postJson('/api/pure-water-retail/transfers', [
             'from_warehouse_id' => $tenant['warehouse']->id,
@@ -93,9 +93,9 @@ class PureWaterRetailWorkflowStateTest extends TestCase
             'units_per_package' => 20,
             'notes' => 'Dispatch to route van',
         ])->assertCreated()
-            ->assertJsonPath('data.out.movement_type', 'transfer_out')
-            ->assertJsonPath('data.in.movement_type', 'transfer_in')
-            ->assertJsonPath('data.out.warehouse.name', 'Main Warehouse')
-            ->assertJsonPath('data.in.warehouse.name', 'Route Van Stock');
+            ->assertJsonPath('out.movement_type', 'transfer_out')
+            ->assertJsonPath('in.movement_type', 'transfer_in')
+            ->assertJsonPath('out.warehouse.name', 'Main Warehouse')
+            ->assertJsonPath('in.warehouse.name', 'Route Van Stock');
     }
 }

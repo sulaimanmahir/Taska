@@ -68,19 +68,19 @@ class AgroDealerWorkflowStateTest extends TestCase
             'amount_received' => 30000,
             'sale_date' => now()->toDateString(),
         ])->assertCreated()
-            ->assertJsonPath('data.amount_due', '120000.00')
-            ->assertJsonPath('data.amount_received', '30000.00')
-            ->assertJsonPath('data.status', 'pending');
+            ->assertJsonPath('amount_due', '120000.00')
+            ->assertJsonPath('amount_received', '30000.00')
+            ->assertJsonPath('status', 'pending');
 
         $this->patchJson("/api/agro/recoveries/{$recovery->id}", [
             'recovered_amount' => 50000,
             'last_contacted_at' => now()->toDateString(),
             'notes' => 'Recovered after cooperative payout',
         ])->assertOk()
-            ->assertJsonPath('data.recovered_amount', '50000.00')
-            ->assertJsonPath('data.outstanding_amount', '0.00')
-            ->assertJsonPath('data.status', 'recovered')
-            ->assertJsonPath('data.customer.name', 'Mallam Adamu');
+            ->assertJsonPath('recovered_amount', '50000.00')
+            ->assertJsonPath('outstanding_amount', '0.00')
+            ->assertJsonPath('status', 'recovered')
+            ->assertJsonPath('customer.name', 'Mallam Adamu');
     }
 
     public function test_agro_recovery_updates_are_hidden_from_other_businesses(): void

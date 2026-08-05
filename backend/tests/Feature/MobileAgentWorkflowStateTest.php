@@ -52,8 +52,8 @@ class MobileAgentWorkflowStateTest extends TestCase
         $this->postJson("/api/mobile-agent/float-requests/{$floatRequest->id}/approve", [
             'approved_amount' => 20000,
         ])->assertOk()
-            ->assertJsonPath('data.status', 'approved')
-            ->assertJsonPath('data.approved_amount', '20000.00');
+            ->assertJsonPath('status', 'approved')
+            ->assertJsonPath('approved_amount', '20000.00');
 
         $this->postJson('/api/mobile-agent/reversals', [
             'mobile_agent_transaction_id' => $transaction->id,
@@ -61,10 +61,10 @@ class MobileAgentWorkflowStateTest extends TestCase
             'amount' => 12000,
             'resolution_notes' => 'Awaiting switch confirmation',
         ])->assertCreated()
-            ->assertJsonPath('data.status', 'pending')
-            ->assertJsonPath('data.amount', '12000.00')
-            ->assertJsonPath('data.transaction.status', 'reversal_pending')
-            ->assertJsonPath('data.transaction.is_reversal_requested', true);
+            ->assertJsonPath('status', 'pending')
+            ->assertJsonPath('amount', '12000.00')
+            ->assertJsonPath('transaction.status', 'reversal_pending')
+            ->assertJsonPath('transaction.is_reversal_requested', true);
     }
 
     public function test_mobile_agent_business_can_record_transactions_and_shortages(): void
@@ -84,9 +84,9 @@ class MobileAgentWorkflowStateTest extends TestCase
             'flag_fraud' => true,
             'notes' => 'Large end-of-day withdrawal',
         ])->assertCreated()
-            ->assertJsonPath('data.agent_name', 'Bashir Musa')
-            ->assertJsonPath('data.status', 'completed')
-            ->assertJsonPath('data.closing_float_balance', '-120000.00');
+            ->assertJsonPath('agent_name', 'Bashir Musa')
+            ->assertJsonPath('status', 'completed')
+            ->assertJsonPath('closing_float_balance', '-120000.00');
 
         $this->assertSame(1, MobileAgentFraudAlert::where('business_id', $tenant['business']->id)->count());
 
@@ -98,9 +98,9 @@ class MobileAgentWorkflowStateTest extends TestCase
             'recovered_amount' => 1000,
             'reason' => 'Till imbalance after reconciliation',
         ])->assertCreated()
-            ->assertJsonPath('data.shortage_amount', '7000.00')
-            ->assertJsonPath('data.recovered_amount', '1000.00')
-            ->assertJsonPath('data.status', 'open');
+            ->assertJsonPath('shortage_amount', '7000.00')
+            ->assertJsonPath('recovered_amount', '1000.00')
+            ->assertJsonPath('status', 'open');
 
         $this->assertSame(2, MobileAgentFraudAlert::where('business_id', $tenant['business']->id)->count());
     }

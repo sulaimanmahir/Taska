@@ -62,19 +62,19 @@ class ConstructionMaterialsWorkflowStateTest extends TestCase
             'status' => 'delivered',
             'confirmed_by' => 'Engr. Musa',
         ])->assertOk()
-            ->assertJsonPath('data.status', 'delivered')
-            ->assertJsonPath('data.confirmed_by', 'Engr. Musa');
+            ->assertJsonPath('status', 'delivered')
+            ->assertJsonPath('confirmed_by', 'Engr. Musa');
 
         $this->postJson("/api/building-materials/credit-accounts/{$account->id}/payments", [
             'amount' => 15000,
             'payment_method' => 'transfer',
             'notes' => 'Part settlement after site handover',
         ])->assertCreated()
-            ->assertJsonPath('data.amount', '15000.00')
-            ->assertJsonPath('data.payment_method', 'transfer')
-            ->assertJsonPath('data.account.paid_amount', '35000.00')
-            ->assertJsonPath('data.account.outstanding_amount', '25000.00')
-            ->assertJsonPath('data.account.customer.balance', '25000.00');
+            ->assertJsonPath('amount', '15000.00')
+            ->assertJsonPath('payment_method', 'transfer')
+            ->assertJsonPath('account.paid_amount', '35000.00')
+            ->assertJsonPath('account.outstanding_amount', '25000.00')
+            ->assertJsonPath('account.customer.balance', '25000.00');
     }
 
     public function test_construction_delivery_and_credit_actions_are_hidden_from_other_businesses(): void

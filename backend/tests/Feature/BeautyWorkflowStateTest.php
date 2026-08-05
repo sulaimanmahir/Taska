@@ -87,12 +87,12 @@ class BeautyWorkflowStateTest extends TestCase
                 ],
             ],
         ])->assertOk()
-            ->assertJsonPath('data.status', 'completed')
-            ->assertJsonPath('data.service_price', 26000)
-            ->assertJsonPath('data.commission_amount', 6500)
-            ->assertJsonPath('data.product_cost', 3000)
-            ->assertJsonPath('data.staff_profile.commission_wallet', 6500)
-            ->assertJsonPath('data.product_usages.0.product_name', 'Fixing Spray');
+            ->assertJsonPath('status', 'completed')
+            ->assertJsonPath('service_price', 26000)
+            ->assertJsonPath('commission_amount', 6500)
+            ->assertJsonPath('product_cost', 3000)
+            ->assertJsonPath('staff_profile.commission_wallet', 6500)
+            ->assertJsonPath('product_usages.0.product_name', 'Fixing Spray');
     }
 
     public function test_beauty_appointment_completion_is_hidden_from_other_businesses(): void

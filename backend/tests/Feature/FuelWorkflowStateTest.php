@@ -55,11 +55,11 @@ class FuelWorkflowStateTest extends TestCase
             'closing_reading' => 1010,
             'cash_reported' => 5000,
         ])->assertCreated()
-            ->assertJsonPath('data.litres_sold', '10.00')
-            ->assertJsonPath('data.expected_sales_amount', '7000.00')
-            ->assertJsonPath('data.variance_amount', '-2000.00')
-            ->assertJsonPath('data.status', 'variance_flagged')
-            ->assertJsonPath('data.pump.tank.current_stock_litres', '9990.00');
+            ->assertJsonPath('litres_sold', '10.00')
+            ->assertJsonPath('expected_sales_amount', '7000.00')
+            ->assertJsonPath('variance_amount', '-2000.00')
+            ->assertJsonPath('status', 'variance_flagged')
+            ->assertJsonPath('pump.tank.current_stock_litres', '9990.00');
 
         $this->postJson('/api/fuel/shifts', [
             'branch_id' => $tenant['branch']->id,
@@ -70,8 +70,8 @@ class FuelWorkflowStateTest extends TestCase
             'recovery_amount' => 500,
             'closed_at' => now()->toJSON(),
         ])->assertCreated()
-            ->assertJsonPath('data.shortage_amount', '1500.00')
-            ->assertJsonPath('data.status', 'closed');
+            ->assertJsonPath('shortage_amount', '1500.00')
+            ->assertJsonPath('status', 'closed');
 
         $this->assertSame(2, FuelVarianceAlert::where('business_id', $tenant['business']->id)->count());
     }
