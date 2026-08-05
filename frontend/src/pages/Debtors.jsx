@@ -51,6 +51,17 @@ export default function Debtors() {
     },
   });
 
+  const customers = customersQuery.data || [];
+  const debtorAccounts = useMemo(() => getDebtorAccounts(customers), [customers]);
+  const visibleAccounts = useMemo(
+    () => filterDebtorAccounts(debtorAccounts, search),
+    [debtorAccounts, search]
+  );
+  const overviewMetrics = useMemo(() => buildDebtorOverviewMetrics(debtorAccounts), [debtorAccounts]);
+  const loadError = customersQuery.isError
+    ? getErrorMessage(customersQuery.error, 'We could not load debtor accounts right now. Please try again.')
+    : '';
+
   if (type === 'textile') {
     return <TextileOps />;
   }
@@ -62,17 +73,6 @@ export default function Debtors() {
   if (type === 'wholesale') {
     return <WholesaleOps />;
   }
-
-  const customers = customersQuery.data || [];
-  const debtorAccounts = useMemo(() => getDebtorAccounts(customers), [customers]);
-  const visibleAccounts = useMemo(
-    () => filterDebtorAccounts(debtorAccounts, search),
-    [debtorAccounts, search]
-  );
-  const overviewMetrics = useMemo(() => buildDebtorOverviewMetrics(debtorAccounts), [debtorAccounts]);
-  const loadError = customersQuery.isError
-    ? getErrorMessage(customersQuery.error, 'We could not load debtor accounts right now. Please try again.')
-    : '';
 
   return (
     <div className="space-y-5">

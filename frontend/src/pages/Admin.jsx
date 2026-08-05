@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Card, { CardHeader } from '../components/Card';
@@ -78,14 +78,17 @@ export default function Admin() {
   const [search, setSearch] = useState('');
   const [pendingAction, setPendingAction] = useState(null);
   const { toast, setToast, clearToast } = useToast(3600);
+  const isAdmin = user?.role === 'admin';
 
-  if (user?.role !== 'admin') {
-    navigate('/dashboard');
-    return null;
-  }
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/dashboard');
+    }
+  }, [isAdmin, navigate]);
 
   const adminQuery = useQuery({
     queryKey: ['admin-page', activeTab],
+    enabled: isAdmin,
     queryFn: async () => {
       const requestConfig = getAdminLoadRequests(activeTab);
 
@@ -155,6 +158,10 @@ export default function Admin() {
   const filteredData = useMemo(() => filterAdminRecords(data, search), [data, search]);
   const statsCards = stats ? buildAdminStatsCards(stats, formatCurrencyNGN) : [];
   const currentTabLabel = getAdminCurrentTabLabel(activeTab, adminTabs);
+
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <PageShell width="wide" className="page-stack">

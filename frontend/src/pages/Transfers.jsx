@@ -56,22 +56,6 @@ export default function Transfers() {
     staleTime: 60000,
   });
 
-  if (type === 'mobile_agent') {
-    return <MobileAgentOps />;
-  }
-
-  if (type === 'construction') {
-    return <BuildingMaterialsOps />;
-  }
-
-  if (type === 'wholesale') {
-    return <WholesaleOps />;
-  }
-
-  if (type === 'pure_water_retail') {
-    return <PureWaterRetailOps />;
-  }
-
   const warehousesResponse = warehousesQuery.data;
   const inventoryResponse = inventoryQuery.data;
   const movementResponse = movementQuery.data;
@@ -96,7 +80,23 @@ export default function Transfers() {
     transferQueries.find((query) => query.isError)?.error,
     'We could not load part of the transfer workspace right now. Please try again.'
   );
-  
+
+  if (type === 'mobile_agent') {
+    return <MobileAgentOps />;
+  }
+
+  if (type === 'construction') {
+    return <BuildingMaterialsOps />;
+  }
+
+  if (type === 'wholesale') {
+    return <WholesaleOps />;
+  }
+
+  if (type === 'pure_water_retail') {
+    return <PureWaterRetailOps />;
+  }
+
   return (
     <div className="space-y-5">
       {loadError ? (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
@@ -149,6 +149,7 @@ export default function Partners() {
   const [registerForm, setRegisterForm] = useState(createPartnerForm());
   const [registerError, setRegisterError] = useState('');
   const [profileForm, setProfileForm] = useState(createPartnerProfileForm());
+  const [syncedProfileAgentId, setSyncedProfileAgentId] = useState(null);
   const [profileError, setProfileError] = useState('');
   const [payoutForm, setPayoutForm] = useState(createPartnerPayoutForm());
   const [payoutFormError, setPayoutFormError] = useState('');
@@ -257,19 +258,21 @@ export default function Partners() {
     label: `${agent.full_name} (${agent.referral_code || 'no code'})`,
   }));
 
-  useEffect(() => {
-    if (!selectedAgentId && agents.length) {
-      const nextAgent = agents[0];
-      setSelectedAgentId(String(nextAgent.id));
-      setProfileForm(createPartnerProfileForm(nextAgent));
-    }
-  }, [agents, selectedAgentId]);
+  // Adjust state during render rather than in an effect (avoids an extra
+  // commit): default to the first agent once the list loads, and keep the
+  // editable profile form synced whenever the resolved selection changes.
+  if (!selectedAgentId && agents.length) {
+    setSelectedAgentId(String(agents[0].id));
+  }
 
-  useEffect(() => {
-    if (!payoutForm.agent_id && payoutReadyAgents.length) {
-      setPayoutForm(createPartnerPayoutForm(String(payoutReadyAgents[0].id)));
-    }
-  }, [payoutForm.agent_id, payoutReadyAgents]);
+  if (selectedAgent && selectedAgent.id !== syncedProfileAgentId) {
+    setSyncedProfileAgentId(selectedAgent.id);
+    setProfileForm(createPartnerProfileForm(selectedAgent));
+  }
+
+  if (!payoutForm.agent_id && payoutReadyAgents.length) {
+    setPayoutForm(createPartnerPayoutForm(String(payoutReadyAgents[0].id)));
+  }
 
   const handlePartnerQueryRefresh = () => {
     partnerDeskQueries.forEach((query) => {
