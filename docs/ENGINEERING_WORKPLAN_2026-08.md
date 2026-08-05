@@ -27,11 +27,28 @@ Ordered by blast radius and how much everything else depends on it, not by effor
 - [ ] Add remote `origin` → `https://github.com/sulaimanmahir/Taska.git`
 - [ ] Push initial commit to `main`
 
-### 2. CI pipeline — Not started
-- [ ] Add `.github/workflows/ci.yml`
+### 2. CI pipeline — Mostly done
+- [x] Add `.github/workflows/ci.yml`
   - Frontend job: `npm ci`, `npm run lint`, `npm test` (Node's built-in test runner via `node --test`)
-  - Backend job: `composer install`, run PHPUnit (`tests/Unit`, `tests/Feature`) against a throwaway SQLite/Postgres DB
-- [ ] Confirm both jobs pass on the initial push
+  - Backend job: `composer install`, run PHPUnit (`tests/Unit`, `tests/Feature`) against in-memory SQLite (matches `phpunit.xml`, no external DB service needed)
+- [x] Frontend job passes locally (502 tests)
+- [ ] Backend job: 3 known pre-existing failures remain (see below) — CI will show red until these are fixed; intentionally not suppressed
+
+**Found while wiring this up:** running the backend suite for the first time (it had never run in CI) surfaced 11 pre-existing failing tests, unrelated to any of the assessment items. Root cause for 8 of them: **19 controllers returned a bare `JsonResource` instance**, which Laravel auto-wraps in `{"data": ...}` — but the "Operations" test files for those modules asserted flat JSON (matching the convention already used in `OrderController`, which explicitly calls `->resolve()`). Separately, 9 "WorkflowState" test files for the *same* modules asserted the opposite (`data.`-prefixed), because they were written against the actual (wrapped) behavior rather than the intended convention. Fixed by:
+- Standardizing on the `OrderController` convention (`->resolve()` / unwrapped JSON) across all 33 bare-resource-return call sites in: AgroDealerController, BeautyController, ConstructionMaterialsController, FuelController, MobileAgentController, PureWaterRetailController, RestaurantController, ServiceBusinessController, TextileController.
+- Updating the 9 `*WorkflowStateTest.php` files that had encoded the old (wrapped) behavior to match.
+- Result: backend suite went from 229 passing / 11 failing to 237 passing / 3 failing.
+
+**3 remaining failures, each a distinct unrelated bug — not fixed in this pass:**
+- [ ] `ConstructionOperationsTest`: converting a quotation to an order fails with "Insufficient stock for this product." — looks like a real stock-validation bug in the quotation→order conversion flow, needs investigation in `ConstructionMaterialsService`.
+- [ ] `FarmOperationsTest`: harvest-log creation fails with "The planting cycle id field is required." — likely a variable/field-name mismatch between what the planting-cycle endpoint returns and what the harvest-log endpoint expects.
+- [ ] `MobileAgentOperationsTest` (foreign-tenant test): a cross-tenant reversal request returns 403 (policy-denied) instead of the expected 422 (validation error) — this is actually the [[tenant-scoping]] gap surfacing directly in a test; worth fixing alongside item 3 below rather than in isolation.
+
+**Also found while wiring this up (frontend side):** `npm run lint` had never been run in CI either. Fixed the ESLint config gap (`frontend/tests/**` used Node globals like `process` but the flat config only declared browser globals) and cleaned up 6 trivial pre-existing unused-var errors. One of those unused imports (`validateInventoryAdjustmentPayload` in `Inventory.jsx`) turned out to be genuinely unfinished wiring — the validator existed, the error-display JSX existed, but nothing called the validator or ever set the error state — so that's now wired into the adjustment form's submit handler instead of just deleted.
+
+11 real lint errors remain, all `react-hooks/rules-of-hooks` violations (hooks called after an early `return` — a real bug class, not just style: if the early-return condition ever changes between renders, React throws "Rendered more/fewer hooks than expected") plus 2 `setState`-in-effect warnings:
+- [ ] `Admin.jsx` (3), `Debtors.jsx` (3), `Rooms.jsx` (3) — hooks called conditionally after an early return; needs each component restructured so all hooks run unconditionally before any early return, not a blind fix.
+- [ ] `Partners.jsx` (2) — synchronous `setState` inside an effect risking cascading renders.
 
 ### 3. Tenant-scoping enforcement — Not started
 - [ ] Add a `BelongsToBusiness` trait + Eloquent global scope applied to tenant-owned models, auto-filtering by `auth()->user()->current_business_id`
