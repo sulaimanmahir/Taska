@@ -1,6 +1,16 @@
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { usePersistentState } from './usePersistentState';
 
+export function computeLedgerPagination({ response, itemCount = 0 }) {
+  return {
+    currentPage: response?.current_page ?? 1,
+    lastPage: response?.last_page ?? 1,
+    from: response?.from ?? (itemCount > 0 ? 1 : 0),
+    to: response?.to ?? itemCount,
+    total: response?.total ?? itemCount,
+  };
+}
+
 export function useLedgerControls({
   storageKeyPrefix,
   initialView = 'all',
@@ -38,13 +48,10 @@ export function useLedgerControls({
     }
   }, [activeSort, requestedSort, setActiveSort]);
 
-  const pagination = useMemo(() => ({
-    currentPage: response?.current_page ?? 1,
-    lastPage: response?.last_page ?? 1,
-    from: response?.from ?? (itemCount > 0 ? 1 : 0),
-    to: response?.to ?? itemCount,
-    total: response?.total ?? itemCount,
-  }), [itemCount, response]);
+  const pagination = useMemo(
+    () => computeLedgerPagination({ response, itemCount }),
+    [itemCount, response]
+  );
 
   return {
     accountsPage,

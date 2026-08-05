@@ -18,7 +18,8 @@ function formatDashboardBadgeDate(dateString) {
   });
 }
 
-export function getAdasheDashboardState(summary = {}) {
+export function getAdasheDashboardState(summary) {
+  summary = summary || {};
   const dueNow = summary.due_now || 0;
   const dueSoon = summary.due_soon || 0;
   const nextReviewDate = formatDashboardBadgeDate(summary.next_due_date);
@@ -62,7 +63,8 @@ export function getAdasheDashboardState(summary = {}) {
   };
 }
 
-export function getTrustFundDashboardState(summary = {}) {
+export function getTrustFundDashboardState(summary) {
+  summary = summary || {};
   const overdueAccounts = summary.overdue_accounts || 0;
   const highUtilizationAccounts = summary.high_utilization_accounts || 0;
   const riskLevel = overdueAccounts > 0 ? 'High risk' : highUtilizationAccounts > 0 ? 'Watch closely' : 'Low risk';
@@ -113,7 +115,8 @@ export function getTrustFundDashboardState(summary = {}) {
   };
 }
 
-export function getCooperativeDashboardState(summary = {}) {
+export function getCooperativeDashboardState(summary) {
+  summary = summary || {};
   const pendingApprovals = summary.pending_approvals || 0;
   const pendingProfitCycles = summary.pending_profit_cycles || 0;
   const reviewLabel = pendingApprovals > 0 ? 'Approval first' : pendingProfitCycles > 0 ? 'Distribution next' : 'Treasury stable';
@@ -164,7 +167,9 @@ export function getCooperativeDashboardState(summary = {}) {
   };
 }
 
-export function getAdasheDashboardWatch(summary = {}, state = {}) {
+export function getAdasheDashboardWatch(summary, state) {
+  summary = summary || {};
+  state = state || {};
   return {
     title: 'Adashe Watch',
     subtitle: 'Collection rhythm, payout readiness, and next due cycle at a glance',
@@ -208,7 +213,9 @@ export function getAdasheDashboardWatch(summary = {}, state = {}) {
   };
 }
 
-export function getTrustFundDashboardWatch(summary = {}, state = {}) {
+export function getTrustFundDashboardWatch(summary, state) {
+  summary = summary || {};
+  state = state || {};
   return {
     title: 'Trust Fund Watch',
     subtitle: 'Exposure, repayment momentum, and overdue recovery visibility',
@@ -254,7 +261,8 @@ export function getTrustFundDashboardWatch(summary = {}, state = {}) {
   };
 }
 
-export function getCooperativeDashboardWatch(summary = {}) {
+export function getCooperativeDashboardWatch(summary) {
+  summary = summary || {};
   return {
     title: 'Cooperative Watch',
     subtitle: 'Treasury health, approval flow, and profit-cycle readiness',

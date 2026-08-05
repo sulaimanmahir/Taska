@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
@@ -22,7 +22,7 @@ import ResultsPagination from '../components/ResultsPagination';
 import StatementPanel from '../components/StatementPanel';
 import Toast from '../components/Toast';
 import { useActiveFinanceSection } from '../hooks/useActiveFinanceSection';
-import { useLedgerControls } from '../hooks/useLedgerControls';
+import { computeLedgerPagination, useLedgerControls } from '../hooks/useLedgerControls';
 import { useStatementData } from '../hooks/useStatementData';
 import { useStatementFilters } from '../hooks/useStatementFilters';
 import { useToast } from '../hooks/useToast';
@@ -145,6 +145,33 @@ export default function TrustFund() {
   } = useStatementFilters({
     storageKeyPrefix: 'taska-trust-fund-statement',
     resetKey: selectedLedgerAccountId,
+  });
+
+  const requestedView = getFinanceQueryValue(
+    searchParams,
+    'view',
+    trustLedgerViews.map((view) => view.id),
+  );
+  const requestedSort = getFinanceQueryValue(
+    searchParams,
+    'sort',
+    trustSortOptions.map((sort) => sort.id),
+  );
+  const {
+    accountsPage,
+    setAccountsPage,
+    searchTerm,
+    setSearchTerm,
+    activeView,
+    setActiveView,
+    activeSort,
+    setActiveSort,
+    deferredSearchTerm,
+    hasSearch,
+  } = useLedgerControls({
+    storageKeyPrefix: 'taska-trust-fund',
+    requestedView,
+    requestedSort,
   });
 
   const accountsQuery = useQuery({
@@ -291,47 +318,45 @@ export default function TrustFund() {
 
   const accountsList = useMemo(() => accounts?.data ?? [], [accounts]);
   const accountsSummary = accounts?.summary ?? null;
-  const requestedView = getFinanceQueryValue(
-    searchParams,
-    'view',
-    trustLedgerViews.map((view) => view.id),
+  const pagination = useMemo(
+    () => computeLedgerPagination({ response: accounts, itemCount: accountsList.length }),
+    [accounts, accountsList.length]
   );
-  const requestedSort = getFinanceQueryValue(
-    searchParams,
-    'sort',
-    trustSortOptions.map((sort) => sort.id),
-  );
-  const {
-    accountsPage,
-    setAccountsPage,
-    searchTerm,
-    setSearchTerm,
-    activeView,
-    setActiveView,
-    activeSort,
-    setActiveSort,
-    deferredSearchTerm,
-    hasSearch,
-    pagination,
-  } = useLedgerControls({
-    storageKeyPrefix: 'taska-trust-fund',
-    requestedView,
-    requestedSort,
-    response: accounts,
-    itemCount: accountsList.length,
-  });
   const overdueList = overdue?.data ?? [];
   const customerOptions = customers?.data ?? [];
   const orderedAccountsList = useMemo(
     () => sortTrustAccounts(accountsList, activeSort),
     [accountsList, activeSort],
   );
+
+  // Adjust state during render rather than in an effect: default to the
+  // first account once accounts load, or fall back to it if the current
+  // selection no longer exists in the list (e.g. filtered out).
+  const hasValidLedgerSelection = selectedLedgerAccountId
+    && accountsList.some((account) => account.id === selectedLedgerAccountId);
+  if (!hasValidLedgerSelection && accountsList.length > 0) {
+    setSelectedLedgerAccountId(accountsList[0].id);
+  }
+
   const selectedLedgerAccount = orderedAccountsList.find((account) => account.id === selectedLedgerAccountId) ?? null;
   const activeViewLabel = trustLedgerViews.find((view) => view.id === activeView)?.label ?? 'All accounts';
   const activeSortLabel = trustSortOptions.find((option) => option.id === activeSort)?.label ?? 'Priority';
   const activeSortDescription = trustSortOptions.find((option) => option.id === activeSort)?.description
     ?? 'Ranks accounts by recommendation risk, next review timing, and exposure still outstanding.';
   const searchScopeSummary = hasSearch ? `Matches for "${deferredSearchTerm}"` : 'All trust accounts';
+  const activeRailAction = useActiveFinanceSection({
+    initialLabel: 'Ledger',
+    overrideLabel: showModal && modalType !== 'create'
+      ? getTrustFundPrimaryActionLabel({ balance: modalType === 'repay' ? 1 : 0 }, 'compact')
+      : null,
+    sections: [
+      { label: 'Ledger', ref: ledgerRef },
+      { label: 'Activity', ref: accountActivityRef },
+    ],
+  });
+  const scrollToLedger = () => scrollToFinanceRef(ledgerRef);
+  const scrollToAccountActivity = () => scrollToFinanceRef(accountActivityRef);
+  const openSelectedLedgerAction = () => runTrustFundPrimaryAction(selectedLedgerAccount, { openDraw, openRepay });
   const ledgerLensItems = buildTrustFundLedgerLensItems({
     pagination,
     orderedAccountsList,
@@ -342,23 +367,10 @@ export default function TrustFund() {
     selectedLedgerAccount,
     focusActions: buildTrustFundFocusActions({
       account: selectedLedgerAccount,
-      onOpenPrimary: () => runTrustFundPrimaryAction(selectedLedgerAccount, { openDraw, openRepay }),
-      onGoToActivity: () => scrollToFinanceRef(accountActivityRef),
+      onOpenPrimary: openSelectedLedgerAction,
+      onGoToActivity: scrollToAccountActivity,
       activeLabel: activeRailAction,
     }),
-  });
-  const scrollToLedger = () => scrollToFinanceRef(ledgerRef);
-  const scrollToAccountActivity = () => scrollToFinanceRef(accountActivityRef);
-  const openSelectedLedgerAction = () => runTrustFundPrimaryAction(selectedLedgerAccount, { openDraw, openRepay });
-  const activeRailAction = useActiveFinanceSection({
-    initialLabel: 'Ledger',
-    overrideLabel: showModal && modalType !== 'create'
-      ? getTrustFundPrimaryActionLabel({ balance: modalType === 'repay' ? 1 : 0 }, 'compact')
-      : null,
-    sections: [
-      { label: 'Ledger', ref: ledgerRef },
-      { label: 'Activity', ref: accountActivityRef },
-    ],
   });
 
   const statementAccount = statementResponse?.account ?? selectedLedgerAccount;
@@ -512,18 +524,6 @@ export default function TrustFund() {
       ...customerOptions.map((customer) => ({ value: customer.id, label: customer.name })),
     ],
   });
-  useEffect(() => {
-    if (!selectedLedgerAccountId && accountsList.length > 0) {
-      setSelectedLedgerAccountId(accountsList[0].id);
-    }
-  }, [accountsList, selectedLedgerAccountId]);
-
-  useEffect(() => {
-    if (selectedLedgerAccountId && accountsList.length > 0 && !accountsList.some((account) => account.id === selectedLedgerAccountId)) {
-      setSelectedLedgerAccountId(accountsList[0].id);
-    }
-  }, [accountsList, selectedLedgerAccountId]);
-
   const handleExportStatement = () => {
     if (!statementAccount || statementExportRows.length === 0) {
       return;

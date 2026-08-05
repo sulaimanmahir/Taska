@@ -21,7 +21,7 @@ import ResultsPagination from '../components/ResultsPagination';
 import StatementPanel from '../components/StatementPanel';
 import Toast from '../components/Toast';
 import { useActiveFinanceSection } from '../hooks/useActiveFinanceSection';
-import { useLedgerControls } from '../hooks/useLedgerControls';
+import { computeLedgerPagination, useLedgerControls } from '../hooks/useLedgerControls';
 import { useStatementData } from '../hooks/useStatementData';
 import { useStatementFilters } from '../hooks/useStatementFilters';
 import { useToast } from '../hooks/useToast';
@@ -144,6 +144,33 @@ export default function Adashe() {
     resetKey: selectedAccountId,
   });
 
+  const requestedView = getFinanceQueryValue(
+    searchParams,
+    'view',
+    adasheViews.map((view) => view.id),
+  );
+  const requestedSort = getFinanceQueryValue(
+    searchParams,
+    'sort',
+    adasheSortOptions.map((sort) => sort.id),
+  );
+  const {
+    accountsPage,
+    setAccountsPage,
+    searchTerm,
+    setSearchTerm,
+    activeView,
+    setActiveView,
+    activeSort,
+    setActiveSort,
+    deferredSearchTerm,
+    hasSearch,
+  } = useLedgerControls({
+    storageKeyPrefix: 'taska-adashe',
+    requestedView,
+    requestedSort,
+  });
+
   const accountsQuery = useQuery({
     queryKey: ['adashe-accounts', accountsPage, deferredSearchTerm, activeView],
     queryFn: () => api.get('/trust-accounts', {
@@ -199,35 +226,10 @@ export default function Adashe() {
 
   const accounts = useMemo(() => accountsResponse?.data ?? [], [accountsResponse]);
   const accountsSummary = accountsResponse?.summary ?? null;
-  const requestedView = getFinanceQueryValue(
-    searchParams,
-    'view',
-    adasheViews.map((view) => view.id),
+  const pagination = useMemo(
+    () => computeLedgerPagination({ response: accountsResponse, itemCount: accounts.length }),
+    [accountsResponse, accounts.length]
   );
-  const requestedSort = getFinanceQueryValue(
-    searchParams,
-    'sort',
-    adasheSortOptions.map((sort) => sort.id),
-  );
-  const {
-    accountsPage,
-    setAccountsPage,
-    searchTerm,
-    setSearchTerm,
-    activeView,
-    setActiveView,
-    activeSort,
-    setActiveSort,
-    deferredSearchTerm,
-    hasSearch,
-    pagination,
-  } = useLedgerControls({
-    storageKeyPrefix: 'taska-adashe',
-    requestedView,
-    requestedSort,
-    response: accountsResponse,
-    itemCount: accounts.length,
-  });
   const customers = customersResponse?.data ?? customersResponse ?? [];
   const orderedAccounts = useMemo(() => sortAdasheAccounts(accounts, activeSort), [accounts, activeSort]);
   const selectedAccount = orderedAccounts.find((account) => account.id === selectedAccountId) ?? orderedAccounts[0] ?? null;
