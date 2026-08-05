@@ -146,6 +146,7 @@ class MobileAgentWorkflowStateTest extends TestCase
         $this->postJson('/api/mobile-agent/reversals', [
             'mobile_agent_transaction_id' => $transaction->id,
             'reason' => 'Unauthorized reversal attempt',
-        ])->assertForbidden();
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['mobile_agent_transaction_id']);
     }
 }

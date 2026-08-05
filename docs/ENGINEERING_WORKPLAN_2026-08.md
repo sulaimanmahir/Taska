@@ -20,12 +20,12 @@ Ordered by blast radius and how much everything else depends on it, not by effor
 
 ## Status
 
-### 1. Version control — In progress
-- [ ] `git init` in project root
-- [ ] Confirm `.env` and other secrets stay untracked (`.gitignore` already covers `.env*`)
-- [ ] Initial commit of current working tree
-- [ ] Add remote `origin` → `https://github.com/sulaimanmahir/Taska.git`
-- [ ] Push initial commit to `main`
+### 1. Version control — Done
+- [x] `git init` in project root
+- [x] Confirm `.env` and other secrets stay untracked (`.gitignore` already covers `.env*`)
+- [x] Initial commit of current working tree
+- [x] Add remote `origin` → `https://github.com/sulaimanmahir/Taska.git`
+- [x] Push initial commit to `main`
 
 ### 2. CI pipeline — Mostly done
 - [x] Add `.github/workflows/ci.yml`
@@ -39,10 +39,11 @@ Ordered by blast radius and how much everything else depends on it, not by effor
 - Updating the 9 `*WorkflowStateTest.php` files that had encoded the old (wrapped) behavior to match.
 - Result: backend suite went from 229 passing / 11 failing to 237 passing / 3 failing.
 
-**3 remaining failures, each a distinct unrelated bug — not fixed in this pass:**
+**2 remaining failures, each a distinct unrelated bug — not fixed yet:**
 - [ ] `ConstructionOperationsTest`: converting a quotation to an order fails with "Insufficient stock for this product." — looks like a real stock-validation bug in the quotation→order conversion flow, needs investigation in `ConstructionMaterialsService`.
 - [ ] `FarmOperationsTest`: harvest-log creation fails with "The planting cycle id field is required." — likely a variable/field-name mismatch between what the planting-cycle endpoint returns and what the harvest-log endpoint expects.
-- [ ] `MobileAgentOperationsTest` (foreign-tenant test): a cross-tenant reversal request returns 403 (policy-denied) instead of the expected 422 (validation error) — this is actually the [[tenant-scoping]] gap surfacing directly in a test; worth fixing alongside item 3 below rather than in isolation.
+
+The third original failure (`MobileAgentOperationsTest` foreign-tenant reversal returning 403 instead of 422) was fixed as part of item 3 below — see that section.
 
 **Also found while wiring this up (frontend side):** `npm run lint` had never been run in CI either. Fixed the ESLint config gap (`frontend/tests/**` used Node globals like `process` but the flat config only declared browser globals) and cleaned up 6 trivial pre-existing unused-var errors. One of those unused imports (`validateInventoryAdjustmentPayload` in `Inventory.jsx`) turned out to be genuinely unfinished wiring — the validator existed, the error-display JSX existed, but nothing called the validator or ever set the error state — so that's now wired into the adjustment form's submit handler instead of just deleted.
 
@@ -50,11 +51,16 @@ Ordered by blast radius and how much everything else depends on it, not by effor
 - [ ] `Admin.jsx` (3), `Debtors.jsx` (3), `Rooms.jsx` (3) — hooks called conditionally after an early return; needs each component restructured so all hooks run unconditionally before any early return, not a blind fix.
 - [ ] `Partners.jsx` (2) — synchronous `setState` inside an effect risking cascading renders.
 
-### 3. Tenant-scoping enforcement — Not started
-- [ ] Add a `BelongsToBusiness` trait + Eloquent global scope applied to tenant-owned models, auto-filtering by `auth()->user()->current_business_id`
-- [ ] Migrate high-risk controllers first (finance, inventory, orders) to rely on the scope instead of manual `where('business_id', ...)`
-- [ ] Add a regression test that proves the scope blocks cross-tenant reads even when a controller "forgets" to filter manually
-- [ ] Sweep remaining controllers incrementally (not a single big-bang PR — too risky without CI history yet)
+### 3. Tenant-scoping enforcement — In progress
+- [x] Add a `BelongsToBusiness` trait (`app/Concerns/BelongsToBusiness.php`) + Eloquent global scope applied to tenant-owned models, auto-filtering by `auth('sanctum')->user()->current_business_id`. No-ops outside an authenticated request (console/seeders/unit tests), so it never masks a missing filter in code that manages `business_id` explicitly.
+- [x] Applied to the 4 highest-risk models first: `Order`, `Product`, `InventoryItem`, `Customer`.
+- [x] Regression test proving the scope blocks cross-tenant reads with **no manual filter at all** (`tests/Unit/BelongsToBusinessScopeTest.php`) — also proves the no-op-outside-auth behavior.
+- [x] Fixed the `MobileAgentOperationsTest`/`MobileAgentWorkflowStateTest` 403-vs-422 conflict this surfaced: `StoreMobileAgentReversalRequest` validated `mobile_agent_transaction_id` with an unscoped `Rule::exists`, unlike its sibling fields (`branch_id`, `staff_id`, `commission_tier_id`) in the same request, which already scope by `business_id`. Scoped it to match, and updated the one WorkflowStateTest assertion that had been written against the old (403) behavior to expect 422 — consistent with the rest of that same endpoint's validated fields.
+
+**Important design decision made here:** naively applying the global scope broke 5 currently-passing tests (`TenantIsolationTest`, `RetailWorkflowTest`, `ProductWorkflowStateTest`, `CustomerWorkflowStateTest`, `OrderWorkflowStateTest`) that deliberately assert **403** for cross-tenant access to a single record via route-model-binding + Policy (e.g. `PATCH /products/{product}`). The scope would've silently turned those into **404** (record scoped out before the Policy ever runs), changing a tested API contract without anyone deciding to. Rather than pick a side on 403-vs-404 unilaterally, the trait overrides `resolveRouteBinding()` to resolve route-bound models *without* the scope, preserving the existing Policy-driven 403 behavior exactly as tested. The scope still applies to every other query — list/index endpoints, relation loads, ad-hoc lookups — which is where the actual documented gap lives (a controller that forgets `where('business_id', ...)` on a query that isn't a single-record route-bound lookup). Full suite after this change: still 240 passing / 2 failing (both pre-existing, unrelated — see item 2 above), zero regressions.
+
+- [ ] Migrate remaining high-risk models (finance: `Expense`, `Supplier`, `Debtors`/receivables; inventory: `InventoryMovement`, `Warehouse`) onto the trait
+- [ ] Sweep remaining models incrementally (not a single big-bang PR — safer to verify each in isolation against the full suite, as happened here)
 
 ### 4. Password reset flow — Not started
 - [ ] Backend: forgot-password request + signed reset-token email + reset endpoint (Laravel's built-in `Illuminate\Auth\Passwords` broker)
