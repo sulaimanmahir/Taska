@@ -92,6 +92,32 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [ ] Add unit tests for dashboard summary builders (`dashboardFinanceSummaries`, `dashboardAiSummaries`, `dashboardOwnerFocus*`, `dashboardVertical*`)
 - [ ] Re-run the gap check (`for f in src/lib/*.js; do ...` matching against both `tests/` and `src/`) periodically rather than assuming coverage from file count alone
 
+### 8. "Renders without crashing" smoke tests — Not started
+
+**Why this jumped the queue (2026-08-05):** all 129 existing `frontend/tests/*.test.js` "page" tests turned out to be regex checks against raw file text (`fs.readFileSync` + `assert.match`), not real rendered-component tests — confirmed by finding 3 live crash bugs (see item 3's design-decision note and the crash-fix commit) that every one of those 129 tests missed, because none of them actually render a component. This is the single highest-leverage remaining gap: cheap to add, and it directly closes the hole that let three production-crashing bugs sit undetected.
+
+- [ ] Add Vitest (Vite's own test runner - reuses the project's existing Vite transform pipeline for JSX/CSS/aliases, unlike trying to force plain `node --test` to handle `.jsx` files) + jsdom as dev dependencies
+- [ ] Build one shared test harness: mock `lib/api.js`, wrap in `QueryClientProvider` + `MemoryRouter` + a fake authenticated `authStore` state
+- [ ] Add a "renders without throwing" test per page component, prioritizing the pages already proven risky (`Dashboard.jsx`, `Adashe.jsx`, `TrustFund.jsx`, `TaskaCooperative.jsx`, `Partners.jsx`, `Deliveries.jsx`) before sweeping the rest
+- [ ] Wire the new Vitest run into `.github/workflows/ci.yml` alongside the existing `npm test` (Node test runner) step - keep both, since the 129 regex tests aren't worthless, just insufficient alone
+- [ ] Note for later: this in-process smoke test still won't catch bugs that only manifest against a real backend response shape (mocked data can hide backend/frontend contract drift) - the Playwright-based live smoke test used to find and verify today's 3 crash fixes is worth turning into a standing (probably manual-trigger, not every-PR) check, but that's future scope beyond this item.
+
+### 9. Multi-business / multi-module architecture — Design phase, not started
+
+Prompted by two related product questions during this session:
+- A single tenant should be able to compose multiple verticals under one business (e.g. a hospital running clinic + pharmacy + lab together) with shared customer/patient records and unified financials/staff - but each of those verticals must also be purchasable and usable completely standalone (a clinic-only customer shouldn't be forced into a bundle).
+- A user with multiple **unrelated** businesses (already supported today - `authStore.js` tracks a `businesses[]` array with `switchBusiness()`, and the UI has a current-business switcher) has no aggregate view - the dashboard only ever shows `current_business_id`'s data, one context at a time. Needs a portfolio-style view: separate cards per business plus rolled-up totals for financials/staff/etc.
+
+**Recommended direction (not yet built, needs sign-off before implementation):**
+- Turn `business_type` + its implied `modules` array into an independently selectable **set of modules per business**, instead of one type implying one fixed module bundle. Since `Customer`, `Product`, `Order`, `InventoryItem` etc. are already scoped by `business_id` (not by vertical), enabling multiple vertical modules on one `business_id` gets shared records "for free" - no sync/replication layer needed, unlike a design based on separate linked `Business` records.
+- Add a portfolio/aggregate dashboard: an endpoint that loops over the user's `businesses[]` and returns each one's stats plus rolled-up totals, and a new top-level page to display it. Doesn't require changing the tenant-isolation model, since each business's data stays cleanly separated by `business_id` underneath.
+- Billing would need to key off the enabled module set (per-module or tiered pricing) rather than a fixed plan tied to one vertical - out of scope to design in detail here, flagging so it isn't forgotten.
+
+- [ ] Confirm this direction with product/stakeholder sign-off before any schema changes (this changes the core tenant/module model - higher blast radius than anything else in this workplan)
+- [ ] Design the `modules` schema change (join table vs. JSON column on `businesses`) and migration path for existing single-type businesses
+- [ ] Design the portfolio-dashboard API shape and page
+- [ ] Scope billing implications separately once the module model is settled
+
 ### 7. Purchases/payables workflow — Not started
 - [ ] Design PO → GRN → supplier-payment data model
 - [ ] Backend service + controllers + tests, following the `OrderService` pattern (tenant-scope test, insufficient-stock-equivalent edge cases, controller validation test)
