@@ -16,7 +16,7 @@ Ordered by blast radius and how much everything else depends on it, not by effor
 4. **Password reset / account recovery** — *correction*: this was flagged as missing based on `ROADMAP.md`'s own "Active Gaps" section, without checking the actual code first — the same mistake as item 6 below, now made twice. It is fully implemented: backend uses Laravel's standard `Password` broker (`AuthController::forgotPassword`/`resetPassword`, `password_reset_tokens` migration present, both flows covered in `tests/Feature/AuthFlowTest.php`); frontend has `ForgotPassword.jsx` and `ResetPassword.jsx`, routed in `App.jsx`, linked from `Login.jsx`, and covered by `tests/forgotPasswordPage.test.js` / `tests/resetPasswordPage.test.js` (6 passing tests). Nothing to build here — `ROADMAP.md` should be corrected instead.
 5. **Oversized page components** — several frontend pages are 40–66KB single files mixing data-fetching, business logic, and rendering (`TaskaCooperative.jsx`, `Adashe.jsx`, `TrustFund.jsx`, `Partners.jsx`, `Deliveries.jsx`). Hard to review, hard to test, high regression risk per change.
 6. **Frontend test coverage gaps** — *correction after fuller review*: the initial assessment only checked `frontend/src` and missed `frontend/tests/`, which holds 129 test files and 502 passing tests (`npm test`), covering most page-level and lib-level logic already. Coverage is not thin overall. The real, narrower gap is a specific set of untested `lib/` modules — mostly the finance-adjacent helpers (`financeFormatters`, `financeActionRouting`, `financeFieldBuilders`, `financeLensItems`, `financeRecommendationPresenter`) and dashboard summary builders (`dashboardFinanceSummaries`, `dashboardAiSummaries`, `dashboardOwnerFocus*`, `dashboardVertical*`). Config/wiring files (`api.js`, `config.js`, `queryClient.js`) legitimately don't need tests and are excluded from this gap.
-7. **Purchases/payables workflow** — real product gap (no PO → GRN → supplier-payment flow), not just polish; matters more than new vertical modules at this point.
+7. **Purchases/payables workflow** — *correction (2026-08-06)*: flagged as a gap in the original assessment without checking the actual code first — the same mistake as items 4 and 6 above, now made a third time. It is fully implemented: `Supplier`, `Purchase`, `PurchaseItem`, `PurchasePayment` models, `PurchaseController`/`SupplierController` (PO → receive → payment, `/purchases`, `/purchases/{id}/receive`, `/purchases/{id}/payments` routes), stock updates into `InventoryItem`/`Product.cost_price` on receipt, and `Tests\Feature\PurchaseFlowTest` covering create → receive → pay end to end. Frontend has a 465-line `Purchases.jsx` page routed at `/purchases`. Nothing to build here. The one real gap this surfaced: tenant scoping on `Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` is manual (`where('business_id', ...)` in the controller), not via the `BelongsToBusiness` trait added for item 3 — worth applying the trait here in a small follow-up for consistency, not because a leak was found.
 
 ## Critical finding: 3 live production crashes, found by actually running the app (2026-08-05)
 
@@ -130,10 +130,12 @@ Prompted by two related product questions during this session:
 - [ ] Design the portfolio-dashboard API shape and page
 - [ ] Scope billing implications separately once the module model is settled
 
-### 7. Purchases/payables workflow — Not started
-- [ ] Design PO → GRN → supplier-payment data model
-- [ ] Backend service + controllers + tests, following the `OrderService` pattern (tenant-scope test, insufficient-stock-equivalent edge cases, controller validation test)
-- [ ] Frontend pages once backend is stable
+### 7. Purchases/payables workflow — Already done, mis-flagged as a gap (see correction above)
+- [x] `Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` models + migrations
+- [x] `PurchaseController`/`SupplierController` (create, receive, record payment), tenant-scoped manually rather than via `BelongsToBusiness`
+- [x] `Tests\Feature\PurchaseFlowTest` — create → receive → pay, asserts stock and supplier balance update correctly
+- [x] `frontend/src/pages/Purchases.jsx`, routed at `/purchases`
+- [ ] Follow-up (low priority, consistency only): apply `BelongsToBusiness` to `Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` to match the rest of the tenant-scoping work in item 3
 
 ## Notes
 
