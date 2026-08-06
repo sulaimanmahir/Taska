@@ -138,7 +138,7 @@ Prompted by two related product questions during this session:
 - [x] `PurchaseController`/`SupplierController` (create, receive, record payment), tenant-scoped manually rather than via `BelongsToBusiness`
 - [x] `Tests\Feature\PurchaseFlowTest` — create → receive → pay, asserts stock and supplier balance update correctly
 - [x] `frontend/src/pages/Purchases.jsx`, routed at `/purchases`
-- [ ] Follow-up (low priority, consistency only): apply `BelongsToBusiness` to `Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` to match the rest of the tenant-scoping work in item 3
+- [x] Follow-up done: applied `BelongsToBusiness` to `Supplier`, `Purchase`, and `PurchasePayment` (each has its own `business_id`). `PurchaseItem` intentionally excluded — no `business_id` column of its own, scoped only via its `purchase` relation, same treatment as `OrderItem`-style line-item models elsewhere. Verified via full backend suite (242 passing) including the existing cross-tenant `PurchaseFlowTest` assertion.
 
 ## Notes
 
