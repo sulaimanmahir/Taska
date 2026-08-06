@@ -12,5 +12,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests-render/setup.js'],
     include: ['tests-render/**/*.test.jsx'],
+    // These tests render full page component trees and flush async query
+    // work (see tests-render/renderPage.jsx) - heavier than the 5s default,
+    // especially on a loaded machine or CI runner.
+    testTimeout: 20000,
   },
 })
