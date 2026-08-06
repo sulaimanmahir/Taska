@@ -62,14 +62,14 @@ Current plan/feature-limit enforcement (`staff_limit` etc., seen in `tests/Featu
 
 ## Suggested sequencing
 
-1. **Portfolio dashboard** (problem 2) — small, additive, no schema risk, ships value immediately using infrastructure that already exists.
-2. **`active_business_types` migration + backfill** — additive, zero behavior change for existing businesses until acted on.
+1. **Portfolio dashboard** (problem 2) — small, additive, no schema risk, ships value immediately using infrastructure that already exists. **Done (2026-08-06).** `GET /api/portfolio` (`PortfolioController`) fans out a lightweight metric set (today's sales/orders, customers, staff, low stock, expenses) across every business a user belongs to via `BusinessContextService::summarizeBusinessesForUser()`, plus rolled-up totals — deliberately shallow compared to `DashboardController`'s deep per-vertical breakdown, since cost has to stay flat regardless of how many businesses a user has. Frontend: `Portfolio.jsx` at `/portfolio`, linked from the business switcher in `Layout.jsx` (shown once a user has 2+ businesses). Covered by 2 new backend feature tests (aggregation correctness, cross-tenant exclusion) and added to the Vitest render-smoke suite.
+2. **`active_business_types` migration + backfill** — additive, zero behavior change for existing businesses until acted on. **Sign-off received (2026-08-06)** on 2 of 3 open questions below — not started.
 3. **`modules` edit endpoint + settings UI** — lets a business toggle feature flags within its active verticals; independently useful even before multi-vertical support ships.
 4. **Frontend navigation/routing merge** — the real work; touches `useBusinessType()` and the nav-preset merge logic; every page's `if (type === 'x')` branch needs auditing against "is X in active_business_types" instead.
 5. **Billing model** — separate product decision, own workplan item.
 
 ## Open questions for sign-off before starting implementation
 
-- Does `active_business_types` need an admin-only gate (sales-assisted upgrade) or can an owner self-serve enable a second vertical?
-- Should there be a hard cap on how many verticals one business can activate, or is it unbounded?
-- For the primary/first vertical vs. added verticals — does anything (default warehouse, default branch, onboarding checklist) need to special-case "the original one"?
+- ~~Does `active_business_types` need an admin-only gate (sales-assisted upgrade) or can an owner self-serve enable a second vertical?~~ **Decided: self-serve.** Owners can enable additional verticals themselves from settings, no admin step required.
+- ~~Should there be a hard cap on how many verticals one business can activate, or is it unbounded?~~ **Decided: no cap for now.** Unbounded; revisit only if it becomes a real problem in practice.
+- For the primary/first vertical vs. added verticals — does anything (default warehouse, default branch, onboarding checklist) need to special-case "the original one"? — still open.
