@@ -58,6 +58,7 @@ const fakeAdminUser = {
 // swept; each entry costs one line since renderPage() does the rest.
 const pagesUnderTest = [
   ['Dashboard', () => import('../src/pages/Dashboard.jsx')],
+  ['Portfolio', () => import('../src/pages/Portfolio.jsx')],
   ['Adashe', () => import('../src/pages/Adashe.jsx')],
   ['TrustFund', () => import('../src/pages/TrustFund.jsx')],
   ['TaskaCooperative', () => import('../src/pages/TaskaCooperative.jsx')],

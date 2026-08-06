@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', DashboardController::class);
+    Route::get('/portfolio', \App\Http\Controllers\API\PortfolioController::class);
 
     // Products
     Route::get('/products', [ProductController::class, 'index']);

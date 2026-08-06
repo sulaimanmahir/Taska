@@ -457,7 +457,17 @@ export default function Layout() {
                       </button>
                     ))}
                   </div>
-                  <div className="mt-3 border-t border-[var(--color-border)] pt-3">
+                  <div className="mt-3 space-y-2 border-t border-[var(--color-border)] pt-3">
+                    {businesses.length > 1 ? (
+                      <Link
+                        to="/portfolio"
+                        onClick={() => setSwitcherOpen(false)}
+                        className="flex items-center justify-between rounded-2xl border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-text)] hover:bg-[var(--color-surface-subtle)]"
+                      >
+                        <span>View portfolio</span>
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    ) : null}
                     <Link
                       to="/businesses/new"
                       onClick={() => setSwitcherOpen(false)}

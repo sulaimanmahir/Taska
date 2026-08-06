@@ -7,6 +7,7 @@ import { BusinessTypeProvider } from './config/BusinessTypeContext';
 import { queryClient } from './lib/queryClient';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Portfolio = lazy(() => import('./pages/Portfolio'));
 const POS = lazy(() => import('./pages/POS'));
 const Products = lazy(() => import('./pages/Products'));
 const Inventory = lazy(() => import('./pages/Inventory'));
@@ -183,6 +184,7 @@ function App() {
           >
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="portfolio" element={<Portfolio />} />
             <Route path="pos" element={<POS />} />
             <Route path="orders" element={<POS />} />
             <Route path="products" element={<Products />} />
