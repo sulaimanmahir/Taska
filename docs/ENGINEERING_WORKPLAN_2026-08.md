@@ -81,11 +81,15 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [x] Tests: request-link flow and reset-with-valid-token flow covered (`AuthFlowTest.php`); frontend wiring covered (`forgotPasswordPage.test.js`, `resetPasswordPage.test.js`)
 - [ ] `ROADMAP.md` still lists this under "Active Gaps > Platform Hardening" — should be corrected there too, since it's stale
 
-### 5. Oversized page components — Not started
-- [ ] Start with the two largest: `TaskaCooperative.jsx` (66KB), `Adashe.jsx` (61KB)
-- [ ] Extract data-fetching + mutations into a dedicated hook (mirrors the `lib/retail.js` + `POS.jsx` split already proven in this codebase)
-- [ ] Extract pure presentation into smaller components
-- [ ] No behavior changes in this pass — structural only, verified by existing tests + manual smoke check
+### 5. Oversized page components — In progress (2 of 5 largest done)
+- [x] `TaskaCooperative.jsx` (66KB → 817 lines page + 503-line `useCooperativeDesk.js` hook)
+- [x] `Adashe.jsx` (61KB → 735 lines page + 837-line `useAdasheDesk.js` hook) — denser than TaskaCooperative (3 refs, 3 effects, ~150 lines of branched recommendation logic), so extracted more cautiously: the hook returns every top-level binding rather than a hand-curated subset, relying on ESLint's `no-unused-vars`/`no-undef` to catch over- or under-inclusion instead of manual tracing. Worked cleanly — one over-inclusion caught, zero omissions.
+- [ ] `TrustFund.jsx` (54KB) — next largest; already has 3 known `react-hooks/refs` lint findings from the earlier crash-fix pass (see item 2) that a full hook extraction should probably resolve at the same time, since they're in the same "builder function receives ref-derived closures" area of the file
+- [ ] `Partners.jsx` (47KB)
+- [ ] `Deliveries.jsx` (44KB)
+- [x] Extraction pattern proven: dedicated hook per page (`use<Page>Desk.js`) holding all `useQuery`/`useMutation`/derived state/handlers, page component only destructures and renders — mirrors the `lib/retail.js` + `POS.jsx` split already proven before this session
+- [ ] Extracting pure presentation into smaller sub-components (not just the data-layer hook) — not attempted yet for any of these; the hook split alone already took both `TaskaCooperative.jsx` and `Adashe.jsx` from "largest in the codebase" to roughly mid-pack, so it's unclear this is still worth the additional risk/effort - reassess once `TrustFund.jsx`/`Partners.jsx`/`Deliveries.jsx` are through the hook split
+- [x] No behavior changes in either pass so far — verified via lint, the full `node --test` suite, and the Vitest render-smoke suite (with a dedicated regression check: revert the change, confirm the relevant test fails with the original error, restore, confirm it passes again) for both
 
 ### 6. Frontend test coverage gaps — Not started
 - [ ] Add unit tests for the finance-adjacent `lib/` helpers listed above (`financeFormatters`, `financeActionRouting`, `financeFieldBuilders`, `financeLensItems`, `financeRecommendationPresenter`)
