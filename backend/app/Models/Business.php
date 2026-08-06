@@ -20,6 +20,7 @@ class Business extends Model
         'state',
         'country',
         'business_type',
+        'active_business_types',
         'business_category',
         'modules',
         'currency',
@@ -29,6 +30,7 @@ class Business extends Model
 
     protected $casts = [
         'modules' => 'array',
+        'active_business_types' => 'array',
         'is_active' => 'boolean',
     ];
 
@@ -77,6 +79,24 @@ class Business extends Model
     {
         $modules = $this->modules ?? [];
         return in_array($module, $modules);
+    }
+
+    /**
+     * Which top-level verticals are active on this business. Falls back to
+     * [business_type] for any row that predates the active_business_types
+     * column or somehow ended up null - keeps single-vertical behavior the
+     * default even if a caller bypasses the backfilled column.
+     */
+    public function activeBusinessTypes(): array
+    {
+        $types = $this->active_business_types;
+
+        return !empty($types) ? $types : array_filter([$this->business_type]);
+    }
+
+    public function hasActiveBusinessType(string $type): bool
+    {
+        return in_array($type, $this->activeBusinessTypes(), true);
     }
 
     public function subscription(): \Illuminate\Database\Eloquent\Relations\HasOne

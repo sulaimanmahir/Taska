@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\AddActiveBusinessTypeRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterOwnerRequest;
@@ -165,6 +166,31 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Business settings updated successfully',
             ...$this->buildAuthenticatedContextPayload($request->user(), $business),
+        ]);
+    }
+
+    public function addActiveBusinessType(AddActiveBusinessTypeRequest $request)
+    {
+        $user = $request->user();
+        $business = $user->current_business_id
+            ? $this->businessContextService->findAccessibleBusiness($user, $user->current_business_id)
+            : null;
+
+        if (!$business) {
+            return response()->json(['message' => 'No active business selected'], 404);
+        }
+
+        $newType = $request->validated('business_type');
+        $activeTypes = $business->activeBusinessTypes();
+
+        if (!in_array($newType, $activeTypes, true)) {
+            $activeTypes[] = $newType;
+            $business->update(['active_business_types' => array_values($activeTypes)]);
+        }
+
+        return response()->json([
+            'message' => 'Business vertical added successfully',
+            ...$this->buildAuthenticatedContextPayload($user, $business->fresh()),
         ]);
     }
 

@@ -56,6 +56,7 @@ class BusinessContextService
                 'name' => $business->name,
                 'business_type' => $business->business_type,
                 'business_type_label' => $typeConfig['name'] ?? str($business->business_type)->headline()->toString(),
+                'active_business_types' => $business->activeBusinessTypes(),
                 'business_category' => $business->business_category ?? ($typeConfig['group'] ?? 'general'),
                 'logo_url' => $business->logo_url,
                 'email' => $business->email,

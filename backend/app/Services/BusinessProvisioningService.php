@@ -54,6 +54,7 @@ class BusinessProvisioningService
                 'state' => $payload['state'] ?? null,
                 'country' => $payload['country'] ?? 'Nigeria',
                 'business_type' => $businessType,
+                'active_business_types' => [$businessType],
                 'business_category' => $payload['business_category'] ?? ($typeConfig['group'] ?? 'general'),
                 'modules' => $this->getDefaultModules($businessType),
                 'timezone' => 'Africa/Lagos',

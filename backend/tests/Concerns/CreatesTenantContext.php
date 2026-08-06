@@ -25,6 +25,7 @@ trait CreatesTenantContext
             'slug' => str()->slug('Test Business ' . str()->random(4)),
             'email' => 'biz-' . str()->random(6) . '@example.com',
             'business_type' => $businessType,
+            'active_business_types' => [$businessType],
             'modules' => config("business_types.types.{$businessType}.modules", []),
         ]);
 
