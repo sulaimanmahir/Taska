@@ -111,7 +111,10 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 
 Also surfaced one instance of mock/reality mismatch while building the generic smoke-test mock: `/ai/insights` returns a raw array in production (confirmed against `AIInsightController::index()` - `AIInsightResource::collection(...)->resolve()` gives an array, no envelope), but the mock's original blanket `{ data: {} }` response broke `Adashe.jsx`'s `(insightResponse ?? []).filter(...)` since `{}` isn't nullish. Not a real app bug - fixed by defaulting the mock to `{ data: [] }` instead, which is compatible with both array-consuming code and `?.`-guarded object access. Flagging because this is exactly the class of false positive/negative this kind of coarse smoke test can produce - it catches "throws on first render" and "throws once data arrives" reliably, but does not verify any endpoint's response shape is actually correct, which is a different (and harder) problem than what this item set out to solve.
 
-### 9. Multi-business / multi-module architecture — Design phase, not started
+### 9. Multi-business / multi-module architecture — Design doc written, not implemented
+
+Full design proposal: [MULTI_MODULE_ARCHITECTURE.md](MULTI_MODULE_ARCHITECTURE.md). Key correction from the original framing below: `businesses.modules` already exists as a JSON column, but it's fine-grained feature toggles *within* one vertical (e.g. retail's `loyalty`/`refunds`), not a mechanism for activating multiple top-level verticals — and the frontend doesn't read it at all today (routing is 100% driven by the single `business_type` string). The proposal is a new additive `active_business_types` array field plus a frontend routing merge, not a redefinition of the existing `modules` column.
+
 
 Prompted by two related product questions during this session:
 - A single tenant should be able to compose multiple verticals under one business (e.g. a hospital running clinic + pharmacy + lab together) with shared customer/patient records and unified financials/staff - but each of those verticals must also be purchasable and usable completely standalone (a clinic-only customer shouldn't be forced into a bundle).
