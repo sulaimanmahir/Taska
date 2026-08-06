@@ -632,3 +632,49 @@ export function getNavigationForBusinessType(businessType) {
 
   return navigationPresets[businessType] || navigationPresets[aliases[businessType]] || navigationPresets.general;
 }
+
+/**
+ * Merges the nav presets for every active vertical on a business into one
+ * tree: sections with the same name are combined (in first-seen order),
+ * items are deduped by path so a shared item like Dashboard or Reports only
+ * shows once even though every preset defines its own copy of it.
+ *
+ * For the common single-vertical case this returns the exact same reference
+ * shape as getNavigationForBusinessType() would - callers should prefer that
+ * simpler function whenever there's only one active type, and reserve this
+ * one for businesses that actually have 2+ active_business_types.
+ */
+export function getMergedNavigationForBusinessTypes(businessTypes) {
+  const types = businessTypes?.length ? businessTypes : ['general'];
+
+  if (types.length === 1) {
+    return getNavigationForBusinessType(types[0]);
+  }
+
+  const sectionOrder = [];
+  const sectionsByName = new Map();
+
+  types.forEach((type) => {
+    const preset = getNavigationForBusinessType(type);
+
+    preset.forEach(({ section, items }) => {
+      if (!sectionsByName.has(section)) {
+        sectionsByName.set(section, new Map());
+        sectionOrder.push(section);
+      }
+
+      const itemsByPath = sectionsByName.get(section);
+
+      items.forEach((item) => {
+        if (!itemsByPath.has(item.path)) {
+          itemsByPath.set(item.path, item);
+        }
+      });
+    });
+  });
+
+  return sectionOrder.map((section) => ({
+    section,
+    items: Array.from(sectionsByName.get(section).values()),
+  }));
+}

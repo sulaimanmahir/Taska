@@ -10,6 +10,8 @@ export function useBusinessType() {
   if (!context) {
     return {
       type: 'general',
+      activeTypes: ['general'],
+      hasActiveType: (type) => type === 'general',
       ...getBusinessTypeConfig('general'),
       navigation: getNavigationForBusinessType('general'),
       labels: getLabelsForBusinessType('general'),
