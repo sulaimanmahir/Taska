@@ -5,7 +5,7 @@ Created: 2026-08-06.
 
 ## Why this exists
 
-Taska already supports 27 business types (`backend/config/business_types.php`), several of which already fit Northern Nigeria's economy well: `agro_dealer`, `farm`, `livestock`, `commodity`, `textile`, and the informal-savings-shaped `Cooperative`/`Adashe`/`Trust Fund` modules. Rather than expanding types speculatively, this doc grounds the next additions in actual market research on what's structurally *missing*, not just "more types."
+Taska already supports 27 business types (`backend/config/business_types.php`), several of which already fit Northern Nigeria's economy well: `agro_dealer`, `farm`, `livestock`, `commodity`, `textile`, and the informal-savings-shaped `Cooperative`/`Adashe`/`Trust Fund` modules. Rather than expanding types speculatively, this doc grounds the next additions in actual market research on what's structurally *missing*, not just "more types." One candidate below (`property_management`) is nationwide rather than Northern-specific — included because it's an unusually strong architectural fit with what's already built, not because of regional demand data.
 
 ## Research findings (sourced, not assumed)
 
@@ -35,8 +35,21 @@ Taska already supports 27 business types (`backend/config/business_types.php`), 
 - **Why third**: smaller, more geographically concentrated (Kano specifically) than the first two, but a real and well-documented cluster.
 - **Core workflow**: hide/skin intake → tanning/processing batches → finished leather goods inventory → sales (including export-oriented bulk sales). Likely the least-differentiated of the three from existing patterns — could plausibly reuse `pure_water_factory`'s production-batch shape closely.
 
+### 4. Property management / rent collection (`property_management`)
+- **Group**: `services`
+- **Not Northern-specific** (real estate is nationwide — Nigeria's real estate market was valued at ~$29.2B in 2024, growing toward ~$40B by 2030 per NextMSC), but flagged here because it's an unusually strong *architectural* fit, not because of regional demand data: it reuses more of Taska's existing building blocks than almost any other candidate.
+- **Why it fits so well**: a landlord/agency managing multiple units collecting recurring rent + service charges is structurally near-identical to the `TrustAccount`/`TrustTransaction` running-balance ledger already built for Adashe/Trust Fund (`Customer` → tenant, due dates, balance, payment history), and maintenance requests already have a working template in `HotelMaintenanceRequest`. Lowest-risk, fastest build of any candidate in this doc.
+- **Core workflow**: property/unit registry (non-fungible, one row per unit rather than stock quantity) → tenant assignment + lease terms → recurring rent/service-charge ledger (reuse `TrustAccount`/`TrustTransaction` shape) → maintenance request tracking (reuse `HotelMaintenanceRequest` shape).
+- **Deliberately scoped to management/rent collection only** — see below for why the other two real-estate flavors are excluded for now.
+
+### Real estate flavors explicitly excluded from `property_management`
+Nigerian real estate SMEs split into three distinct flavors; only the one above is recommended right now:
+- **Agency/brokerage** (sells/lets listings on commission) — a genuinely new "deal pipeline" shape (listing moves available → under offer → let/sold → commission paid) with no strong existing Taska template to build from (closest analog is `Purchase`'s status lifecycle, but for deals, not goods). Possible phase two, not now.
+- **Developer/land sales** (off-plan units sold in installments over months/years) — excluded for the same category of reason as artisanal mining below: real legal complexity around land titling and informal allocation in Nigeria (title disputes, informal land-allocation disputes in some markets), plus a genuinely different "one-off non-fungible unit" data model rather than restockable inventory. Wrong risk profile to build for right now.
+
 ### Explicitly not recommended right now
 - **Artisanal solid minerals mining** — see research findings above. Revisit only if Taska's risk posture changes or the sector formalizes further.
+- **Real estate developer/land sales** — see immediately above.
 
 ## What each addition actually requires (based on the existing 27-type pattern)
 
@@ -52,6 +65,6 @@ Each of these is roughly the same shape and size as the existing verticals alrea
 
 ## Open questions before starting implementation
 
-- Which of the three (if any) should be built first — grain milling is the strongest data case, but livestock market may be faster to build given its similarity to the existing `commodity` type.
-- Do any of these need real on-the-ground validation (a pilot business, a demo with an actual Kano trader) before investing engineering time, or is the market research sufficient to proceed?
+- Which of the four (if any) should be built first — grain milling is the strongest Northern-demand case, livestock market may be fastest to build given its similarity to `commodity`, and `property_management` is arguably the lowest-risk/fastest build of all four given how much it reuses (`TrustAccount`/`TrustTransaction`, `HotelMaintenanceRequest`) despite not being Northern-specific.
+- Do any of these need real on-the-ground validation (a pilot business, a demo with an actual Kano trader, or a property manager for `property_management`) before investing engineering time, or is the research sufficient to proceed?
 - Should `livestock_market` and `livestock` (farm) share any data model (e.g. can a business run both, per the multi-module composition idea in [MULTI_MODULE_ARCHITECTURE.md](MULTI_MODULE_ARCHITECTURE.md)), since a cattle rearer and a cattle trader are adjacent, not identical, businesses?
