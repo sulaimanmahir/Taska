@@ -91,9 +91,12 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [ ] Extracting pure presentation into smaller sub-components (not just the data-layer hook) — not attempted for any of these; the hook split alone already took every one of them from "largest in the codebase" to roughly mid-pack, so it's unclear this is still worth the additional risk/effort. Reassessed now that all 5 are through the hook split: deferring indefinitely unless a specific page becomes a bottleneck again.
 - [x] No behavior changes across any of the 5 passes — verified via lint, the full `node --test` suite (502 tests), and the Vitest render-smoke suite (12 tests) after each split
 
-### 6. Frontend test coverage gaps — Not started
-- [ ] Add unit tests for the finance-adjacent `lib/` helpers listed above (`financeFormatters`, `financeActionRouting`, `financeFieldBuilders`, `financeLensItems`, `financeRecommendationPresenter`)
-- [ ] Add unit tests for dashboard summary builders (`dashboardFinanceSummaries`, `dashboardAiSummaries`, `dashboardOwnerFocus*`, `dashboardVertical*`)
+### 6. Frontend test coverage gaps — Done
+- [x] Added unit tests for the finance-adjacent `lib/` helpers (`financeFormatters`, `financeActionRouting`, `financeFieldBuilders`, `financeLensItems`, `financeRecommendationPresenter`) — 5 new files in `frontend/tests/`
+- [x] Added unit tests for dashboard summary builders (`dashboardFinanceSummaries`, `dashboardAiSummaries`, `dashboardOwnerFocus`, `dashboardOwnerFocusActions`, `dashboardVerticalActions`, `dashboardVerticalSections`) — 6 new files in `frontend/tests/`
+- [x] Fixed one real, if minor, latent bug surfaced while adding these: `dashboardAiSummaries.js` imported `./aiInsights` as an extensionless directory import, which Vite silently resolves to `./aiInsights/index.js` but Node's native ESM loader (used by `npm test`/`node --test`) rejects with `ERR_UNSUPPORTED_DIR_IMPORT`. Never caught before because nothing under `tests/` imported this module until now. Fixed by making the import explicit (`./aiInsights/index.js`); no behavior change.
+- [x] 3 of the new tests initially had wrong expectations (not source bugs) — two assumed `buildFinancePageUrl` always appends `sort=priority` when it's actually the default value and gets omitted; one assumed a null `actionKey` in `getTrustFundRecommendationPresentation` short-circuits straight to the "No balance due" `repay` branch, when it actually resolves via `getTrustFundPrimaryActionKey` first and can land in the no-headroom branch instead for a zero-balance/zero-limit account. Corrected the test expectations to match actual (existing, unchanged) behavior.
+- [x] Full suite verified green after fixes: `npm test` → 599 passing, 0 failing (was 502 before this item)
 - [ ] Re-run the gap check (`for f in src/lib/*.js; do ...` matching against both `tests/` and `src/`) periodically rather than assuming coverage from file count alone
 
 ### 8. "Renders without crashing" smoke tests — Not started

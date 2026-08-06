@@ -1,4 +1,4 @@
-import { buildInsightViewUrl } from './aiInsights';
+import { buildInsightViewUrl } from './aiInsights/index.js';
 
 export function getDashboardAiAlertSummary({
   totalInsights = 0,
