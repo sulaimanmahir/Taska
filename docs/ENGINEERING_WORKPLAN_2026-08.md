@@ -81,10 +81,10 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [x] Tests: request-link flow and reset-with-valid-token flow covered (`AuthFlowTest.php`); frontend wiring covered (`forgotPasswordPage.test.js`, `resetPasswordPage.test.js`)
 - [ ] `ROADMAP.md` still lists this under "Active Gaps > Platform Hardening" — should be corrected there too, since it's stale
 
-### 5. Oversized page components — In progress (2 of 5 largest done)
+### 5. Oversized page components — In progress (3 of 5 largest done)
 - [x] `TaskaCooperative.jsx` (66KB → 817 lines page + 503-line `useCooperativeDesk.js` hook)
 - [x] `Adashe.jsx` (61KB → 735 lines page + 837-line `useAdasheDesk.js` hook) — denser than TaskaCooperative (3 refs, 3 effects, ~150 lines of branched recommendation logic), so extracted more cautiously: the hook returns every top-level binding rather than a hand-curated subset, relying on ESLint's `no-unused-vars`/`no-undef` to catch over- or under-inclusion instead of manual tracing. Worked cleanly — one over-inclusion caught, zero omissions.
-- [ ] `TrustFund.jsx` (54KB) — next largest; already has 3 known `react-hooks/refs` lint findings from the earlier crash-fix pass (see item 2) that a full hook extraction should probably resolve at the same time, since they're in the same "builder function receives ref-derived closures" area of the file
+- [x] `TrustFund.jsx` (54KB → 830 lines page + 591-line `useTrustFundDesk.js` hook) — undercounted the return list by hand on the first pass this time (9 missing bindings); ESLint's `no-undef` caught every one on the first lint run, confirming "let lint verify" beats hand-tracing for a block this size. Side benefit: 2 of the file's 3 tracked `react-hooks/refs` findings stopped triggering once the ref-derived closures moved behind the hook boundary (the lint rule's static analysis doesn't trace through it) — the third, same root cause, moved into the hook and still triggers there.
 - [ ] `Partners.jsx` (47KB)
 - [ ] `Deliveries.jsx` (44KB)
 - [x] Extraction pattern proven: dedicated hook per page (`use<Page>Desk.js`) holding all `useQuery`/`useMutation`/derived state/handlers, page component only destructures and renders — mirrors the `lib/retail.js` + `POS.jsx` split already proven before this session
