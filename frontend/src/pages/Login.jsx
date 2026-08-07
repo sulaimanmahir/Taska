@@ -147,7 +147,7 @@ export default function Login() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@company.com"
-                    className="input pl-12"
+                    className="input pl-12!"
                     required
                   />
                 </div>
@@ -164,7 +164,7 @@ export default function Login() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="********"
-                    className="input pl-12 pr-12"
+                    className="input pl-12! pr-12!"
                     required
                   />
                   <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-text-faint)] hover:text-[var(--color-text)]">

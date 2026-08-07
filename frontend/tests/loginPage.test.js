@@ -29,3 +29,15 @@ test('Login preserves password recovery, register, and demo handoffs', () => {
   assert.match(source, /Create Business Account/);
   assert.match(source, /to="\/demo"/);
 });
+
+test('email/password inputs force the icon-clearance padding to win over the shared .input class', () => {
+  // .input sets `padding` as a single shorthand (all four sides), which silently
+  // overrides a plain pl-12/pr-12 utility of equal specificity defined earlier in
+  // the cascade (Tailwind's utilities load via @import "tailwindcss" at the very
+  // top of index.css, and .input's own rule comes later, so .input always won).
+  // That collapsed the icon-clearance padding back to .input's default, crowding
+  // the leading @ and lock icons into the placeholder/typed text. The `!` suffix
+  // forces these two utilities to win regardless of source order.
+  assert.match(source, /className="input pl-12!"/);
+  assert.match(source, /className="input pl-12! pr-12!"/);
+});
