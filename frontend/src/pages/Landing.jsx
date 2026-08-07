@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { PublicBulletList, PublicMetricChip, PublicShell, PublicStage } from '../components/PageShell';
 import { logoPropPresets } from '../components/logoConfig.js';
-import ThemeToggle from '../components/ThemeToggle';
 
 const highlights = [
   'Offline-first operations for unstable internet and power environments',
@@ -47,7 +46,6 @@ export default function Landing() {
             <a href="#pricing" className="text-sm font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text)]">Pricing</a>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <Link to="/login" className="hidden text-sm font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text)] sm:inline-flex">
               Sign In
             </Link>

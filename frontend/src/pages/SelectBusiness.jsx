@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { AuthShell, BrandIntro, BrandTopbar, ContentGrid, FormPanel, PageHeader, PageShell, PublicMetricChip } from '../components/PageShell';
-import ThemeToggle from '../components/ThemeToggle';
 import { useAuthStore } from '../stores/authStore';
 import { getBusinessTypeConfig } from '../config/businessTypes';
 
@@ -58,7 +57,6 @@ export default function SelectBusiness() {
               />
             </BrandIntro>
           )}
-          actions={<ThemeToggle />}
         />
 
         <ContentGrid columns="sidebar" className="xl:grid-cols-[minmax(0,1fr)_18.75rem]">

@@ -11,7 +11,6 @@ import {
 import SyncIndicator from './SyncIndicator';
 import Logo from './Logo';
 import { logoPropPresets } from './logoConfig.js';
-import ThemeToggle from './ThemeToggle';
 
 export default function Layout() {
   const location = useLocation();
@@ -397,8 +396,6 @@ export default function Layout() {
           </div>
 
           <div className="flex items-center gap-3">
-            <ThemeToggle className="hidden sm:inline-flex" />
-
             <div ref={switcherRef} className="relative">
               <button
                 ref={switcherButtonRef}

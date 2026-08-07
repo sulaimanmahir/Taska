@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthShell, BrandIntro, BrandTopbar, FormPanel, PageHeader, PageShell } from '../components/PageShell';
-import ThemeToggle from '../components/ThemeToggle';
 import Button from '../components/Button';
 import { useAuthStore } from '../stores/authStore';
 import { businessTypeGroups, businessTypes, canonicalizeBusinessType, isVisibleBusinessType } from '../config/businessTypes';
@@ -75,7 +74,6 @@ export default function Register() {
               </p>
             </BrandIntro>
           )}
-          actions={<ThemeToggle />}
         />
 
         <div className="mb-6 flex items-center justify-center gap-3 xl:mb-8">

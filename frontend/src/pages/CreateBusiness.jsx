@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import Button from '../components/Button';
 import Logo from '../components/Logo';
 import { AuthShell, BrandIntro, BrandTopbar, ContentGrid, FormPanel, PageHeader, PageShell } from '../components/PageShell';
-import ThemeToggle from '../components/ThemeToggle';
 import api from '../lib/api';
 import { businessTypeGroups, businessTypes, canonicalizeBusinessType, getBusinessTypeConfig } from '../config/businessTypes';
 import { useAuthStore } from '../stores/authStore';
@@ -111,7 +110,6 @@ export default function CreateBusiness() {
               />
             </BrandIntro>
           )}
-          actions={<ThemeToggle />}
         />
 
         <QueryErrorPanel

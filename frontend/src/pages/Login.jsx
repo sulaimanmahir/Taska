@@ -4,7 +4,6 @@ import Button from '../components/Button';
 import Logo from '../components/Logo';
 import { logoPropPresets } from '../components/logoConfig.js';
 import { AuthShell, BrandTopbar, ContentGrid, PageShell, PublicBulletList } from '../components/PageShell';
-import ThemeToggle from '../components/ThemeToggle';
 import { useAuthStore } from '../stores/authStore';
 import { resolvePostLoginPath } from '../lib/businessSession';
 
@@ -45,7 +44,6 @@ export default function Login() {
               <Logo {...logoPropPresets.authHeader} />
             </Link>
           )}
-          actions={<ThemeToggle compact={true} className="scale-90 origin-top-right sm:scale-100" />}
         />
 
         <ContentGrid columns="sidebar" className="auth-login-grid">

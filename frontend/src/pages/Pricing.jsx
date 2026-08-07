@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import api from '../lib/api';
 import { BrandIntro, BrandTopbar, PublicCard, PublicFeaturePanel, PublicInsetPanel, PublicShell, PublicStage } from '../components/PageShell';
-import ThemeToggle from '../components/ThemeToggle';
 import Button from '../components/Button';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
@@ -120,17 +119,14 @@ export default function Pricing() {
               </BrandIntro>
             )}
             actions={(
-              <>
-                <ThemeToggle />
-                <Button
-                  as={Link}
-                  to="/register"
-                  variant="primary"
-                  size="md"
-                >
-                  Start free
-                </Button>
-              </>
+              <Button
+                as={Link}
+                to="/register"
+                variant="primary"
+                size="md"
+              >
+                Start free
+              </Button>
             )}
           />
 

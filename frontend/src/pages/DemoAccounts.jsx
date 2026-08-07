@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { BrandIntro, BrandTopbar, PublicBulletList, PublicCard, PublicFeaturePanel, PublicInsetPanel, PublicMetricChip, PublicShell, PublicStage, PublicValuePill, ResponsiveCardGrid } from '../components/PageShell';
-import ThemeToggle from '../components/ThemeToggle';
 import { businessTypeGroups, businessTypes } from '../config/businessTypes';
 import { useAuthStore } from '../stores/authStore';
 import { resolvePostLoginPath } from '../lib/businessSession';
@@ -94,12 +93,9 @@ export default function DemoAccounts() {
               </BrandIntro>
             )}
             actions={(
-              <>
-                <ThemeToggle />
-                <Button as={Link} to="/login" variant="secondary">
-                  Sign in
-                </Button>
-              </>
+              <Button as={Link} to="/login" variant="secondary">
+                Sign in
+              </Button>
             )}
           />
 

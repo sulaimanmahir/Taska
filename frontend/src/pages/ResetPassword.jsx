@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Button from '../components/Button';
-import ThemeToggle from '../components/ThemeToggle';
 import { AuthShell, BrandIntro, BrandTopbar, ContentGrid, FormPanel, PageHeader, PublicInsetPanel } from '../components/PageShell';
 import api from '../lib/api';
 
@@ -71,7 +70,6 @@ export default function ResetPassword() {
               </p>
             </BrandIntro>
           )}
-          actions={<ThemeToggle />}
         />
 
         <ContentGrid columns="split" className="items-start gap-6">
