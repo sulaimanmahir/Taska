@@ -1,6 +1,6 @@
 # Northern Nigeria market expansion — new business types
 
-Status: **research + design phase, not implemented. Needs sign-off on priority order before any build starts.**
+Status: **candidate 1 (grain milling) implemented and shipped 2026-08-07. Candidates 2-4 remain research/design only.**
 Created: 2026-08-06.
 
 ## Why this exists
@@ -18,11 +18,13 @@ Taska already supports 27 business types (`backend/config/business_types.php`), 
 
 ## Recommended new business types, in priority order
 
-### 1. Grain milling / processing (`grain_milling`)
+### 1. Grain milling / processing (`grain_milling`) — Done (2026-08-07)
 - **Group**: `manufacturing` (alongside `pure_water_factory`)
-- **Why first**: cleanest, best-evidenced gap; reuses the production-batch tracking pattern already built for `pure_water_factory` (`ProductionBatch` model, referenced in `DashboardController`'s `production` summary block) rather than needing a new data shape from scratch.
-- **Core workflow**: raw grain intake (purchase from farmers/aggregators) → milling/processing batches (yield, waste, byproduct tracking) → output inventory (flour/processed grain) → sales. Needs supplier-side integration with the already-built `Purchase`/`Supplier` models for raw-grain intake.
-- **Rough scope**: 1 new migration set (`grain_batches`, maybe `grain_intake_records`), 1-2 models, 1 controller, 1 Resource, dashboard summary block, 1 frontend Ops page, 1 nav preset entry, demo seeder data.
+- **Why first**: cleanest, best-evidenced gap; reuses the production-batch tracking *shape* built for `pure_water_factory` (not the full field set, which is sachet/bag-specific) rather than needing a new data shape from scratch.
+- **Core workflow, as built**: raw grain intake reuses the existing `Purchase`/`Supplier` workflow directly (no new intake model needed — a farmer/aggregator is just a `Supplier`) → milling batches (`GrainMillingBatch`: input/output/byproduct/wastage in kg, labour/electricity/packaging cost, computed yield %) → overview dashboard (today's input/output/byproduct/cost, average yield across all batches).
+- **What shipped**: `grain_milling_batches` migration + model (tenant-scoped from the start via `BelongsToBusiness`), `GrainMillingController` (overview/index/store), `GrainMillingOps.jsx` page at `/grain-milling`, dedicated nav preset, `businessTypes.js` entry (selectable at signup). 3 backend feature tests, 7 frontend unit tests, added to the render-smoke suite.
+- **Deliberately not done**: no seeded demo account (would need a full synthetic dataset — separate undertaking); real signups work today regardless.
+- **One real bug caught only by live verification**: the overview endpoint's average-yield query used a bare `/` between two SQLite decimal columns, which silently did integer division and returned 0 instead of the real yield percentage whenever both values happened to be "clean" (no fractional part) - a SQLite NUMERIC-affinity quirk, not a Laravel/PHP bug. The per-batch yield (computed in PHP) was correct throughout, which is exactly why only a live screenshot - not the API response checked in isolation - surfaced the mismatch. Fixed with an explicit `* 1.0` float-cast; added the missing assertion to the test that should have caught it originally.
 
 ### 2. Livestock trading / market (`livestock_market`)
 - **Group**: `commerce` (distinct from `livestock`'s `agriculture` group — this is a market/trading business, not a husbandry operation)
