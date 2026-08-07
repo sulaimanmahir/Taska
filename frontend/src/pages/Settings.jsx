@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
 import SettingsBranchesPanel from '../components/SettingsBranchesPanel';
+import SettingsModulesPanel from '../components/SettingsModulesPanel';
 import SettingsTeamPanel from '../components/SettingsTeamPanel';
 import { FinanceFormError } from '../components/FinanceFormFeedback';
 import OpsMetricCard from '../components/OpsMetricCard';
@@ -480,6 +481,10 @@ export default function Settings() {
 
       {activeTab === 'branches' ? (
         <SettingsBranchesPanel content={activeTabContent} />
+      ) : null}
+
+      {activeTab === 'modules' ? (
+        <SettingsModulesPanel content={activeTabContent} />
       ) : null}
     </div>
   );

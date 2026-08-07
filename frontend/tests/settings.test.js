@@ -15,6 +15,7 @@ test('settings tabs stay aligned with the available workspace sections', () => {
     { key: 'business', label: 'Business' },
     { key: 'users', label: 'Users & Roles' },
     { key: 'branches', label: 'Branches' },
+    { key: 'modules', label: 'Modules' },
   ]);
 });
 
@@ -99,5 +100,6 @@ test('settings tab content helpers keep live settings copy aligned', () => {
     'Location-specific approval rules for stock and finance actions',
     'AI-led branch comparison alerts for performance, demand, and staffing',
   ]);
+  assert.equal(getSettingsTabContent('modules')?.calloutTitle, 'Feature modules');
   assert.equal(getSettingsTabContent('missing'), null);
 });

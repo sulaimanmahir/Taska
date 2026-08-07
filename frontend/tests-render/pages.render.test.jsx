@@ -69,6 +69,7 @@ const pagesUnderTest = [
   ['Transfers', () => import('../src/pages/Transfers.jsx')],
   ['Production', () => import('../src/pages/Production.jsx')],
   ['AIInsights', () => import('../src/pages/AIInsights.jsx')],
+  ['Settings', () => import('../src/pages/Settings.jsx')],
 ];
 
 describe('pages render without crashing', () => {

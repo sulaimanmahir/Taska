@@ -13,6 +13,7 @@ test('Settings keeps its shared settings tabs and helper wiring intact', () => {
   assert.match(source, /activeTab === 'business'/);
   assert.match(source, /activeTab === 'users'/);
   assert.match(source, /activeTab === 'branches'/);
+  assert.match(source, /activeTab === 'modules'/);
 });
 
 test('Settings keeps profile and business updates on the auth store mutation contract', () => {
@@ -27,4 +28,5 @@ test('Settings preserves workspace-switch and creation actions at the page bound
   assert.match(source, /to="\/businesses\/new"/);
   assert.match(source, /<SettingsTeamPanel content=\{activeTabContent\} \/>/);
   assert.match(source, /<SettingsBranchesPanel content=\{activeTabContent\} \/>/);
+  assert.match(source, /<SettingsModulesPanel content=\{activeTabContent\} \/>/);
 });

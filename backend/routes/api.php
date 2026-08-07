@@ -65,6 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/auth/current-business', [AuthController::class, 'updateCurrentBusiness']);
     Route::post('/auth/switch-business', [AuthController::class, 'switchBusiness']);
     Route::post('/auth/business/active-types', [AuthController::class, 'addActiveBusinessType']);
+    Route::get('/auth/business/modules', [AuthController::class, 'availableModules']);
+    Route::patch('/auth/business/modules', [AuthController::class, 'updateModules']);
     Route::post('/auth/businesses', [AuthController::class, 'createBusiness']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::middleware('role:admin')->group(function () {

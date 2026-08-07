@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\RegisterOwnerRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\StoreBusinessRequest;
 use App\Http\Requests\Auth\SwitchBusinessRequest;
+use App\Http\Requests\Auth\UpdateBusinessModulesRequest;
 use App\Http\Requests\UpdateBusinessSettingsRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Business;
@@ -190,6 +191,52 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Business vertical added successfully',
+            ...$this->buildAuthenticatedContextPayload($user, $business->fresh()),
+        ]);
+    }
+
+    public function availableModules(Request $request)
+    {
+        $user = $request->user();
+        $business = $user->current_business_id
+            ? $this->businessContextService->findAccessibleBusiness($user, $user->current_business_id)
+            : null;
+
+        if (!$business) {
+            return response()->json(['message' => 'No active business selected'], 404);
+        }
+
+        return response()->json([
+            'available' => config("business_types.types.{$business->business_type}.modules", []),
+            'enabled' => $business->modules ?? [],
+        ]);
+    }
+
+    public function updateModules(UpdateBusinessModulesRequest $request)
+    {
+        $user = $request->user();
+        $business = $user->current_business_id
+            ? $this->businessContextService->findAccessibleBusiness($user, $user->current_business_id)
+            : null;
+
+        if (!$business) {
+            return response()->json(['message' => 'No active business selected'], 404);
+        }
+
+        $availableModules = config("business_types.types.{$business->business_type}.modules", []);
+        $requestedModules = $request->validated('modules');
+
+        // "dashboard" is core to every vertical and never user-toggleable -
+        // always keep it enabled regardless of what was submitted.
+        $modules = array_values(array_unique(array_intersect(
+            array_merge(['dashboard'], $requestedModules),
+            $availableModules,
+        )));
+
+        $business->update(['modules' => $modules]);
+
+        return response()->json([
+            'message' => 'Modules updated successfully',
             ...$this->buildAuthenticatedContextPayload($user, $business->fresh()),
         ]);
     }

@@ -3,6 +3,7 @@ export const settingsTabs = [
   { key: 'business', label: 'Business' },
   { key: 'users', label: 'Users & Roles' },
   { key: 'branches', label: 'Branches' },
+  { key: 'modules', label: 'Modules' },
 ];
 
 export function buildSettingsMetrics({ user = null, business = null, linkedBusinesses = 0 } = {}) {
@@ -124,6 +125,15 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       ],
       roadmapClassName: 'border-emerald-200 bg-emerald-50/60',
       roadmapTextClassName: 'text-emerald-900',
+    };
+  }
+
+  if (tab === 'modules') {
+    return {
+      calloutTitle: 'Feature modules',
+      calloutSubtitle: 'Turn optional workflows on or off without changing your business type',
+      calloutCopy:
+        'Modules are feature toggles within your current business type - they control which optional workflows (like loyalty, refunds, or barcode labels) show up in navigation, not which industry your workspace is set up as.',
     };
   }
 
