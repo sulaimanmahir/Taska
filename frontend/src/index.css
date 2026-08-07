@@ -95,6 +95,20 @@
   --shadow-xl: 0 40px 120px rgba(76, 29, 149, 0.36);
 }
 
+/*
+ * This reset and every custom class below are explicitly layered
+ * (base < components, both below Tailwind's own utilities layer) so that
+ * ANY Tailwind utility class always wins over them, matching Tailwind's
+ * intended cascade. Before this, the reset below was unlayered CSS, and
+ * unlayered CSS beats every layered rule regardless of specificity - so
+ * `* { padding: 0 }` was silently canceling Tailwind padding utilities
+ * (px-4, py-3, pl-11, etc.) on every plain <input>/<textarea> across the
+ * app that didn't have a custom class (like .input) to rescue it, since
+ * .input's own unlayered padding rule could out-specificity `*` directly,
+ * but bare Tailwind utility classes - always layered - could not.
+ */
+@layer base {
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -137,6 +151,10 @@ img {
   max-width: 100%;
   display: block;
 }
+
+}
+
+@layer components {
 
 .app-loader {
   background: var(--auth-bg);
@@ -1295,4 +1313,6 @@ img {
   .auth-login-grid {
     align-items: start;
   }
+}
+
 }
