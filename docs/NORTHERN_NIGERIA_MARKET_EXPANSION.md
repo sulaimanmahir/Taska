@@ -1,6 +1,6 @@
 # Northern Nigeria market expansion — new business types
 
-Status: **candidate 1 (grain milling) implemented and shipped 2026-08-07. Candidates 2-4 remain research/design only.**
+Status: **candidates 1 (grain milling) and 2 (livestock trading market) implemented and shipped 2026-08-07. Candidates 3-4 (leather trading, property management) remain research/design only.**
 Created: 2026-08-06.
 
 ## Why this exists
@@ -26,11 +26,12 @@ Taska already supports 27 business types (`backend/config/business_types.php`), 
 - **Deliberately not done**: no seeded demo account (would need a full synthetic dataset — separate undertaking); real signups work today regardless.
 - **One real bug caught only by live verification**: the overview endpoint's average-yield query used a bare `/` between two SQLite decimal columns, which silently did integer division and returned 0 instead of the real yield percentage whenever both values happened to be "clean" (no fractional part) - a SQLite NUMERIC-affinity quirk, not a Laravel/PHP bug. The per-batch yield (computed in PHP) was correct throughout, which is exactly why only a live screenshot - not the API response checked in isolation - surfaced the mismatch. Fixed with an explicit `* 1.0` float-cast; added the missing assertion to the test that should have caught it originally.
 
-### 2. Livestock trading / market (`livestock_market`)
+### 2. Livestock trading / market (`livestock_market`) — Done (2026-08-07)
 - **Group**: `commerce` (distinct from `livestock`'s `agriculture` group — this is a market/trading business, not a husbandry operation)
 - **Why second**: concrete, current government investment (Wudil), and structurally distinct enough from the existing `livestock` type that forcing it into that type would misrepresent the workflow.
-- **Core workflow**: animal intake (purchase from herders/farmers, weight-based pricing) → holding pen inventory → market-day sales (weight-based or negotiated pricing) → settlement. Different KPIs from `livestock` farm type: no breeding/milk/medication, but adds market-day cycles and weight-based pricing negotiation.
-- **Rough scope**: similar shape to `commodity` type (which already has weight-based trade tickets, `CommodityTradeTicket`, `weight_kg` fields) — closest existing template to adapt from, likely faster to build than grain milling.
+- **Core workflow, as built**: a single `LivestockMarketTransaction` log — each row is either an `intake` (bought from a herder/farmer) or a `sale` (sold to a buyer); the holding-pen count is *derived* (SUM of intake head counts minus SUM of sale head counts) rather than tracked as separate mutable state, keeping the model as lean as `grain_milling`'s single-batch approach instead of building a full lot/ticket dual-model system.
+- **What shipped**: `livestock_market_transactions` migration + model, `LivestockMarketController` (overview with holding-pen count/today's intake+sale counts/revenue/intake cost/average sale price per kg, index, store), `LivestockMarketOps.jsx` page at `/livestock-market`, dedicated nav preset, `businessTypes.js` entry. 3 backend feature tests, 8 frontend unit tests, added to the render-smoke suite.
+- **No repeat of the grain-milling SQLite division bug**: the average-price calculation uses Eloquent's `->avg()` helper instead of a raw `/` between two decimal columns — verified correct in both the test and a live walkthrough, clean on the first live check.
 
 ### 3. Leather / hides & skins (`leather_trading`)
 - **Group**: `manufacturing` (spans tannery/processing and trading, mirroring how `pure_water_factory` spans production)
