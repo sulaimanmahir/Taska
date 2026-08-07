@@ -588,13 +588,13 @@ function AppointmentsGeneral({ labels }) {
 }
 
 export default function Appointments() {
-  const { labels, color, type } = useBusinessType();
+  const { labels, color, hasActiveType } = useBusinessType();
 
-  if (type === 'beauty') {
+  if (hasActiveType('beauty')) {
     return <BeautyOps />;
   }
 
-  if (type === 'service') {
+  if (hasActiveType('service')) {
     return <ServiceOps />;
   }
 

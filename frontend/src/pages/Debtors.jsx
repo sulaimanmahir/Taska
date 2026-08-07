@@ -40,7 +40,7 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function Debtors() {
-  const { labels, type } = useBusinessType();
+  const { labels, hasActiveType } = useBusinessType();
   const [search, setSearch] = useState('');
 
   const customersQuery = useQuery({
@@ -62,15 +62,15 @@ export default function Debtors() {
     ? getErrorMessage(customersQuery.error, 'We could not load debtor accounts right now. Please try again.')
     : '';
 
-  if (type === 'textile') {
+  if (hasActiveType('textile')) {
     return <TextileOps />;
   }
 
-  if (type === 'construction') {
+  if (hasActiveType('construction')) {
     return <BuildingMaterialsOps />;
   }
 
-  if (type === 'wholesale') {
+  if (hasActiveType('wholesale')) {
     return <WholesaleOps />;
   }
 

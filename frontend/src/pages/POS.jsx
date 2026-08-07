@@ -62,7 +62,7 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function POS() {
-  const { type } = useBusinessType();
+  const { hasActiveType } = useBusinessType();
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
   const [customerId, setCustomerId] = useState('');
@@ -210,35 +210,35 @@ export default function POS() {
     }
   };
 
-  if (type === 'construction') {
+  if (hasActiveType('construction')) {
     return <BuildingMaterialsOps />;
   }
 
-  if (type === 'commodity') {
+  if (hasActiveType('commodity')) {
     return <CommodityOps />;
   }
 
-  if (type === 'warehouse') {
+  if (hasActiveType('warehouse')) {
     return <WarehouseOps />;
   }
 
-  if (type === 'restaurant') {
+  if (hasActiveType('restaurant')) {
     return <RestaurantPOS />;
   }
 
-  if (type === 'retail' || type === 'supermarket') {
+  if (hasActiveType('retail') || hasActiveType('supermarket')) {
     return <RetailOps />;
   }
 
-  if (type === 'wholesale') {
+  if (hasActiveType('wholesale')) {
     return <WholesaleOps />;
   }
 
-  if (type === 'pure_water_retail') {
+  if (hasActiveType('pure_water_retail')) {
     return <PureWaterRetailOps />;
   }
 
-  if (type === 'mixed' || type === 'general') {
+  if (hasActiveType('mixed') || hasActiveType('general')) {
     return <SMEOps />;
   }
 

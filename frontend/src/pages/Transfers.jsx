@@ -39,7 +39,7 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function Transfers() {
-  const { labels, type } = useBusinessType();
+  const { labels, hasActiveType } = useBusinessType();
   const warehousesQuery = useQuery({
     queryKey: ['warehouses'],
     queryFn: () => api.get('/warehouses').then((response) => response.data),
@@ -81,19 +81,19 @@ export default function Transfers() {
     'We could not load part of the transfer workspace right now. Please try again.'
   );
 
-  if (type === 'mobile_agent') {
+  if (hasActiveType('mobile_agent')) {
     return <MobileAgentOps />;
   }
 
-  if (type === 'construction') {
+  if (hasActiveType('construction')) {
     return <BuildingMaterialsOps />;
   }
 
-  if (type === 'wholesale') {
+  if (hasActiveType('wholesale')) {
     return <WholesaleOps />;
   }
 
-  if (type === 'pure_water_retail') {
+  if (hasActiveType('pure_water_retail')) {
     return <PureWaterRetailOps />;
   }
 

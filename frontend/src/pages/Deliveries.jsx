@@ -729,13 +729,13 @@ function DeliveryCompanyOps() {
 }
 
 export default function Deliveries() {
-  const { type } = useBusinessType();
+  const { hasActiveType } = useBusinessType();
 
-  if (type === 'construction') {
+  if (hasActiveType('construction')) {
     return <BuildingMaterialsOps />;
   }
 
-  if (type === 'logistics') {
+  if (hasActiveType('logistics')) {
     return <LogisticsOps />;
   }
 

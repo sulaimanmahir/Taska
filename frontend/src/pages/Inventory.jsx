@@ -62,7 +62,7 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function Inventory() {
-  const { type } = useBusinessType();
+  const { hasActiveType } = useBusinessType();
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [warehouseFilter, setWarehouseFilter] = useState('');
@@ -118,35 +118,35 @@ export default function Inventory() {
     },
   });
 
-  if (type === 'fuel_business') {
+  if (hasActiveType('fuel_business')) {
     return <FuelOps />;
   }
 
-  if (type === 'construction') {
+  if (hasActiveType('construction')) {
     return <BuildingMaterialsOps />;
   }
 
-  if (type === 'commodity') {
+  if (hasActiveType('commodity')) {
     return <CommodityOps />;
   }
 
-  if (type === 'warehouse') {
+  if (hasActiveType('warehouse')) {
     return <WarehouseOps />;
   }
 
-  if (type === 'beauty') {
+  if (hasActiveType('beauty')) {
     return <BeautyOps />;
   }
 
-  if (type === 'pure_water_retail') {
+  if (hasActiveType('pure_water_retail')) {
     return <PureWaterRetailOps />;
   }
 
-  if (type === 'farm') {
+  if (hasActiveType('farm')) {
     return <FarmOps />;
   }
 
-  if (type === 'mixed' || type === 'general') {
+  if (hasActiveType('mixed') || hasActiveType('general')) {
     return <SMEOps />;
   }
 

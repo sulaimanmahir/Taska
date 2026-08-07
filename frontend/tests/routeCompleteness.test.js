@@ -28,7 +28,7 @@ test('lab requests page uses the diagnostics intake and queue endpoints', () => 
 });
 
 test('results page branches between school and laboratory workflows', () => {
-  assert.match(resultsSource, /if \(type === 'school'\)/);
+  assert.match(resultsSource, /if \(hasActiveType\('school'\)\)/);
   assert.match(resultsSource, /api\.post\('\/school\/results', payload\)/);
   assert.match(resultsSource, /api\.post\(`\/health\/lab-requests\/\$\{labRequestId\}\/approve`/);
 });

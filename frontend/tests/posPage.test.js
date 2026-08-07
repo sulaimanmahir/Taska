@@ -7,11 +7,11 @@ const sourcePath = path.resolve('src/pages/POS.jsx');
 const source = fs.readFileSync(sourcePath, 'utf8');
 
 test('pos delegates business-specific types to their richer operational desks', () => {
-  assert.match(source, /if \(type === 'restaurant'\) \{\s+return <RestaurantPOS \/>;/);
-  assert.match(source, /if \(type === 'retail' \|\| type === 'supermarket'\) \{\s+return <RetailOps \/>;/);
-  assert.match(source, /if \(type === 'wholesale'\) \{\s+return <WholesaleOps \/>;/);
-  assert.match(source, /if \(type === 'pure_water_retail'\) \{\s+return <PureWaterRetailOps \/>;/);
-  assert.match(source, /if \(type === 'mixed' \|\| type === 'general'\) \{\s+return <SMEOps \/>;/);
+  assert.match(source, /if \(hasActiveType\('restaurant'\)\) \{\s+return <RestaurantPOS \/>;/);
+  assert.match(source, /if \(hasActiveType\('retail'\) \|\| hasActiveType\('supermarket'\)\) \{\s+return <RetailOps \/>;/);
+  assert.match(source, /if \(hasActiveType\('wholesale'\)\) \{\s+return <WholesaleOps \/>;/);
+  assert.match(source, /if \(hasActiveType\('pure_water_retail'\)\) \{\s+return <PureWaterRetailOps \/>;/);
+  assert.match(source, /if \(hasActiveType\('mixed'\) \|\| hasActiveType\('general'\)\) \{\s+return <SMEOps \/>;/);
 });
 
 test('pos fallback checkout uses query-backed loading and the shared retail helpers', () => {

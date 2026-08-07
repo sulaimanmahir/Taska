@@ -475,9 +475,9 @@ function LaboratoryResults() {
 }
 
 export default function Results() {
-  const { type } = useBusinessType();
+  const { hasActiveType } = useBusinessType();
 
-  if (type === 'school') {
+  if (hasActiveType('school')) {
     return <SchoolResults />;
   }
 

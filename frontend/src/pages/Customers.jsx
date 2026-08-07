@@ -55,7 +55,7 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function Customers() {
-  const { type } = useBusinessType();
+  const { hasActiveType } = useBusinessType();
   const emptyCustomerForm = createCustomerForm();
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -110,16 +110,16 @@ export default function Customers() {
     'We could not load customers right now. Please try again.',
   );
 
-  if (type === 'agro_dealer') return <AgroOps />;
-  if (type === 'construction') return <BuildingMaterialsOps />;
-  if (type === 'commodity') return <CommodityOps />;
-  if (type === 'warehouse') return <WarehouseOps />;
-  if (type === 'wholesale') return <WholesaleOps />;
-  if (type === 'beauty') return <BeautyOps />;
-  if (type === 'service') return <ServiceOps />;
-  if (type === 'pure_water_retail') return <PureWaterRetailOps />;
-  if (type === 'farm') return <FarmOps />;
-  if (type === 'mixed' || type === 'general') return <SMEOps />;
+  if (hasActiveType('agro_dealer')) return <AgroOps />;
+  if (hasActiveType('construction')) return <BuildingMaterialsOps />;
+  if (hasActiveType('commodity')) return <CommodityOps />;
+  if (hasActiveType('warehouse')) return <WarehouseOps />;
+  if (hasActiveType('wholesale')) return <WholesaleOps />;
+  if (hasActiveType('beauty')) return <BeautyOps />;
+  if (hasActiveType('service')) return <ServiceOps />;
+  if (hasActiveType('pure_water_retail')) return <PureWaterRetailOps />;
+  if (hasActiveType('farm')) return <FarmOps />;
+  if (hasActiveType('mixed') || hasActiveType('general')) return <SMEOps />;
 
   return (
     <div className="space-y-6">

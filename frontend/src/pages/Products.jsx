@@ -61,7 +61,7 @@ function QueryErrorPanel({ message, onRetry }) {
 }
 
 export default function Products() {
-  const { type } = useBusinessType();
+  const { hasActiveType } = useBusinessType();
   const emptyProductForm = createProductForm();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -145,15 +145,15 @@ export default function Products() {
     createMutation.mutate(form);
   };
 
-  if (type === 'textile') return <TextileOps />;
-  if (type === 'construction') return <BuildingMaterialsOps />;
-  if (type === 'commodity') return <CommodityOps />;
-  if (type === 'wholesale') return <WholesaleOps />;
-  if (type === 'beauty') return <BeautyOps />;
-  if (type === 'service') return <ServiceOps />;
-  if (type === 'pure_water_retail') return <PureWaterRetailOps />;
-  if (type === 'farm') return <FarmOps />;
-  if (type === 'mixed' || type === 'general') return <SMEOps />;
+  if (hasActiveType('textile')) return <TextileOps />;
+  if (hasActiveType('construction')) return <BuildingMaterialsOps />;
+  if (hasActiveType('commodity')) return <CommodityOps />;
+  if (hasActiveType('wholesale')) return <WholesaleOps />;
+  if (hasActiveType('beauty')) return <BeautyOps />;
+  if (hasActiveType('service')) return <ServiceOps />;
+  if (hasActiveType('pure_water_retail')) return <PureWaterRetailOps />;
+  if (hasActiveType('farm')) return <FarmOps />;
+  if (hasActiveType('mixed') || hasActiveType('general')) return <SMEOps />;
 
   const products = productsData?.data || [];
   const pagination = {
