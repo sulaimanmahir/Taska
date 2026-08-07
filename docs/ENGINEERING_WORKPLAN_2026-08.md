@@ -64,7 +64,7 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [x] `Admin.jsx`, `Debtors.jsx`, `Transfers.jsx` — each had hooks declared after an early `return`, which breaks React's hook-order guarantee if the early-return condition ever changes between renders. Moved all hooks above the early returns. `Admin.jsx` also had its role-gate `navigate()` call moved into a `useEffect` (it was a side effect running directly in the render body) and gained `enabled: isAdmin` on its query. (`Rooms.jsx` turned out already fine once line numbers shifted from the earlier unused-import cleanup.)
 - [x] `Partners.jsx` — two effects called `setState` synchronously to seed default form state once async data loaded. Replaced both with React's recommended "adjust state during render" pattern (conditional, self-limiting `setState` calls directly in the render body) instead of an effect.
 
-### 3. Tenant-scoping enforcement — In progress
+### 3. Tenant-scoping enforcement — Done (all originally-flagged models covered)
 - [x] Add a `BelongsToBusiness` trait (`app/Concerns/BelongsToBusiness.php`) + Eloquent global scope applied to tenant-owned models, auto-filtering by `auth('sanctum')->user()->current_business_id`. No-ops outside an authenticated request (console/seeders/unit tests), so it never masks a missing filter in code that manages `business_id` explicitly.
 - [x] Applied to the 4 highest-risk models first: `Order`, `Product`, `InventoryItem`, `Customer`.
 - [x] Regression test proving the scope blocks cross-tenant reads with **no manual filter at all** (`tests/Unit/BelongsToBusinessScopeTest.php`) — also proves the no-op-outside-auth behavior.
@@ -72,8 +72,9 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 
 **Important design decision made here:** naively applying the global scope broke 5 currently-passing tests (`TenantIsolationTest`, `RetailWorkflowTest`, `ProductWorkflowStateTest`, `CustomerWorkflowStateTest`, `OrderWorkflowStateTest`) that deliberately assert **403** for cross-tenant access to a single record via route-model-binding + Policy (e.g. `PATCH /products/{product}`). The scope would've silently turned those into **404** (record scoped out before the Policy ever runs), changing a tested API contract without anyone deciding to. Rather than pick a side on 403-vs-404 unilaterally, the trait overrides `resolveRouteBinding()` to resolve route-bound models *without* the scope, preserving the existing Policy-driven 403 behavior exactly as tested. The scope still applies to every other query — list/index endpoints, relation loads, ad-hoc lookups — which is where the actual documented gap lives (a controller that forgets `where('business_id', ...)` on a query that isn't a single-record route-bound lookup). Full suite after this change: still 240 passing / 2 failing (both pre-existing, unrelated — see item 2 above), zero regressions.
 
-- [ ] Migrate remaining high-risk models (finance: `Expense`, `Supplier`, `Debtors`/receivables; inventory: `InventoryMovement`, `Warehouse`) onto the trait
-- [ ] Sweep remaining models incrementally (not a single big-bang PR — safer to verify each in isolation against the full suite, as happened here)
+- [x] Migrated the remaining flagged models onto the trait: `Supplier`/`Purchase`/`PurchasePayment` (2026-08-06, part of the purchases-workflow correction below), then `Expense`, `InventoryMovement`, `Warehouse` (2026-08-07). "Debtors/receivables" turned out to just be `Customer.balance`, already covered since `Customer` had the trait from the start. `BelongsToBusinessScopeTest` extended with a case covering all three new models. Full backend suite: 254 passing.
+- [x] Swept incrementally in small verified batches rather than one big-bang PR, as planned — 4 models → 3 models (purchases) → 3 models (this batch), each verified against the full suite before moving on.
+- [ ] No further models currently flagged - if a new high-risk model is added later (a new financial or inventory-adjacent table), apply the same trait+test pattern rather than assuming it's covered by osmosis.
 
 ### 4. Password reset flow — Already done (verified 2026-08-05)
 - [x] Backend: forgot-password request + reset-token flow via Laravel's `Password` broker, `password_reset_tokens` table present
@@ -114,24 +115,17 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 
 Also surfaced one instance of mock/reality mismatch while building the generic smoke-test mock: `/ai/insights` returns a raw array in production (confirmed against `AIInsightController::index()` - `AIInsightResource::collection(...)->resolve()` gives an array, no envelope), but the mock's original blanket `{ data: {} }` response broke `Adashe.jsx`'s `(insightResponse ?? []).filter(...)` since `{}` isn't nullish. Not a real app bug - fixed by defaulting the mock to `{ data: [] }` instead, which is compatible with both array-consuming code and `?.`-guarded object access. Flagging because this is exactly the class of false positive/negative this kind of coarse smoke test can produce - it catches "throws on first render" and "throws once data arrives" reliably, but does not verify any endpoint's response shape is actually correct, which is a different (and harder) problem than what this item set out to solve.
 
-### 9. Multi-business / multi-module architecture — Design doc written, not implemented
+### 9. Multi-business / multi-module architecture — 4 of 5 steps implemented (2026-08-07)
 
-Full design proposal: [MULTI_MODULE_ARCHITECTURE.md](MULTI_MODULE_ARCHITECTURE.md). Key correction from the original framing below: `businesses.modules` already exists as a JSON column, but it's fine-grained feature toggles *within* one vertical (e.g. retail's `loyalty`/`refunds`), not a mechanism for activating multiple top-level verticals — and the frontend doesn't read it at all today (routing is 100% driven by the single `business_type` string). The proposal is a new additive `active_business_types` array field plus a frontend routing merge, not a redefinition of the existing `modules` column.
+Full design + implementation status: [MULTI_MODULE_ARCHITECTURE.md](MULTI_MODULE_ARCHITECTURE.md). This item moved well past "design doc, not implemented" over the course of this session:
 
+- [x] **Portfolio dashboard** — `GET /api/portfolio` + `Portfolio.jsx`, live at `/portfolio`.
+- [x] **`active_business_types` schema + self-serve endpoint** — additive column, backfilled, `POST /api/auth/business/active-types`.
+- [x] **`modules` edit endpoint + settings UI** — `GET/PATCH /api/auth/business/modules` + the new "Modules" tab on Settings.
+- [x] **Frontend navigation/routing merge** — nav merges across active verticals; the 9 pages that route between Ops components by business type converted to `hasActiveType()`.
+- [ ] **Billing model** — explicitly out of scope, separate product decision, not an engineering task. This is the only remaining piece.
 
-Prompted by two related product questions during this session:
-- A single tenant should be able to compose multiple verticals under one business (e.g. a hospital running clinic + pharmacy + lab together) with shared customer/patient records and unified financials/staff - but each of those verticals must also be purchasable and usable completely standalone (a clinic-only customer shouldn't be forced into a bundle).
-- A user with multiple **unrelated** businesses (already supported today - `authStore.js` tracks a `businesses[]` array with `switchBusiness()`, and the UI has a current-business switcher) has no aggregate view - the dashboard only ever shows `current_business_id`'s data, one context at a time. Needs a portfolio-style view: separate cards per business plus rolled-up totals for financials/staff/etc.
-
-**Recommended direction (not yet built, needs sign-off before implementation):**
-- Turn `business_type` + its implied `modules` array into an independently selectable **set of modules per business**, instead of one type implying one fixed module bundle. Since `Customer`, `Product`, `Order`, `InventoryItem` etc. are already scoped by `business_id` (not by vertical), enabling multiple vertical modules on one `business_id` gets shared records "for free" - no sync/replication layer needed, unlike a design based on separate linked `Business` records.
-- Add a portfolio/aggregate dashboard: an endpoint that loops over the user's `businesses[]` and returns each one's stats plus rolled-up totals, and a new top-level page to display it. Doesn't require changing the tenant-isolation model, since each business's data stays cleanly separated by `business_id` underneath.
-- Billing would need to key off the enabled module set (per-module or tiered pricing) rather than a fixed plan tied to one vertical - out of scope to design in detail here, flagging so it isn't forgotten.
-
-- [ ] Confirm this direction with product/stakeholder sign-off before any schema changes (this changes the core tenant/module model - higher blast radius than anything else in this workplan)
-- [ ] Design the `modules` schema change (join table vs. JSON column on `businesses`) and migration path for existing single-type businesses
-- [ ] Design the portfolio-dashboard API shape and page
-- [ ] Scope billing implications separately once the module model is settled
+See the doc's own "Open questions" section for the two still-open product decisions (self-serve activation and vertical cap were both resolved and implemented; the "primary vertical special-casing" question remains open but isn't load-bearing yet).
 
 ### 7. Purchases/payables workflow — Already done, mis-flagged as a gap (see correction above)
 - [x] `Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` models + migrations
