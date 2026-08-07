@@ -73,18 +73,17 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 
 ### Platform Hardening
 
-- Tenant isolation is enforced mainly through business-context scoping in services and controllers; a unified global-scope pattern now exists (`app/Concerns/BelongsToBusiness.php`) and is applied to the highest-risk models (`Order`, `Product`, `InventoryItem`, `Customer`), with the rest to be migrated incrementally.
+- Tenant isolation is enforced mainly through business-context scoping in services and controllers; a unified global-scope pattern now exists (`app/Concerns/BelongsToBusiness.php`) and is applied to every model originally flagged as high-risk (`Order`, `Product`, `InventoryItem`, `Customer`, `Supplier`, `Purchase`, `PurchasePayment`, `Expense`, `InventoryMovement`, `Warehouse`). Line-item-only models (`OrderItem`, `PurchaseItem`) are intentionally excluded since they have no `business_id` of their own and are scoped through their parent relation instead. Apply the same trait+test pattern to any new high-risk model added later.
 - Notification center and push notifications are not live yet.
 - Access-change audit history for workspace team and branch administration is still ahead.
 
 ### Workflow Depth
 
-- Purchases are only partial today.
+- A general purchase-order, receive, and supplier-payment workflow exists end to end (`Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` models, `PurchaseController`/`SupplierController`, `Purchases.jsx`), including stock updates into inventory on receipt.
   - Production input purchases exist.
   - Pharmacy purchase history exists.
-  - A general purchase-order, GRN, and supplier-payables workflow is not yet a first-class end-to-end module.
 - Warehouse CRUD exists, but branch-to-warehouse setup and routing still need a stronger admin UX.
-- Some older module controllers still need the same tenant-scoping hardening already applied to reports, settings, team access, and branches.
+- Tenant-scoping hardening (the `BelongsToBusiness` trait) is now applied to every originally-flagged model — see Platform Hardening above.
 
 ### Intelligence and Offline Maturity
 

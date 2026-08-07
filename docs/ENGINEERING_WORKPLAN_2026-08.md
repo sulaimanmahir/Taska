@@ -80,7 +80,7 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [x] Backend: forgot-password request + reset-token flow via Laravel's `Password` broker, `password_reset_tokens` table present
 - [x] Frontend: "Forgot password" entry point (linked from `Login.jsx`), request form, reset form, both routed
 - [x] Tests: request-link flow and reset-with-valid-token flow covered (`AuthFlowTest.php`); frontend wiring covered (`forgotPasswordPage.test.js`, `resetPasswordPage.test.js`)
-- [ ] `ROADMAP.md` still lists this under "Active Gaps > Platform Hardening" — should be corrected there too, since it's stale
+- [x] Checked `ROADMAP.md` (2026-08-07) — it no longer mentions password reset as a gap anywhere (`grep -i password` finds nothing under "Active Gaps"), so this was already corrected or the original note was mistaken. Nothing left to fix here.
 
 ### 5. Oversized page components — Done (5 of 5 largest split)
 - [x] `TaskaCooperative.jsx` (66KB → 817 lines page + 503-line `useCooperativeDesk.js` hook)
@@ -100,13 +100,13 @@ All real lint errors are now fixed (frontend lint: 0 errors, 115 pre-existing `e
 - [x] Full suite verified green after fixes: `npm test` → 599 passing, 0 failing (was 502 before this item)
 - [ ] Re-run the gap check (`for f in src/lib/*.js; do ...` matching against both `tests/` and `src/`) periodically rather than assuming coverage from file count alone
 
-### 8. "Renders without crashing" smoke tests — Not started
+### 8. "Renders without crashing" smoke tests — Done (header was stale; body below was already all checked)
 
 **Why this jumped the queue (2026-08-05):** all 129 existing `frontend/tests/*.test.js` "page" tests turned out to be regex checks against raw file text (`fs.readFileSync` + `assert.match`), not real rendered-component tests — confirmed by finding 3 live crash bugs (see item 3's design-decision note and the crash-fix commit) that every one of those 129 tests missed, because none of them actually render a component. This is the single highest-leverage remaining gap: cheap to add, and it directly closes the hole that let three production-crashing bugs sit undetected.
 
 - [x] Add Vitest (Vite's own test runner - reuses the project's existing Vite transform pipeline for JSX/CSS/aliases, unlike trying to force plain `node --test` to handle `.jsx` files) + jsdom + React Testing Library as dev dependencies (`npm run test:render`)
 - [x] Build one shared test harness (`tests-render/renderPage.jsx`): mocks `lib/api.js`, wraps in `QueryClientProvider` + `MemoryRouter` + a fake authenticated `authStore` state
-- [x] Add a "renders without throwing" test per page component for the 11 pages already proven risky or largest (`Dashboard.jsx`, `Adashe.jsx`, `TrustFund.jsx`, `TaskaCooperative.jsx`, `Partners.jsx`, `Deliveries.jsx`, `Admin.jsx`, `Debtors.jsx`, `Transfers.jsx`, `Production.jsx`, `AIInsights.jsx`) - adding more is now a one-line addition to the array in `tests-render/pages.render.test.jsx`, sweeping the rest of the 68 pages is a fast follow, not done in this pass
+- [x] Add a "renders without throwing" test per page component, now covering 14 pages (`Dashboard.jsx`, `Portfolio.jsx`, `Adashe.jsx`, `TrustFund.jsx`, `TaskaCooperative.jsx`, `Partners.jsx`, `Deliveries.jsx`, `Admin.jsx`, `Debtors.jsx`, `Transfers.jsx`, `Production.jsx`, `AIInsights.jsx`, `Settings.jsx` — grew from the original 11 as new pages shipped this session) - adding more is a one-line addition to the array in `tests-render/pages.render.test.jsx`; sweeping the rest of the ~68 pages is still a fast follow, not done in this pass
 - [x] Add a dedicated regression test (`tests-render/dashboardNullModules.render.test.jsx`) reproducing the exact null-shaped `/dashboard` response that crashed production, proving the fix holds
 - [x] Wire the new Vitest run into `.github/workflows/ci.yml` alongside the existing `npm test` (Node test runner) step - keep both, since the 129 regex tests aren't worthless, just insufficient alone
 - [x] Verified the harness actually catches what it claims to, twice: reverted the Adashe TDZ fix and the dashboard null-deref fix in turn and confirmed each failed the relevant test with the exact original error, before restoring both
