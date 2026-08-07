@@ -5,7 +5,7 @@ export const businessTypeGroups = {
   },
   manufacturing: {
     name: 'Manufacturing',
-    types: ['pure_water_factory']
+    types: ['pure_water_factory', 'grain_milling']
   },
   services: {
     name: 'Services',
@@ -160,6 +160,15 @@ export const businessTypes = {
     icon: 'M12 3C9 7 7 10 7 13a5 5 0 0010 0c0-3-2-6-5-10zM6 20h12',
     color: '#0284C7',
     description: 'Sachet, bottle, crate and wholesale water retail operations',
+  },
+  grain_milling: {
+    id: 'grain_milling',
+    name: 'Grain Milling / Processing',
+    slug: 'grain_milling',
+    group: 'manufacturing',
+    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l2 3H9m2 3l2 3H7.5a2 2 0 01-2-2V3.5M8 13l2 3h3m-3 0l2-3h3m-3 0l2 3h3m-3 0l2-3',
+    color: '#B45309',
+    description: 'Grain intake, milling batches, yield and byproduct tracking',
   },
   livestock: {
     id: 'livestock',

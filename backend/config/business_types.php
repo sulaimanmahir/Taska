@@ -82,6 +82,11 @@ return [
             'group' => 'manufacturing',
             'modules' => ['dashboard', 'production', 'inventory', 'suppliers', 'expenses', 'reports', 'distribution', 'quality_checks', 'energy_costs', 'packaging_inventory', 'downtime_tracking', 'batch_costing', 'wastage_logs'],
         ],
+        'grain_milling' => [
+            'name' => 'Grain Milling / Processing',
+            'group' => 'manufacturing',
+            'modules' => ['dashboard', 'milling', 'inventory', 'suppliers', 'purchases', 'expenses', 'reports', 'yield_tracking', 'byproduct_tracking', 'wastage_logs'],
+        ],
         'livestock' => [
             'name' => 'Livestock Farm',
             'group' => 'agriculture',

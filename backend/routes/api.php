@@ -272,6 +272,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/raw-materials', [\App\Http\Controllers\API\ProductionController::class, 'storeRawMaterial']);
     Route::post('/raw-materials/{material}/adjust', [\App\Http\Controllers\API\ProductionController::class, 'adjustRawMaterial']);
 
+    // Grain Milling / Processing
+    Route::get('/grain-milling/overview', [\App\Http\Controllers\API\GrainMillingController::class, 'overview']);
+    Route::get('/grain-milling/batches', [\App\Http\Controllers\API\GrainMillingController::class, 'index']);
+    Route::post('/grain-milling/batches', [\App\Http\Controllers\API\GrainMillingController::class, 'store']);
+
     // Warehouses
     Route::get('/warehouses', [\App\Http\Controllers\API\WarehouseController::class, 'index']);
     Route::post('/warehouses', [\App\Http\Controllers\API\WarehouseController::class, 'store']);

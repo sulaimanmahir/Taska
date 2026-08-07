@@ -22,6 +22,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const AIInsights = lazy(() => import('./pages/AIInsights'));
 const Pharmacy = lazy(() => import('./pages/Pharmacy'));
 const Production = lazy(() => import('./pages/Production'));
+const GrainMillingOps = lazy(() => import('./pages/GrainMillingOps'));
 const BillingSettings = lazy(() => import('./pages/BillingSettings'));
 const Partners = lazy(() => import('./pages/Partners'));
 const Purchases = lazy(() => import('./pages/Purchases'));
@@ -201,6 +202,7 @@ function App() {
             <Route path="ai-insights" element={<AIInsights />} />
             <Route path="pharmacy" element={<Pharmacy />} />
             <Route path="production" element={<Production />} />
+            <Route path="grain-milling" element={<GrainMillingOps />} />
             <Route path="pricing" element={<Pricing />} />
             <Route path="billing" element={<BillingSettings />} />
             <Route path="partners" element={<Partners />} />
