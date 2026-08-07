@@ -39,7 +39,7 @@ Known follow-up, not fixed in this pass: fixing `TrustFund.jsx`'s `useLedgerCont
 - [x] Add remote `origin` → `https://github.com/sulaimanmahir/Taska.git`
 - [x] Push initial commit to `main`
 
-### 2. CI pipeline — Mostly done
+### 2. CI pipeline — Done
 - [x] Add `.github/workflows/ci.yml`
   - Frontend job: `npm ci`, `npm run lint`, `npm test` (Node's built-in test runner via `node --test`)
   - Backend job: `composer install`, run PHPUnit (`tests/Unit`, `tests/Feature`) against in-memory SQLite (matches `phpunit.xml`, no external DB service needed)
