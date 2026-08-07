@@ -20,7 +20,6 @@ import {
   buildAdasheFocusActions,
   buildAdasheStatementActions,
   buildAdasheMobileActions,
-  buildTrustFundFocusActions,
   buildTrustFundStatementActions,
   buildTrustFundMobileActions,
 } from '../src/lib/financeActionRouting.js';
@@ -358,27 +357,6 @@ test('buildAdasheStatementActions and buildAdasheMobileActions build fixed actio
     mobileActions.map((action) => action.label),
     ['Ledger', 'Payout', 'Statement'],
   );
-});
-
-test('buildTrustFundFocusActions returns an empty list without an account', () => {
-  assert.deepEqual(
-    buildTrustFundFocusActions({ account: null, onOpenPrimary: () => {}, onGoToActivity: () => {} }),
-    [],
-  );
-});
-
-test('buildTrustFundFocusActions marks the active label for the primary and activity actions', () => {
-  const actions = buildTrustFundFocusActions({
-    account: { balance: 5000 },
-    onOpenPrimary: () => {},
-    onGoToActivity: () => {},
-    activeLabel: 'Repay',
-  });
-
-  assert.equal(actions[0].label, 'Open repayment');
-  assert.equal(actions[0].active, true);
-  assert.equal(actions[1].label, 'Go to activity');
-  assert.equal(actions[1].active, false);
 });
 
 test('buildTrustFundStatementActions handles missing and present accounts', () => {

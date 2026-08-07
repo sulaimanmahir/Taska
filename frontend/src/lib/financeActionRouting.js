@@ -281,28 +281,6 @@ export function buildAdasheMobileActions({
   ];
 }
 
-export function buildTrustFundFocusActions({
-  account,
-  onOpenPrimary,
-  onGoToActivity,
-  activeLabel,
-}) {
-  if (!account) {
-    return [];
-  }
-
-  const compactPrimaryLabel = getTrustFundPrimaryActionLabel(account, 'compact');
-
-  return [
-    buildFinanceAction(
-      getTrustFundPrimaryActionLabel(account),
-      onOpenPrimary,
-      activeLabel === compactPrimaryLabel,
-    ),
-    buildFinanceAction('Go to activity', onGoToActivity, activeLabel === 'Activity'),
-  ];
-}
-
 export function buildTrustFundStatementActions({
   account,
   onBackToLedger,

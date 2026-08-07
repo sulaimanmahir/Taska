@@ -10,7 +10,6 @@ import { useToast } from './useToast';
 import { getErrorMessage } from '../lib/apiFeedback';
 import { buildNumberField, buildSelectField, buildTextareaField } from '../lib/financeFieldBuilders';
 import {
-  buildTrustFundFocusActions,
   getTrustFundPrimaryActionLabel,
   getTrustFundSuggestedAmount,
   runTrustFundPrimaryAction,
@@ -294,7 +293,7 @@ export function useTrustFundDesk() {
   const scrollToLedger = () => scrollToFinanceRef(ledgerRef);
   const scrollToAccountActivity = () => scrollToFinanceRef(accountActivityRef);
   const openSelectedLedgerAction = () => runTrustFundPrimaryAction(selectedLedgerAccount, { openDraw, openRepay });
-  const ledgerLensItems = buildTrustFundLedgerLensItems({
+  const ledgerLensItemsBase = buildTrustFundLedgerLensItems({
     pagination,
     orderedAccountsList,
     activeViewLabel,
@@ -302,13 +301,34 @@ export function useTrustFundDesk() {
     activeSortDescription,
     searchScopeSummary,
     selectedLedgerAccount,
-    focusActions: buildTrustFundFocusActions({
-      account: selectedLedgerAccount,
-      onOpenPrimary: openSelectedLedgerAction,
-      onGoToActivity: scrollToAccountActivity,
-      activeLabel: activeRailAction,
-    }),
   });
+  // The ref-derived "Go to activity" closure is attached locally, after the
+  // external builder call, rather than passed as a focusActions argument into
+  // it (matching how useAdasheDesk.js's equivalent already does this
+  // correctly). react-hooks/refs can't trace a ref-closure through a function
+  // boundary to confirm it's never invoked during render (buildFinanceAction
+  // just stores onClick on the returned object, it never calls it), so it
+  // flags any such call as a false positive - keeping the closure local avoids
+  // that entirely instead of trying to prove a negative to the linter.
+  const focusActions = selectedLedgerAccount
+    ? [
+      {
+        label: getTrustFundPrimaryActionLabel(selectedLedgerAccount),
+        onClick: openSelectedLedgerAction,
+        active: activeRailAction === getTrustFundPrimaryActionLabel(selectedLedgerAccount, 'compact'),
+      },
+      {
+        label: 'Go to activity',
+        onClick: () => scrollToFinanceRef(accountActivityRef),
+        active: activeRailAction === 'Activity',
+      },
+    ]
+    : [];
+  const ledgerLensItems = ledgerLensItemsBase.map((item, index) => (
+    index === ledgerLensItemsBase.length - 1
+      ? { ...item, actions: focusActions }
+      : item
+  ));
 
   const statementAccount = statementResponse?.account ?? selectedLedgerAccount;
   const statementTransactions = statementResponse?.transactions ?? [];
