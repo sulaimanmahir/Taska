@@ -277,6 +277,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/grain-milling/batches', [\App\Http\Controllers\API\GrainMillingController::class, 'index']);
     Route::post('/grain-milling/batches', [\App\Http\Controllers\API\GrainMillingController::class, 'store']);
 
+    // Livestock Trading / Market
+    Route::get('/livestock-market/overview', [\App\Http\Controllers\API\LivestockMarketController::class, 'overview']);
+    Route::get('/livestock-market/transactions', [\App\Http\Controllers\API\LivestockMarketController::class, 'index']);
+    Route::post('/livestock-market/transactions', [\App\Http\Controllers\API\LivestockMarketController::class, 'store']);
+
     // Warehouses
     Route::get('/warehouses', [\App\Http\Controllers\API\WarehouseController::class, 'index']);
     Route::post('/warehouses', [\App\Http\Controllers\API\WarehouseController::class, 'store']);

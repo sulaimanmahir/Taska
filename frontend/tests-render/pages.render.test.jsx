@@ -86,6 +86,7 @@ const pagesUnderTest = [
   ['Fees', () => import('../src/pages/Fees.jsx')],
   ['FuelOps', () => import('../src/pages/FuelOps.jsx')],
   ['GrainMillingOps', () => import('../src/pages/GrainMillingOps.jsx')],
+  ['LivestockMarketOps', () => import('../src/pages/LivestockMarketOps.jsx')],
   ['Inventory', () => import('../src/pages/Inventory.jsx')],
   ['LabRequests', () => import('../src/pages/LabRequests.jsx')],
   ['LivestockOps', () => import('../src/pages/LivestockOps.jsx')],

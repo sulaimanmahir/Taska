@@ -92,6 +92,11 @@ return [
             'group' => 'agriculture',
             'modules' => ['dashboard', 'animals', 'feeding', 'health', 'breeding', 'reports', 'weight_tracking', 'milk_production', 'disease_logs', 'medication_records', 'pen_management'],
         ],
+        'livestock_market' => [
+            'name' => 'Livestock Trading / Market',
+            'group' => 'commerce',
+            'modules' => ['dashboard', 'market_transactions', 'holding_pen', 'customers', 'suppliers', 'expenses', 'reports', 'weight_tracking'],
+        ],
         'farm' => [
             'name' => 'Crop Farming / Agribusiness',
             'group' => 'agriculture',

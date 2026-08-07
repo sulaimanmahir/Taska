@@ -1,7 +1,7 @@
 export const businessTypeGroups = {
   commerce: {
     name: 'Commerce',
-    types: ['retail', 'supermarket', 'wholesale', 'commodity', 'pharmacy', 'textile', 'construction', 'fuel_business', 'pure_water_retail']
+    types: ['retail', 'supermarket', 'wholesale', 'commodity', 'pharmacy', 'textile', 'construction', 'fuel_business', 'pure_water_retail', 'livestock_market']
   },
   manufacturing: {
     name: 'Manufacturing',
@@ -178,6 +178,15 @@ export const businessTypes = {
     icon: 'M4 15c2-2 4-3 8-3s6 1 8 3v3H4v-3zm3-5a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z',
     color: '#D97706',
     description: 'Animal groups, feed, health, breeding, and mortality operations',
+  },
+  livestock_market: {
+    id: 'livestock_market',
+    name: 'Livestock Trading / Market',
+    slug: 'livestock_market',
+    group: 'commerce',
+    icon: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 4a1 1 0 102 0 1 1 0 00-2 0zm10 0a1 1 0 102 0 1 1 0 00-2 0z',
+    color: '#92400E',
+    description: 'Animal intake, holding pen, and market-day trading',
   },
   service: {
     id: 'service',
