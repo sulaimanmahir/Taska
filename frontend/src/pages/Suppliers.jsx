@@ -4,6 +4,7 @@ import api from '../lib/api';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import ConfirmDialog from '../components/ConfirmDialog';
+import EmptyState from '../components/EmptyState';
 import ModalShell, { ModalActions } from '../components/ModalShell';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
@@ -209,9 +210,29 @@ export default function Suppliers() {
           })}
 
           {!filteredSuppliers.length ? (
-            <Card className="col-span-full p-8 text-center text-slate-500">
-              {supplierRecords.length ? 'No suppliers matched the current search.' : 'No suppliers yet'}
-            </Card>
+            <div className="col-span-full">
+              <EmptyState
+                icon="M3 7l1.5-3h15L21 7M3 7v11a2 2 0 002 2h14a2 2 0 002-2V7M3 7h18M9 11h6"
+                title={supplierRecords.length ? 'No suppliers matched your search' : 'No suppliers yet'}
+                description={
+                  supplierRecords.length
+                    ? 'Try a different name or clear the search to see all suppliers.'
+                    : 'Add your suppliers to track purchases, deliveries, and outstanding balances.'
+                }
+                action={
+                  supplierRecords.length
+                    ? null
+                    : {
+                      label: 'New supplier',
+                      onClick: () => {
+                        setForm(emptySupplierForm);
+                        setSupplierBaseline(emptySupplierForm);
+                        setShowModal(true);
+                      },
+                    }
+                }
+              />
+            </div>
           ) : null}
         </div>
       </Card>

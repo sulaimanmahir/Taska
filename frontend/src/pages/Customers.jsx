@@ -4,6 +4,7 @@ import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import ModalShell, { ModalActions } from '../components/ModalShell';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -205,8 +206,28 @@ export default function Customers() {
               ))
             ) : filteredCustomers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-5 py-10 text-center text-sm text-slate-500">
-                  {customerRecords.length ? 'No customers matched the current search.' : 'No customers yet'}
+                <td colSpan={7} className="px-5 py-6">
+                  <EmptyState
+                    icon="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4"
+                    title={customerRecords.length ? 'No customers matched your search' : 'No customers yet'}
+                    description={
+                      customerRecords.length
+                        ? 'Try a different name, phone number, or clear the search to see everyone.'
+                        : 'Add your customers to track balances, credit, and collection history in one place.'
+                    }
+                    action={
+                      customerRecords.length
+                        ? null
+                        : {
+                          label: 'New customer',
+                          onClick: () => {
+                            clearToast();
+                            resetCustomerForm();
+                            setShowModal(true);
+                          },
+                        }
+                    }
+                  />
                 </td>
               </tr>
             ) : filteredCustomers.map((customer) => {

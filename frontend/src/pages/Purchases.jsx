@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -455,7 +456,11 @@ export default function Purchases() {
               );
             })}
             {purchaseCards.length === 0 ? (
-              <p className="text-sm text-slate-500">No purchases have been raised yet for this workspace.</p>
+              <EmptyState
+                icon="M9 2a1 1 0 00-1 1v1H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-3V3a1 1 0 00-1-1H9zm1 4V4h4v2h-4zM6 10h12M6 14h12M6 18h6"
+                title="No purchases yet"
+                description="Raise your first purchase order above to bring stock in and track supplier balances."
+              />
             ) : null}
           </div>
         </Card>
