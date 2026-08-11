@@ -1,6 +1,6 @@
 # Northern Nigeria market expansion — new business types
 
-Status: **candidates 1 (grain milling) and 2 (livestock trading market) implemented and shipped 2026-08-07. Candidates 3-4 (leather trading, property management) remain research/design only.**
+Status: **candidates 1-3 (grain milling, livestock trading market, leather trading) implemented and shipped. Candidate 4 (property management) remains research/design only.**
 Created: 2026-08-06.
 
 ## Why this exists
@@ -33,10 +33,12 @@ Taska already supports 27 business types (`backend/config/business_types.php`), 
 - **What shipped**: `livestock_market_transactions` migration + model, `LivestockMarketController` (overview with holding-pen count/today's intake+sale counts/revenue/intake cost/average sale price per kg, index, store), `LivestockMarketOps.jsx` page at `/livestock-market`, dedicated nav preset, `businessTypes.js` entry. 3 backend feature tests, 8 frontend unit tests, added to the render-smoke suite.
 - **No repeat of the grain-milling SQLite division bug**: the average-price calculation uses Eloquent's `->avg()` helper instead of a raw `/` between two decimal columns — verified correct in both the test and a live walkthrough, clean on the first live check.
 
-### 3. Leather / hides & skins (`leather_trading`)
+### 3. Leather / hides & skins (`leather_trading`) — Done (2026-08-11)
 - **Group**: `manufacturing` (spans tannery/processing and trading, mirroring how `pure_water_factory` spans production)
 - **Why third**: smaller, more geographically concentrated (Kano specifically) than the first two, but a real and well-documented cluster.
-- **Core workflow**: hide/skin intake → tanning/processing batches → finished leather goods inventory → sales (including export-oriented bulk sales). Likely the least-differentiated of the three from existing patterns — could plausibly reuse `pure_water_factory`'s production-batch shape closely.
+- **Core workflow, as built**: a single `LeatherProcessingBatch` log per tanning run (hide type, input hide count/weight, output sqft, reject count, tanning chemical/labour/other cost), following the same lean single-batch-log pattern as `grain_milling` rather than a separate intake+processing dual-model system — raw hide/skin intake reuses the existing `Purchase`/`Supplier` workflow directly, same as grain milling's grain intake.
+- **What shipped**: `leather_processing_batches` migration + model (tenant-scoped via `BelongsToBusiness`), `LeatherTradingController` (overview/index/store), `LeatherTradingOps.jsx` page at `/leather-trading`, dedicated nav preset, `businessTypes.js` entry. 3 backend feature tests, 8 frontend unit tests, added to the render-smoke suite.
+- **No repeat of the grain-milling SQLite division bug**: `average_reject_rate_percent` is computed via a PHP-level Collection average over each batch's own `rejectRatePercent()` (not raw SQL, not even Eloquent's `->avg()`), fully sidestepping any repeat of the NUMERIC-affinity integer-division issue. Live-verified via Playwright walkthrough — all overview metrics correct on first check once the verification script's hardcoded date was corrected to use the actual current date.
 
 ### 4. Property management / rent collection (`property_management`)
 - **Group**: `services`
