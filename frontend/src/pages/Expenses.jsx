@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import ModalShell, { ModalActions } from '../components/ModalShell';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
@@ -223,9 +224,11 @@ export default function Expenses() {
                 </div>
               ))
             ) : (
-              <p className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-sm text-slate-500">
-                No categories yet. Create one before logging controlled business spend.
-              </p>
+              <EmptyState
+                icon="M7 7h10M7 12h10M7 17h6"
+                title="No categories yet"
+                description="Create a category before logging controlled business spend."
+              />
             )}
           </div>
         </Card>
@@ -306,8 +309,16 @@ export default function Expenses() {
             ))}
             {!ledgerRows.length ? (
               <tr className="border-t border-slate-100">
-                <td colSpan={6} className="px-5 py-10 text-center text-sm text-slate-500">
-                  {expensesLoading ? 'Loading expenses...' : 'No expenses matched the current filters.'}
+                <td colSpan={6} className="px-5 py-6">
+                  {expensesLoading ? (
+                    <p className="py-4 text-center text-sm text-slate-500">Loading expenses...</p>
+                  ) : (
+                    <EmptyState
+                      icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3"
+                      title="No expenses matched your filters"
+                      description="Try adjusting the date range or category filter, or log a new expense above."
+                    />
+                  )}
                 </td>
               </tr>
             ) : null}

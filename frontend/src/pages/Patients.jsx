@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -356,9 +357,15 @@ export default function Patients() {
                 </div>
               );
             }) : (
-              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-sm text-slate-500">
-                {patientRecords.length ? 'No patients matched the current search.' : 'No patient records yet.'}
-              </p>
+              <EmptyState
+                icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                title={patientRecords.length ? 'No patients matched your search' : 'No patient records yet'}
+                description={
+                  patientRecords.length
+                    ? 'Try a different name or clear the search.'
+                    : 'Patient records will appear here once customers are registered for care.'
+                }
+              />
             )}
           </div>
         </Card>
@@ -382,7 +389,11 @@ export default function Patients() {
                 </div>
               );
             }) : (
-              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-sm text-slate-500">No consultations recorded yet.</p>
+              <EmptyState
+                icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                title="No consultations yet"
+                description="Consultations will build a history here as patients are seen."
+              />
             )}
           </div>
         </Card>

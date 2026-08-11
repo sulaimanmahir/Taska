@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -214,9 +215,11 @@ export default function Attendance() {
               </div>
             ))}
             {!attendanceCards.length ? (
-              <p className="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-sm text-slate-500">
-                No attendance records have been captured yet.
-              </p>
+              <EmptyState
+                icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                title="No attendance records yet"
+                description="Attendance entries will appear here as they're captured."
+              />
             ) : null}
           </div>
         </Card>

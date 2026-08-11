@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -288,7 +289,7 @@ export default function Bookings() {
                   </div>
                 </div>
               );
-            }) : <p className="text-sm text-slate-500">No reservation calendar entries yet.</p>}
+            }) : <EmptyState icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" title="No calendar entries yet" description="Reservations will populate the calendar here as they're booked." className="py-4" />}
           </div>
         </Card>
 
@@ -309,7 +310,7 @@ export default function Bookings() {
                   </div>
                 </div>
               );
-            }) : <p className="text-sm text-slate-500">No payment report yet.</p>}
+            }) : <EmptyState icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3" title="No payment report yet" description="Payment collection mix will appear here once bookings are paid for." className="py-4" />}
           </div>
         </Card>
       </section>
@@ -327,7 +328,7 @@ export default function Bookings() {
                   <p className="font-semibold text-slate-900">{trendCard.checkinsLabel}</p>
                 </div>
               );
-            }) : <p className="text-sm text-slate-500">No occupancy trend yet.</p>}
+            }) : <EmptyState icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14" title="No occupancy trend yet" description="Check-in activity will build a trend here over time." className="py-4" />}
           </div>
         </Card>
 
@@ -372,7 +373,7 @@ export default function Bookings() {
                   </div>
                 </div>
               );
-            }) : <p className="text-sm text-slate-500">No bookings recorded yet.</p>}
+            }) : <EmptyState icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" title="No bookings yet" description="Active bookings with check-in and payment details will appear here." className="py-4" />}
           </div>
         </Card>
       </section>
