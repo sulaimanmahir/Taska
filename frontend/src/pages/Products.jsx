@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import { FinanceFormError } from '../components/FinanceFormFeedback';
 import ModalShell, { ModalActions } from '../components/ModalShell';
 import OpsMetricCard from '../components/OpsMetricCard';
@@ -274,8 +275,28 @@ export default function Products() {
 
             {!isLoading && !products.length ? (
               <tr>
-                <td colSpan={7} className="px-5 py-10 text-center text-sm text-slate-500">
-                  {search || categoryFilter ? 'No products matched the current search or category filter.' : 'No products yet'}
+                <td colSpan={7} className="px-5 py-6">
+                  <EmptyState
+                    icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    title={search || categoryFilter ? 'No products matched your filters' : 'No products yet'}
+                    description={
+                      search || categoryFilter
+                        ? 'Try a different search term or clear the category filter.'
+                        : 'Add your products to start selling, tracking stock, and pricing with confidence.'
+                    }
+                    action={
+                      search || categoryFilter
+                        ? null
+                        : {
+                          label: 'New product',
+                          onClick: () => {
+                            clearToast();
+                            resetProductForm();
+                            setShowModal(true);
+                          },
+                        }
+                    }
+                  />
                 </td>
               </tr>
             ) : null}

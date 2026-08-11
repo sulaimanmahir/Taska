@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Card, { CardHeader } from '../components/Card';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -264,8 +265,16 @@ export default function Inventory() {
 
               {!isLoading && !filteredItems.length ? (
                 <tr className="border-t border-slate-100">
-                  <td colSpan={7} className="px-5 py-10 text-center text-sm text-slate-500">
-                    {inventoryItems.length ? 'No inventory lines matched the current search or stock filter.' : 'No inventory lines yet.'}
+                  <td colSpan={7} className="px-5 py-6">
+                    <EmptyState
+                      icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      title={inventoryItems.length ? 'No inventory lines matched your filters' : 'No inventory lines yet'}
+                      description={
+                        inventoryItems.length
+                          ? 'Try a different search or clear the stock filter to see everything.'
+                          : 'Inventory lines appear here once products have stock recorded against a warehouse.'
+                      }
+                    />
                   </td>
                 </tr>
               ) : null}
@@ -401,7 +410,12 @@ export default function Inventory() {
                   </div>
                 );
               }) : (
-                <p className="rounded-2xl bg-slate-50 px-4 py-6 text-sm text-slate-500">No inventory movement history yet.</p>
+                <EmptyState
+                  icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+                  title="No movement history yet"
+                  description="Stock adjustments, sales, and transfers will build a history here as they happen."
+                  className="py-4"
+                />
               )}
             </div>
           </Card>
