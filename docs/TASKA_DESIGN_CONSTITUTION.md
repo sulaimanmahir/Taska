@@ -402,7 +402,14 @@ Findings from a dedicated read-only audit pass, before any implementation began.
 - **Phase 11 (QA)** and **Phase 12 (polish)**: sequenced last per the user's own phase ordering — don't polish before the underlying batches are functionally verified.
 
 ### Files/components to modify first
-`src/index.css` (done — token gaps filled), `src/components/Badge.jsx` (done — new), then in order: `src/components/EmptyState.jsx` usage sweep (highest ROI, lowest risk — 43 pages, purely additive swap), a new shared `Table`/mobile-card-fallback component (addresses the biggest concrete Phase-10 gap), then a `ModalShell` simplification pass (highest risk, do last, after everything else is stable).
+`src/index.css` (done — token gaps filled), `src/components/Badge.jsx` (done — new), `src/components/EmptyState.jsx` usage sweep (done 2026-08-11 — see below), then a new shared `Table`/mobile-card-fallback component (addresses the biggest concrete Phase-10 gap), then a `ModalShell` simplification pass (highest risk, do last, after everything else is stable).
+
+### EmptyState sweep — done (2026-08-11)
+All pages flagged by the original audit checked and migrated where applicable, across 9 verified batches (each: lint 0 errors, node suite 630 passing, render-smoke 56 passing, committed+pushed separately): Customers, Suppliers, Purchases, Pharmacy, Inventory, Products, Results, Deliveries, Expenses, Bookings, Attendance, Patients, Consultations, LogisticsOps, ServiceOps, BeautyOps, Rooms, MobileAgentOps, Production, WholesaleOps, BuildingMaterialsOps, Reports (fixed at the shared `ReportListCard` level, covering 4 panels in one change), BillingSettings, Portfolio, Partners (also consolidated a local duplicate `EmptyPanel` component into `EmptyState` instead of leaving a second copy - the exact "duplicate components" risk the audit flagged), POS.
+
+Found already correct on inspection (no change needed): TrustFund, Adashe, TaskaCooperative, Dashboard, SMEOps, Transfers - all already used `EmptyState` properly, most because they were split into page+hook this same session with careful review.
+
+Deliberately left as-is, with reasoning: `SelectBusiness.jsx` (bespoke onboarding CTA with a `Link`-based action, a shape `EmptyState`'s onClick-only action prop doesn't support, and already meets the design bar), `RetailOps.jsx`'s empty-cart line (transient POS micro-state, not a page-level empty list), `DemoGeneral.jsx` (static marketing copy, not a real empty state).
 
 ## Implementation notes for whoever picks this up
 
