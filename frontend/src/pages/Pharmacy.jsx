@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
+import EmptyState from '../components/EmptyState';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
 import { getErrorMessage } from '../lib/apiFeedback';
@@ -526,7 +527,15 @@ export default function Pharmacy() {
               </div>
             ))}
             {!batchCards.length ? (
-              <p className="text-sm text-slate-500">No medicine batches matched the current search.</p>
+              <EmptyState
+                icon="M9 3v2m6-2v2M4 7h16M5 7v11a2 2 0 002 2h10a2 2 0 002-2V7"
+                title="No medicine batches found"
+                description={
+                  batches.length
+                    ? 'Try a different medicine, supplier, or expiry search.'
+                    : 'Save your first batch above to start tracking stock, cost, and expiry together.'
+                }
+              />
             ) : null}
           </div>
         </Card>
@@ -547,7 +556,11 @@ export default function Pharmacy() {
               );
             })}
             {!nearExpiry.length ? (
-              <p className="text-sm text-slate-500">No batches are currently sitting inside the near-expiry warning window.</p>
+              <EmptyState
+                icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                title="Nothing near expiry"
+                description="Batches will show up here automatically once they enter the near-expiry warning window."
+              />
             ) : null}
           </div>
         </Card>
@@ -570,7 +583,11 @@ export default function Pharmacy() {
               );
             })}
             {!substitutions.length ? (
-              <p className="text-sm text-slate-500">No substitution rules have been recorded yet.</p>
+              <EmptyState
+                icon="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"
+                title="No substitution rules yet"
+                description="Map approved brand and generic alternatives above so the dispense desk can suggest safe switches."
+              />
             ) : null}
           </div>
         </Card>
@@ -592,7 +609,11 @@ export default function Pharmacy() {
               );
             })}
             {!controlledLogs.length ? (
-              <p className="text-sm text-slate-500">No controlled-drug movements have been logged yet.</p>
+              <EmptyState
+                icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                title="No controlled-drug movements yet"
+                description="Dispense a controlled medicine above to start the traceability log for this pharmacy."
+              />
             ) : null}
           </div>
         </Card>
@@ -625,7 +646,16 @@ export default function Pharmacy() {
                   </div>
                 ))}
                 {!reminderCards.length ? (
-                  <p className="text-sm text-slate-500">No refill reminders matched the current search.</p>
+                  <EmptyState
+                    icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    title="No refill reminders"
+                    description={
+                      reminders.length
+                        ? 'Try a different search.'
+                        : 'Save a dispense record above with "Save refill reminder" checked to start tracking follow-through.'
+                    }
+                    className="py-4"
+                  />
                 ) : null}
               </div>
 
@@ -642,7 +672,16 @@ export default function Pharmacy() {
                   </div>
                 ))}
                 {!purchaseHistoryCards.length ? (
-                  <p className="text-sm text-slate-500">No dispense history matched the current search.</p>
+                  <EmptyState
+                    icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    title="No dispense history"
+                    description={
+                      purchaseHistory.length
+                        ? 'Try a different search.'
+                        : 'Dispense records will build a history here as sales happen at this pharmacy.'
+                    }
+                    className="py-4"
+                  />
                 ) : null}
               </div>
             </div>
