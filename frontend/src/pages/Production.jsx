@@ -5,6 +5,7 @@ import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { PageShell, ResponsiveCardGrid } from '../components/PageShell';
 import PageHero from '../components/PageHero';
@@ -549,7 +550,7 @@ export default function Production() {
                   </div>
                   <p className="mt-2 text-xs text-slate-500">Revenue {entry.revenueLabel} | Total cost {entry.totalCostLabel}</p>
                 </div>
-              )) : <p className="text-sm text-slate-500">No production trend data is available yet.</p>}
+              )) : <EmptyState icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14" title="No production trend yet" description="Trend data will build here as batches are completed." className="py-4" />}
             </div>
           </Card>
         </div>
@@ -628,7 +629,12 @@ export default function Production() {
               </div>
             ))}
             {!batchPresentations.length ? (
-              <p className="text-sm text-slate-500">No production batches matched the current search.</p>
+              <EmptyState
+                icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                title="No production batches matched your search"
+                description="Try a different search, or log a new batch above."
+                className="py-4"
+              />
             ) : null}
           </div>
         </Card>

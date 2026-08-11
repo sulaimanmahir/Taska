@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -267,7 +268,11 @@ export default function MobileAgentOps() {
           <CardHeader title="Agent Ranking" subtitle="Who is driving earnings and who needs attention." />
           <div className="space-y-3">
             {(data?.overview?.agent_rankings || []).length === 0 ? (
-              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-sm text-slate-500">No agent volume yet.</p>
+              <EmptyState
+                icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"
+                title="No agent volume yet"
+                description="Rankings will appear here once agents start recording transactions."
+              />
             ) : (data?.overview?.agent_rankings || []).map((agent, index) => {
               const ranking = buildMobileAgentRankingItem(agent, index, formatCurrency);
               return (
@@ -404,7 +409,7 @@ export default function MobileAgentOps() {
             {filteredShortages.slice(0, 4).map((shortageItem) => {
               return <div key={shortageItem.id} className="rounded-2xl bg-slate-50 px-3 py-3"><p className="font-medium text-slate-900">{shortageItem.agentName}</p><p className="mt-1 text-xs">{shortageItem.meta}</p><p className="mt-1 text-xs text-slate-500">{shortageItem.reasonLabel}</p></div>;
             })}
-            {!filteredShortages.length ? <p className="text-sm text-slate-500">No shortage records matched the current search.</p> : null}
+            {!filteredShortages.length ? <EmptyState icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.16 17c-.78 1.333.192 3 1.732 3z" title="No shortage records matched your search" description="Try a different agent name, reason, or status." className="py-4" /> : null}
           </div>
         </Card>
       </div>

@@ -4,6 +4,7 @@ import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import Toast from '../components/Toast';
@@ -501,9 +502,13 @@ export default function Rooms() {
           })}
 
           {!filteredRooms.length ? (
-            <p className="rounded-2xl bg-slate-50 px-4 py-6 text-sm text-slate-500 lg:col-span-2">
-              No rooms matched the current search or readiness filters.
-            </p>
+            <div className="lg:col-span-2">
+              <EmptyState
+                icon="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                title="No rooms matched your filters"
+                description="Try a different search or clear the readiness filter to see every room."
+              />
+            </div>
           ) : null}
         </div>
       </Card>
@@ -520,7 +525,7 @@ export default function Rooms() {
                 <p className="mt-1 text-xs text-slate-500">{entry.notesLabel}</p>
               </div>
             ))}
-            {!latestHousekeeping.length ? <p className="text-sm text-slate-500">No housekeeping updates logged yet.</p> : null}
+            {!latestHousekeeping.length ? <EmptyState icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" title="No housekeeping updates yet" description="Room turnover activity will appear here as it's logged." className="py-4" /> : null}
           </div>
         </Card>
 
@@ -535,7 +540,7 @@ export default function Rooms() {
                 <p className="mt-1 text-xs text-slate-500">{entry.detailsLabel}</p>
               </div>
             ))}
-            {!latestMaintenance.length ? <p className="text-sm text-slate-500">No maintenance requests logged yet.</p> : null}
+            {!latestMaintenance.length ? <EmptyState icon="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828z" title="No maintenance requests yet" description="Maintenance pressure affecting room readiness will appear here." className="py-4" /> : null}
           </div>
         </Card>
 
@@ -550,7 +555,7 @@ export default function Rooms() {
                 <p className="mt-1 text-xs text-slate-500">{entry.notesLabel}</p>
               </div>
             ))}
-            {!latestInspections.length ? <p className="text-sm text-slate-500">No inspections logged yet.</p> : null}
+            {!latestInspections.length ? <EmptyState icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" title="No inspections yet" description="Pass or fail signals will appear here before rooms return to sellable use." className="py-4" /> : null}
           </div>
         </Card>
       </ResponsiveCardGrid>
