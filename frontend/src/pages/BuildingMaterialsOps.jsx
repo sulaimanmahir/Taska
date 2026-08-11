@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -379,7 +380,7 @@ export default function BuildingMaterialsOps() {
                 </div>
               </div>
             ))}
-            {!filteredItems.length ? <p className="text-sm text-slate-500">No material lines matched the current search.</p> : null}
+            {!filteredItems.length ? <EmptyState icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" title="No material lines matched your search" description="Try a different search term to find the material you're looking for." className="py-4" /> : null}
           </div>
         </Card>
       </div>
@@ -434,7 +435,7 @@ export default function BuildingMaterialsOps() {
                 </div>
               </div>
             ))}
-            {!filteredCredits.length ? <p className="text-sm text-slate-500">No credit accounts matched the current search.</p> : null}
+            {!filteredCredits.length ? <EmptyState icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3" title="No credit accounts matched your search" description="Try a different contractor or account name." className="py-4" /> : null}
           </div>
         </Card>
       </div>
@@ -507,7 +508,7 @@ export default function BuildingMaterialsOps() {
                 {!quotationCard.isConverted ? <p className="mt-3 text-sm font-semibold text-slate-900">{quotationCard.totalLabel}</p> : null}
               </div>
             ))}
-            {!filteredQuotations.length ? <p className="text-sm text-slate-500">No quotations matched the current search.</p> : null}
+            {!filteredQuotations.length ? <EmptyState icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" title="No quotations matched your search" description="Try a different search, or create a new quotation above." className="py-4" /> : null}
           </div>
         </Card>
       </div>
@@ -658,7 +659,7 @@ export default function BuildingMaterialsOps() {
                 </div>
               </div>
             ))}
-            {!filteredDeliveries.length ? <p className="text-sm text-slate-500">No deliveries matched the current search.</p> : null}
+            {!filteredDeliveries.length ? <EmptyState icon="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" title="No deliveries matched your search" description="Try a different search to find the delivery you're looking for." className="py-4" /> : null}
 
             {priceChanges.slice(0, 3).map((change) => {
               const priceChangeCard = buildBuildingMaterialsPriceChangeCard(change, formatCurrency);

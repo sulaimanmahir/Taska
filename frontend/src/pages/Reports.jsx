@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { PageShell, ResponsiveCardGrid } from '../components/PageShell';
 import PageHero from '../components/PageHero';
@@ -44,9 +45,12 @@ function ReportListCard({ title, subtitle, items, emptyText, renderItem }) {
         {items?.length ? (
           items.map((item, index) => renderItem(item, index))
         ) : (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">
-            {emptyText}
-          </div>
+          <EmptyState
+            icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"
+            title="Nothing to show yet"
+            description={emptyText}
+            className="py-4"
+          />
         )}
       </div>
     </Card>

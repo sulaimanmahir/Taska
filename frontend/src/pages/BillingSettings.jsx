@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
 import ConfirmDialog from '../components/ConfirmDialog';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { PageHeader, ResponsiveCardGrid, SectionShell } from '../components/PageShell';
 import Toast from '../components/Toast';
@@ -393,9 +394,11 @@ export default function BillingSettings() {
             </tbody>
           </table>
         ) : (
-          <div className="px-5 py-8 text-center text-sm text-slate-500">
-            No invoices yet
-          </div>
+          <EmptyState
+            icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            title="No invoices yet"
+            description="Billing invoices will appear here once they're generated."
+          />
         )}
       </Card>
 
