@@ -1,5 +1,6 @@
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import { FinanceFormError } from '../components/FinanceFormFeedback';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { PageShell, ResponsiveCardGrid } from '../components/PageShell';
@@ -23,10 +24,11 @@ import {
 
 function EmptyPanel({ title, description }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-8">
-      <p className="font-semibold text-slate-900">{title}</p>
-      <p className="mt-2 text-sm text-slate-600">{description}</p>
-    </div>
+    <EmptyState
+      icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"
+      title={title}
+      description={description}
+    />
   );
 }
 
@@ -556,11 +558,15 @@ export default function Partners() {
                   })}
                 </div>
               ) : (
-                <div className="px-5 py-10 text-center text-sm text-slate-500">
-                  {agentSearch || agentStatus
-                    ? 'No partners matched the current search or status filter on this page.'
-                    : 'No partners yet. Register the first partner from the panel above.'}
-                </div>
+                <EmptyState
+                  icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  title={agentSearch || agentStatus ? 'No partners matched your filters' : 'No partners yet'}
+                  description={
+                    agentSearch || agentStatus
+                      ? 'Try a different search or clear the status filter.'
+                      : 'Register the first partner from the panel above.'
+                  }
+                />
               )
             ) : null}
 

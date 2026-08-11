@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -142,7 +143,11 @@ export default function Portfolio() {
 
       {!portfolioQuery.isLoading && businesses.length === 0 ? (
         <Card>
-          <p className="text-sm text-slate-500">No businesses found on your account yet.</p>
+          <EmptyState
+            icon="M3 7l1.5-3h15L21 7M3 7v11a2 2 0 002 2h14a2 2 0 002-2V7M3 7h18M9 11h6"
+            title="No businesses yet"
+            description="Businesses you own or belong to will appear here."
+          />
         </Card>
       ) : null}
     </div>
