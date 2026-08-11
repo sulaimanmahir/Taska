@@ -10,6 +10,7 @@ This workplan captures a senior-level system assessment of TASKA's frontend and 
 
 Ordered by blast radius and how much everything else depends on it, not by effort.
 
+0. **Taska Design Constitution v2.0 (design system overhaul)** — **user-prioritized 2026-08-11, ahead of everything else in this doc.** Full brief: [TASKA_DESIGN_CONSTITUTION.md](TASKA_DESIGN_CONSTITUTION.md). See item 10 below for status/next steps. Not started yet — currently just captured and prioritized per explicit instruction; the market-expansion vertical-building work (item 9's sibling doc, [NORTHERN_NIGERIA_MARKET_EXPANSION.md](NORTHERN_NIGERIA_MARKET_EXPANSION.md)) was paused to record this before resuming.
 1. **Version control** — the project had no `.git` repository at all. No history, no diffs, no revert path, no code review, no CI possible. Blocks everything else below.
 2. **CI pipeline** — once git exists, get both test suites running on every push so regressions are caught automatically instead of relying on manual runs.
 3. **Tenant-scoping enforcement** — currently done by convention (`where('business_id', ...)` hand-written in 44+ controllers, zero Eloquent global scopes). One missed line is a cross-tenant data leak. Already flagged in [ROADMAP.md](../ROADMAP.md) as an active gap.
@@ -133,6 +134,13 @@ See the doc's own "Open questions" section for the two still-open product decisi
 - [x] `Tests\Feature\PurchaseFlowTest` — create → receive → pay, asserts stock and supplier balance update correctly
 - [x] `frontend/src/pages/Purchases.jsx`, routed at `/purchases`
 - [x] Follow-up done: applied `BelongsToBusiness` to `Supplier`, `Purchase`, and `PurchasePayment` (each has its own `business_id`). `PurchaseItem` intentionally excluded — no `business_id` column of its own, scoped only via its `purchase` relation, same treatment as `OrderItem`-style line-item models elsewhere. Verified via full backend suite (242 passing) including the existing cross-tenant `PurchaseFlowTest` assertion.
+
+### 10. Taska Design Constitution v2.0 — Prioritized 2026-08-11, not started
+- [ ] Full brief captured verbatim in [TASKA_DESIGN_CONSTITUTION.md](TASKA_DESIGN_CONSTITUTION.md): a platform-wide design authority the user wants applied across all of Taska — shared Makaranta colour DNA (purple/orange/warm neutrals) instead of a standalone Taska palette, typography/spacing/radius/shadow discipline, the "not every thing deserves a card" rule, business-type-aware + role-aware dashboards and navigation, an intelligent "Needs Your Attention" signature feature, restrained AI/animation, and an 8-gate design approval checklist for every future feature.
+- [ ] **Missing piece**: the user's paste of the "TASKA MASTER DESIGN, UX, ANIMATION & GAMIFICATION IMPLEMENTATION PROMPT" was cut off mid-sentence by a 50,000-character paste limit, right as it started detailing the animation/gamification implementation spec. Get the rest from the user before starting implementation, or proceed on the constitution + the shorter animation/gamification summary already captured if that's judged sufficient.
+- [ ] Not yet started: no Makaranta design tokens have been pulled into Taska, no component audit against §57–60 done, no page has been reviewed against the 8 gates in §66.
+- [ ] Suggested first step whenever this is picked up: locate Makaranta's actual production colour/spacing/radius/font tokens (this doc references them by name only, not by value) before touching any Taska CSS/Tailwind config.
+- **Why this jumped the queue**: explicit user instruction ("add the following and prioritize it") while mid-flow on the Northern Nigeria market-expansion vertical work (item 9's sibling track). That vertical-building work (grain_milling, livestock_market, leather_trading all shipped) was paused, not abandoned, to record this — see [NORTHERN_NIGERIA_MARKET_EXPANSION.md](NORTHERN_NIGERIA_MARKET_EXPANSION.md) for its status; candidate 4 (`property_management`) is the one remaining item there whenever work resumes on that track instead.
 
 ## Notes
 
