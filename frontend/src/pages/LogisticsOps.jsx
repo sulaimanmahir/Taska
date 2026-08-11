@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card, { CardHeader } from '../components/Card';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -487,7 +488,7 @@ export default function LogisticsOps() {
                 </div>
               </div>
             ))}
-            {!tripSheets.length ? <p className="text-sm text-slate-500">No trip sheets yet.</p> : null}
+            {!tripSheets.length ? <EmptyState icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" title="No trip sheets yet" description="Trip sheets will appear here once a run is scheduled." className="py-4" /> : null}
           </div>
         </Card>
       </section>
@@ -534,7 +535,7 @@ export default function LogisticsOps() {
                   ))}
                 </div>
               </div>
-            )) : <p className="text-sm text-slate-500">No trips logged yet.</p>}
+            )) : <EmptyState icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" title="No trips logged yet" description="Trips will appear here once drivers start logging stops." className="py-4" />}
           </div>
         </Card>
 
@@ -548,7 +549,7 @@ export default function LogisticsOps() {
                   <p className="text-sm text-slate-500">{log.meta}</p>
                 </div>
               ))}
-              {!fuelLogs.length ? <p className="text-sm text-slate-500">No fuel logs yet.</p> : null}
+              {!fuelLogs.length ? <EmptyState icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3" title="No fuel logs yet" description="Fuel purchases will build a log here as they're recorded." className="py-4" /> : null}
             </div>
           </Card>
 
@@ -561,7 +562,7 @@ export default function LogisticsOps() {
                   <p className="text-sm text-slate-500">{log.meta}</p>
                 </div>
               ))}
-              {!maintenanceLogs.length ? <p className="text-sm text-slate-500">No maintenance logs yet.</p> : null}
+              {!maintenanceLogs.length ? <EmptyState icon="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828z" title="No maintenance logs yet" description="Vehicle maintenance activity will build a log here." className="py-4" /> : null}
             </div>
           </Card>
 
@@ -574,7 +575,7 @@ export default function LogisticsOps() {
                   <p className="text-sm text-slate-500">{settlement.payoutLabel}</p>
                 </div>
               ))}
-              {!settlements.length ? <p className="text-sm text-slate-500">No settlements yet.</p> : null}
+              {!settlements.length ? <EmptyState icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3" title="No settlements yet" description="Driver settlements will appear here once payouts are created." className="py-4" /> : null}
             </div>
           </Card>
         </div>

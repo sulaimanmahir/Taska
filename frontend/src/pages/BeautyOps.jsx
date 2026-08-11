@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -280,7 +281,7 @@ export default function BeautyOps() {
                 </div>
               );
             })}
-            {!staff.length ? <p className="text-sm text-slate-500">No stylist profiles yet.</p> : null}
+            {!staff.length ? <EmptyState icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" title="No stylist profiles yet" description="Add stylists to start assigning appointments and keeping the chair diary full." className="py-4" /> : null}
           </div>
         </Card>
 
