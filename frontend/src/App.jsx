@@ -24,6 +24,7 @@ const Pharmacy = lazy(() => import('./pages/Pharmacy'));
 const Production = lazy(() => import('./pages/Production'));
 const GrainMillingOps = lazy(() => import('./pages/GrainMillingOps'));
 const LivestockMarketOps = lazy(() => import('./pages/LivestockMarketOps'));
+const LeatherTradingOps = lazy(() => import('./pages/LeatherTradingOps'));
 const BillingSettings = lazy(() => import('./pages/BillingSettings'));
 const Partners = lazy(() => import('./pages/Partners'));
 const Purchases = lazy(() => import('./pages/Purchases'));
@@ -205,6 +206,7 @@ function App() {
             <Route path="production" element={<Production />} />
             <Route path="grain-milling" element={<GrainMillingOps />} />
             <Route path="livestock-market" element={<LivestockMarketOps />} />
+            <Route path="leather-trading" element={<LeatherTradingOps />} />
             <Route path="pricing" element={<Pricing />} />
             <Route path="billing" element={<BillingSettings />} />
             <Route path="partners" element={<Partners />} />

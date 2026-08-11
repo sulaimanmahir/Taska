@@ -5,7 +5,7 @@ export const businessTypeGroups = {
   },
   manufacturing: {
     name: 'Manufacturing',
-    types: ['pure_water_factory', 'grain_milling']
+    types: ['pure_water_factory', 'grain_milling', 'leather_trading']
   },
   services: {
     name: 'Services',
@@ -169,6 +169,15 @@ export const businessTypes = {
     icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l2 3H9m2 3l2 3H7.5a2 2 0 01-2-2V3.5M8 13l2 3h3m-3 0l2-3h3m-3 0l2 3h3m-3 0l2-3',
     color: '#B45309',
     description: 'Grain intake, milling batches, yield and byproduct tracking',
+  },
+  leather_trading: {
+    id: 'leather_trading',
+    name: 'Leather / Hides & Skins',
+    slug: 'leather_trading',
+    group: 'manufacturing',
+    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l2 3H9m2 3l2 3H7.5a2 2 0 01-2-2V3.5M8 13l2 3h3m-3 0l2-3h3m-3 0l2 3h3m-3 0l2-3',
+    color: '#78350F',
+    description: 'Hide intake, tanning batches, finished leather output and rejects',
   },
   livestock: {
     id: 'livestock',

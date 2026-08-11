@@ -87,6 +87,11 @@ return [
             'group' => 'manufacturing',
             'modules' => ['dashboard', 'milling', 'inventory', 'suppliers', 'purchases', 'expenses', 'reports', 'yield_tracking', 'byproduct_tracking', 'wastage_logs'],
         ],
+        'leather_trading' => [
+            'name' => 'Leather / Hides & Skins',
+            'group' => 'manufacturing',
+            'modules' => ['dashboard', 'tanning', 'inventory', 'suppliers', 'purchases', 'customers', 'expenses', 'reports', 'yield_tracking', 'reject_tracking'],
+        ],
         'livestock' => [
             'name' => 'Livestock Farm',
             'group' => 'agriculture',
