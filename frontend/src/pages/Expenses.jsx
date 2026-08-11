@@ -278,6 +278,7 @@ export default function Expenses() {
           </div>
         </div>
 
+        <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -324,6 +325,7 @@ export default function Expenses() {
             ) : null}
           </tbody>
         </table>
+        </div>
       </Card>
 
       {showExpenseModal ? (

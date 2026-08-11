@@ -248,6 +248,7 @@ export default function Inventory() {
             </div>
           </div>
 
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -310,6 +311,7 @@ export default function Inventory() {
               }) : null}
             </tbody>
           </table>
+          </div>
         </Card>
 
         <div className="space-y-6">

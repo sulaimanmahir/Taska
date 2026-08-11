@@ -258,6 +258,7 @@ export default function Products() {
           </div>
         </div>
 
+        <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -339,6 +340,7 @@ export default function Products() {
               : null}
           </tbody>
         </table>
+        </div>
       </Card>
 
       {pagination.lastPage > 1 ? (

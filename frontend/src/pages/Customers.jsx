@@ -183,6 +183,7 @@ export default function Customers() {
           </div>
         </div>
 
+        <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -261,6 +262,7 @@ export default function Customers() {
             })}
           </tbody>
         </table>
+        </div>
       </Card>
 
       {showModal ? (

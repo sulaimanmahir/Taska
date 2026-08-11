@@ -255,6 +255,7 @@ export default function Admin() {
         ) : null}
 
         {!adminQuery.isLoading && filteredData.length > 0 && activeTab === 'users' ? (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -316,9 +317,11 @@ export default function Admin() {
               })}
             </tbody>
           </table>
+          </div>
         ) : null}
 
         {!adminQuery.isLoading && filteredData.length > 0 && activeTab === 'businesses' ? (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -350,9 +353,11 @@ export default function Admin() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : null}
 
         {!adminQuery.isLoading && filteredData.length > 0 && activeTab === 'plans' ? (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -375,9 +380,11 @@ export default function Admin() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : null}
 
         {!adminQuery.isLoading && filteredData.length > 0 && activeTab === 'transactions' ? (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -405,9 +412,11 @@ export default function Admin() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : null}
 
         {!adminQuery.isLoading && filteredData.length > 0 && activeTab === 'support' ? (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -448,9 +457,11 @@ export default function Admin() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : null}
 
         {!adminQuery.isLoading && filteredData.length > 0 && activeTab === 'referrals' ? (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -475,6 +486,7 @@ export default function Admin() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : null}
       </Card>
 
