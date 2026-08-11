@@ -1,4 +1,5 @@
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -278,7 +279,7 @@ function DeliveryCompanyOps() {
                   </div>
                 </div>
               </div>
-            )) : <p className="text-sm text-slate-500">No rider data yet.</p>}
+            )) : <EmptyState icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" title="No riders yet" description="Riders will show up here once they're added to the fleet." className="py-4" />}
           </div>
         </Card>
 
@@ -295,7 +296,7 @@ function DeliveryCompanyOps() {
                   <p className="text-sm font-semibold text-emerald-700">{investor.payoutLabel}</p>
                 </div>
               </div>
-            )) : <p className="text-sm text-slate-500">No investor payouts yet.</p>}
+            )) : <EmptyState icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m0-16a9 9 0 100 18 9 9 0 000-18z" title="No investor payouts yet" description="Payout pressure will appear here once investor revenue starts flowing." className="py-4" />}
           </div>
         </Card>
       </section>
@@ -314,7 +315,7 @@ function DeliveryCompanyOps() {
                   <p className="text-sm font-semibold text-emerald-700">{entry.amountLabel}</p>
                 </div>
               </div>
-            )) : <p className="text-sm text-slate-500">No rider wallet activity yet.</p>}
+            )) : <EmptyState icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3" title="No wallet activity yet" description="Rider wallet credits and debits will build a history here." className="py-4" />}
           </div>
         </Card>
 
@@ -333,7 +334,7 @@ function DeliveryCompanyOps() {
                   </span>
                 </div>
               </div>
-            )) : <p className="text-sm text-slate-500">No complaints logged yet.</p>}
+            )) : <EmptyState icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.16 17c-.78 1.333.192 3 1.732 3z" title="No complaints logged" description="Customer-facing issues will appear here as they're raised." className="py-4" />}
           </div>
         </Card>
 
@@ -407,7 +408,7 @@ function DeliveryCompanyOps() {
                     </span>
                   </div>
                 </button>
-              )) : <p className="text-sm text-slate-500">No manifest-ready jobs yet.</p>}
+              )) : <EmptyState icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" title="No manifest-ready jobs" description="Jobs will appear here once they're ready to be added to a delivery manifest." className="py-4" />}
             </div>
 
             <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -444,7 +445,7 @@ function DeliveryCompanyOps() {
                     </span>
                   </div>
                 </div>
-              )}) : <p className="text-sm text-slate-500">No manifests yet.</p>}
+              )}) : <EmptyState icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" title="No manifests yet" description="Build a manifest above to group jobs for a route run." className="py-4" />}
             </div>
           </Card>
 
@@ -464,7 +465,7 @@ function DeliveryCompanyOps() {
                     <p className="text-xs font-semibold uppercase text-emerald-700">{item.actorLabel}</p>
                   </div>
                 </div>
-              )}) : <p className="text-sm text-slate-500">No remittance records yet.</p>}
+              )}) : <EmptyState icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m-6-4h8m0 0l-3-3m3 3l-3 3" title="No remittance records yet" description="Remittances will build a history here as riders settle collected cash." className="py-4" />}
             </div>
           </Card>
         </div>

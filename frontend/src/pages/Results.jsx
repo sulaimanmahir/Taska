@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -196,7 +197,12 @@ function SchoolResults() {
               </div>
             ))}
             {!bestPerformers.length ? (
-              <p className="text-sm text-slate-500">No result entries are available yet to rank top performers.</p>
+              <EmptyState
+                icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"
+                title="No results to rank yet"
+                description="Once results are recorded, top performers will be ranked here automatically."
+                className="py-4"
+              />
             ) : null}
           </div>
         </Card>
@@ -431,7 +437,12 @@ function LaboratoryResults() {
                 </div>
               ))}
               {approvedResults.length === 0 ? (
-                <p className="text-sm text-slate-500">No approved results are visible yet.</p>
+                <EmptyState
+                  icon="M5 13l4 4L19 7"
+                  title="No approved results yet"
+                  description="Results appear here once they've been reviewed and approved for release."
+                  className="py-4"
+                />
               ) : null}
             </div>
           </Card>
