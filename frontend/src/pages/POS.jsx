@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { PageShell, ResponsiveCardGrid } from '../components/PageShell';
 import PageHero from '../components/PageHero';
@@ -306,15 +307,12 @@ export default function POS() {
             ) : null}
 
             {!posQuery.isLoading && filteredProducts.length === 0 ? (
-              <div className="py-16 text-center">
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100">
-                  <svg className="h-10 w-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                </div>
-                <p className="text-lg font-semibold text-slate-900">No products found</p>
-                <p className="mt-1 text-sm text-slate-500">Try another search term or stock the product first.</p>
-              </div>
+              <EmptyState
+                icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                title="No products found"
+                description="Try another search term or stock the product first."
+                className="py-16"
+              />
             ) : null}
 
             {!posQuery.isLoading && filteredProducts.length > 0 ? (
