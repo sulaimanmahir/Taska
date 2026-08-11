@@ -10,6 +10,23 @@
   --color-error: #dc2626;
   --color-info: #2563eb;
 
+  /*
+   * Taska Design Constitution v2.0 (docs/TASKA_DESIGN_CONSTITUTION.md):
+   * orange is the secondary "energy/emphasis" accent that sits alongside
+   * brand purple, used sparingly (highlights, badges, milestones) and
+   * never for primary actions. taska-* tokens are the operational-personality
+   * layer described in the constitution's §59-60 - reused for the
+   * "Needs Your Attention" pattern and the gamification work in Phase 9.
+   */
+  --color-accent-orange: #ea580c;
+  --color-accent-orange-soft: #fff1e6;
+  --taska-attention-surface: #fff7ed;
+  --taska-attention-border: #fed7aa;
+  --taska-kpi-positive: #15803d;
+  --taska-kpi-negative: #b91c1c;
+  --taska-navigation-active: var(--color-brand);
+  --taska-table-hover: #faf5ff;
+
   --color-bg: #f6f7fb;
   --color-bg-elevated: #ffffff;
   --color-bg-subtle: #f9fafb;

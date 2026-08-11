@@ -305,6 +305,105 @@ Taska should never require users to understand the software before they can unde
 
 ---
 
+---
+
+## Implementation phases & closing commandments (pasted 2026-08-11, completes the master prompt)
+
+The user supplied the rest of the master prompt that was cut off earlier. Phases 1–6 of that prompt were never received (the paste that got cut off jumped straight from framing into phase 7) — if they turn out to matter, ask the user; everything below is what was actually sent.
+
+### PHASE 7 — Business-specific UX
+Work through each supported business type individually. Do not assume one workflow fits all.
+
+### PHASE 8 — Motion system
+Standardise animation. Add meaningful micro-interactions. Respect reduced-motion preferences.
+
+### PHASE 9 — Gamification foundation
+Implement: business health; progress; levels; achievements; milestones; streaks where appropriate; recommendations; progress centre.
+
+### PHASE 10 — Mobile
+Review each core workflow deliberately for mobile.
+
+### PHASE 11 — QA
+Test: desktop; tablet; mobile; roles; business types; permissions; offline behaviour; loading; errors; edge cases.
+
+### PHASE 12 — Polish
+Only after functionality is stable, refine: spacing; motion; typography; chart presentation; empty states; tooltips; copy; micro-interactions.
+
+### §72. Do not make large blind changes
+Before major changes, inspect context. If a workflow appears unusual, investigate whether it supports a specific business rule. Do not assume unfamiliar code is wrong. **Preserve domain logic. Improve presentation around it.**
+
+### §73. Development quality
+Follow the existing architecture unless there is a strong technical reason to improve it. Maintain: modularity; testability; accessibility; type safety where applicable; validation; reusable components; clean service boundaries; secure permissions; database integrity. Do not introduce unnecessary dependencies.
+
+### §74. Testing
+Add or improve tests for critical workflows. At minimum cover: sales; payment; inventory changes; purchase; financial posting; authentication; permissions; offline/sync if available; business type configuration; gamification calculation where implemented. **UI redesign must not silently break business logic.**
+
+### §75. Final north star
+Can it be simpler? Can it be clearer? Can it be faster? Can it be smarter? Can it be more beautiful? Does it match Makaranta's quality? Does it still feel like Taska? Does it help the business operate better? If not, redesign it.
+
+### §76. Final Taska experience
+Open Taska → Understand the business → See what matters → See what needs attention → Take action → Receive feedback → Make progress → Improve the business → Continue working. The software itself should gradually disappear behind the workflow.
+
+### §77. Final commandment
+**TASKA MUST MATCH MAKARANTA'S DESIGN STANDARD WITHOUT BECOMING MAKARANTA.**
+
+Use Makaranta's established colour system and premium visual DNA. Retain Taska's professional business personality. Keep the interface calm. Make business data understandable. Make routine operations exceptionally fast. Use animation to improve comprehension. Use gamification to encourage good business habits. Use AI to increase intelligence without clutter. Adapt Taska deeply to every business type. Adapt Taska to user role and permission.
+
+Never sacrifice correct business workflow for visual beauty. Never sacrifice simplicity for feature visibility. Never sacrifice performance for animation. Never use childish gamification. Never allow new modules to deteriorate into generic ERP templates.
+
+And above everything:
+
+> **DON'T SHOW BUSINESSES SOFTWARE. SHOW THEM THEIR BUSINESS.**
+
+### Required first action (per the user's prompt)
+Before writing implementation code: audit the existing codebase (architecture, design system, colour/token usage, business types, workflows per business type, UI/UX inconsistencies, mobile/responsive issues, existing animation usage, existing/missing gamification, broken/incomplete workflows, duplicate components/logic), then propose implementation phases and the files/components to modify first, and the risks to protect against — **without stopping at the audit**. Proceed into implementation systematically afterward. Don't rebuild features that already exist. See the "2026-08-11 codebase audit" section below for the audit itself.
+
+---
+
+## 2026-08-11 codebase audit (required first action, per the master prompt)
+
+Findings from a dedicated read-only audit pass, before any implementation began.
+
+**1. Architecture**: 69 page components (`src/pages/`), 55 shared components (`src/components/`, flat, no subdirectories). Routing/lazy-loading centralized in `App.jsx`. Business-type config split across `config/businessTypes.js` (groups/colors/icons) and `config/navigationPresets.js` (per-type nav/dashboard). State pattern: per-domain custom hooks in `src/hooks/` (`use<Page>Desk.js`), no TanStack Query, two Zustand stores (`authStore.js`, `offlineStore.js`).
+
+**2. Existing design system**: primitives exist (`Button.jsx`, `Card.jsx`, `ModalShell.jsx` + 8 helper files, `EmptyState.jsx`, `Toast.jsx`, `ConfirmDialog.jsx`, `StatsCard.jsx`, `OpsMetricCard.jsx`, `PageHero.jsx`, `PageShell.jsx`) but usage is inconsistent — only 5 pages import `ModalShell`, only 7 import `EmptyState` even though 43 pages hand-roll their own "no data yet" markup instead. **No shared Table, Badge, Tabs, or Skeleton component existed** before this session (Badge added below).
+
+**3. Colour/token assessment**: `index.css` already has a solid token layer (~60 root variables: brand/status/bg/surface/border/text/shadow/spacing/typography). But **token bypass is widespread** — 88 files use arbitrary Tailwind colour utilities (`bg-purple-600`, `text-orange-500`, etc.) directly instead of the tokens, and 15 files have raw hex codes. This includes even the newest, most-consistent pages (`GrainMillingOps.jsx` uses `border-rose-200 bg-rose-50` instead of a token/status class). `App.css` (184 lines) was confirmed dead — zero imports anywhere — and has been deleted.
+
+**4. Business types** (28 slugs, from `businessTypes.js`): commerce group (retail, supermarket, wholesale, commodity, pharmacy, textile, construction, fuel_business, pure_water_retail, livestock_market), manufacturing (pure_water_factory, grain_milling, leather_trading), services (restaurant, hotel, clinic, laboratory, service, school, beauty), agriculture (farm, livestock, agro_dealer), mobility (logistics, delivery_company, mobile_agent), other (warehouse, general, mixed; `ngo_warehouse` aliases to warehouse).
+
+**5. Workflows by type**: most business types have a dedicated Ops page. Notable exceptions relying on generic pages: pharmacy (`Pharmacy.jsx`), hotel (`Rooms.jsx`), clinic (`Patients.jsx`), laboratory (`LabRequests.jsx`), school (`Classes.jsx`/`Students.jsx`), pure_water_factory (`Production.jsx`).
+
+**6. UI/UX inconsistencies**: older pages (`Customers.jsx`) use raw Tailwind pill classes with no shared badge component; even the newest pages (`GrainMillingOps.jsx`, built this same session) are visually consistent with each other but still not token-driven — they hand-roll the same rose/amber alert-box and input styling independently rather than through a shared class. Consistency-by-copying, not consistency-by-system.
+
+**7. Mobile/responsive**: only 1 page uses `overflow-x-auto` for table scrolling, only 2 implement a mobile-card fallback for tables (per §30 of the constitution, this is meant to be the default, not the exception). 14 files use fixed pixel widths.
+
+**8. Animation**: the custom keyframe set (`fadeIn`, `riseIn`, `shimmer`, `floaty`, `sheen`, `gentlePulse`) plus a `prefers-reduced-motion` override already exist in `index.css` and are reasonably calm/restrained already (matches §38's "smooth, subtle, confident" standard) — but only used in ~10 page files. Most pages use bare Tailwind `animate-pulse` for skeletons and nothing else.
+
+**9. Gamification**: confirmed greenfield — zero matches for achievement/streak/gamif/milestone anywhere in the frontend. Phase 9 has no existing scaffolding to preserve or conflict with.
+
+**10. Broken/incomplete workflows**: no TODO/FIXME/stub markers found in `pages/`/`components/` — nothing obviously unfinished surfaced at this pass (would need per-page manual testing to find anything deeper, which is what Phase 11 QA is for).
+
+**11. Duplicates**: `EmptyState.jsx` exists but is bypassed by 43 pages (a de facto duplicate inline pattern). `ModalShell` is a single implementation but unusually fragmented across 8+ helper files (`modalShellActions/Config/Controller/Dom/Focus/Hooks/Interactions/Runtime/Scroll/Sections/State/View.js`) — a simplification candidate, not a rebuild candidate.
+
+### Risks to protect against (per §72–74)
+- **88 files with token-bypassing colour classes** is the single biggest risk surface — touching all of them at once would be exactly the "large blind change" the constitution itself forbids. Must be migrated in small verified batches, page-by-page or component-by-component, the same way the 3 business-type verticals were built this session.
+- The fragmented `ModalShell` (8+ files) and the underused `EmptyState`/lack-of-`Badge` situation are real duplication/inconsistency, but changing shared components touches every page that (in)directly depends on them — highest blast radius in the whole codebase. Any change here needs the full render-smoke suite (56 pages) plus a live spot-check before/after, not just unit tests.
+- No gamification data model exists yet on the backend either — Phase 9 needs a schema/migration design pass (business health score inputs, achievement definitions, streak tracking) before any frontend "progress centre" UI is built, otherwise it'll be decorative rather than real, which §17 and §77 both explicitly warn against ("never use childish gamification" / data must be interpreted, not merely displayed).
+- Business-logic preservation (§72, §74): none of the 28 verticals' actual workflows should change while restyling — this is a presentation-layer effort layered on top of working domain logic, verified via the existing test suites (backend PHPUnit, frontend `node --test`, Vitest render-smoke) after every batch, exactly as done for the grain_milling/livestock_market/leather_trading builds.
+
+### Proposed phasing (maps the constitution's Phase 7-12 onto this codebase's actual shape)
+
+- **Phase 0 (foundation, started 2026-08-11)**: dead-code removal (`App.css`, done), fill token gaps (added `--color-accent-orange` + `taska-*` semantic tokens since no orange/attention/gamification-adjacent tokens existed), add the missing `Badge` component wrapping the `.badge-*` classes that already existed in CSS but had no component wrapper. Foundation only — no page migrated yet.
+- **Phase 7 (business-specific UX)**: work vertical-by-vertical using the existing `businessTypes.js` grouping as the worklist; prioritize the 6 "no dedicated Ops page" types first (pharmacy, hotel, clinic, laboratory, school, pure_water_factory) since those are furthest from the constitution's per-business-dashboard standard (§18–21).
+- **Phase 8 (motion)**: audit is favorable here — the existing keyframe set is already restrained and on-spec, so this is more "apply consistently" than "invent." Low risk, can run in parallel with Phase 7.
+- **Phase 9 (gamification)**: needs a short design pass (backend schema: what counts as "business health," what triggers a milestone/streak) before UI work — flagged as a risk above, not started yet.
+- **Phase 10 (mobile)**: the table-responsiveness gap (only 2/69 pages have a mobile fallback) is the concrete, measurable target here.
+- **Phase 11 (QA)** and **Phase 12 (polish)**: sequenced last per the user's own phase ordering — don't polish before the underlying batches are functionally verified.
+
+### Files/components to modify first
+`src/index.css` (done — token gaps filled), `src/components/Badge.jsx` (done — new), then in order: `src/components/EmptyState.jsx` usage sweep (highest ROI, lowest risk — 43 pages, purely additive swap), a new shared `Table`/mobile-card-fallback component (addresses the biggest concrete Phase-10 gap), then a `ModalShell` simplification pass (highest risk, do last, after everything else is stable).
+
 ## Implementation notes for whoever picks this up
 
 - This is a **platform-wide** design direction, not a single-page task. Do not attempt it as one big rewrite — the existing session's pattern of small, verified, incremental changes (proven across the `BelongsToBusiness` tenant-scoping sweep, the render-smoke test sweep, and the 3 new business-type verticals) is the right execution model here too.
