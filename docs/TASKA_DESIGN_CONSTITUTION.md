@@ -419,6 +419,18 @@ Found already correct on inspection (no change needed): TrustFund, Adashe, Taska
 
 Deliberately left as-is, with reasoning: `SelectBusiness.jsx` (bespoke onboarding CTA with a `Link`-based action, a shape `EmptyState`'s onClick-only action prop doesn't support, and already meets the design bar), `RetailOps.jsx`'s empty-cart line (transient POS micro-state, not a page-level empty list), `DemoGeneral.jsx` (static marketing copy, not a real empty state).
 
+---
+
+## Logo integration — done (2026-08-12)
+
+The user supplied the official Taska logo (stylised ribbon T in a purple/blue gradient, "Taska" wordmark with an orange "ka", "By Result Seekers" italic subordinate endorsement) with a detailed 50-section integration brief. Full audit-then-implement pass:
+
+**What was found**: `Logo.jsx` was already a well-built, centralized, variant/theme/size-aware component (`logoConfig.js` drives every preset) — exactly the "one component, one language" architecture the brief asked for. It just rendered the *wrong* mark: an old "orbit and nodes" placeholder icon, not the approved T. `public/favicon.svg` turned out to already contain a vector ribbon-T path close in spirit to the new mark (an earlier, abandoned attempt at the same identity) — reused directly rather than redrawn from scratch. `public/brand/*.png` and root `Taska logo*.png`/`Taska Logo_v2.png` were confirmed to be an old "network node" moodboard, unreferenced by any code.
+
+**What shipped**: `Logo.jsx`'s `BrandIcon` now renders the ribbon-T path with a purple→blue gradient; `BrandWordmark` splits "Taska" into T (gradient) / as (theme-aware) / ka (orange gradient). Because every page already consumes `Logo.jsx` through the shared component, this one change propagates everywhere automatically — sidebar, top nav, login, auth, mobile — with no per-page edits needed. `favicon.svg` simplified (the old version had heavy blur/glow that wouldn't survive being shrunk to 16×16). `icon-192.svg` rebuilt as a real maskable app icon (rounded dark square, T centered in a safe area) and wired into the PWA manifest for both 192/512 slots. Fixed a broken `apple-touch-icon` reference (pointed at a `.png` that never existed) and a `theme_color` mismatch between `index.html` and the PWA manifest (leftover unrelated sky-blue). Verified live via a Playwright screenshot of the login page.
+
+**Explicitly out of scope / not achievable in this environment**: true vector tracing of the supplied PNG artwork, and PNG raster fallback generation — no image-editing tooling (ImageMagick, Inkscape, rsvg-convert, sharp) was available. This is a faithful from-scratch SVG recreation of the mark's shape/colour treatment matching the brief's hierarchy and colour direction, not a pixel-perfect trace. Also not attempted: email-template branding, PDF/report/invoice logo placement, print/monochrome variant, Open Graph/social images, dark-mode-specific logo variant (moot — dark theme was removed from Taska earlier this session), command-palette/loading-screen T-mark animation. The old moodboard PNGs were deliberately left in place (confirmed unreferenced, but not deleted without being asked to).
+
 ## Implementation notes for whoever picks this up
 
 - This is a **platform-wide** design direction, not a single-page task. Do not attempt it as one big rewrite — the existing session's pattern of small, verified, incremental changes (proven across the `BelongsToBusiness` tenant-scoping sweep, the render-smoke test sweep, and the 3 new business-type verticals) is the right execution model here too.
