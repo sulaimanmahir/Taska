@@ -252,6 +252,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/ai/insights/{id}/dismiss', [AIInsightController::class, 'dismiss']);
     Route::post('/ai/insights/{id}/restore', [AIInsightController::class, 'restore']);
 
+    // Gamification (data model - see docs/TASKA_DESIGN_CONSTITUTION.md)
+    Route::get('/gamification/overview', [\App\Http\Controllers\API\GamificationController::class, 'overview']);
+
     // Inventory
     Route::get('/inventory', [\App\Http\Controllers\API\InventoryController::class, 'index']);
     Route::get('/inventory/low-stock', [\App\Http\Controllers\API\InventoryController::class, 'lowStock']);

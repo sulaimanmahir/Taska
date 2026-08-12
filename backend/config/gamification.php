@@ -65,8 +65,8 @@ return [
         ],
         'debt_free' => [
             'name' => 'Debt Free',
-            'description' => 'Cleared every overdue customer balance.',
-            'metric' => 'overdue_receivables_total',
+            'description' => 'Every customer balance is fully cleared.',
+            'metric' => 'outstanding_customer_balance',
             'threshold' => 0,
             'comparator' => 'lte',
             'tier' => 'silver',

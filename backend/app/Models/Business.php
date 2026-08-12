@@ -65,6 +65,21 @@ class Business extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function healthSnapshots(): HasMany
+    {
+        return $this->hasMany(BusinessHealthSnapshot::class);
+    }
+
+    public function streaks(): HasMany
+    {
+        return $this->hasMany(BusinessStreak::class);
+    }
+
+    public function achievementUnlocks(): HasMany
+    {
+        return $this->hasMany(BusinessAchievementUnlock::class);
+    }
+
     public function primaryBranch(): BelongsTo
     {
         return $this->belongsTo(Branch::class, 'primary_branch_id');
