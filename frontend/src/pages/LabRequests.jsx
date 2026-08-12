@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { useBusinessType } from '../config';
 import Card, { CardHeader } from '../components/Card';
+import EmptyState from '../components/EmptyState';
 import OpsMetricCard from '../components/OpsMetricCard';
 import PageHero from '../components/PageHero';
 import { ResponsiveCardGrid } from '../components/PageShell';
@@ -359,9 +360,13 @@ export default function LabRequests() {
                 </div>
               ))}
               {!catalogCards.length ? (
-                <p className="rounded-2xl bg-slate-50 px-4 py-6 text-sm text-slate-500 md:col-span-2">
-                  No diagnostics tests matched the current catalogue search.
-                </p>
+                <div className="md:col-span-2">
+                  <EmptyState
+                    icon="M9 3v2m6-2v2M4 7h16M5 7v11a2 2 0 002 2h10a2 2 0 002-2V7"
+                    title="No diagnostic tests matched your search"
+                    description="Try a different search term to find the test you're looking for."
+                  />
+                </div>
               ) : null}
             </div>
           </div>
@@ -517,7 +522,12 @@ export default function LabRequests() {
           })}
 
           {activeRequestItems.length === 0 ? (
-            <p className="text-sm text-slate-500">No active lab requests matched the current search or status filter.</p>
+            <EmptyState
+              icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              title="No active lab requests"
+              description="Try a different search, or clear the status filter to see everything."
+              className="py-4"
+            />
           ) : null}
         </div>
       </Card>
