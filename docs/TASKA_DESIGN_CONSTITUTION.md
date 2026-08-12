@@ -402,7 +402,12 @@ Findings from a dedicated read-only audit pass, before any implementation began.
 - **Phase 11 (QA)** and **Phase 12 (polish)**: sequenced last per the user's own phase ordering — don't polish before the underlying batches are functionally verified.
 
 ### Files/components to modify first
-`src/index.css` (done — token gaps filled), `src/components/Badge.jsx` (done — new), `src/components/EmptyState.jsx` usage sweep (done 2026-08-11 — see below), then a new shared `Table`/mobile-card-fallback component (addresses the biggest concrete Phase-10 gap), then a `ModalShell` simplification pass (highest risk, do last, after everything else is stable).
+`src/index.css` (done — token gaps filled), `src/components/Badge.jsx` (done — new), `src/components/EmptyState.jsx` usage sweep (done 2026-08-11 — see below), raw-table mobile fallback (done 2026-08-12 — see below), then a `ModalShell` simplification pass (highest risk, do last, after everything else is stable).
+
+### Phase 10 mobile table gap — done (2026-08-12)
+Step 1: every raw `<table>` missing a horizontal-scroll container got one (`overflow-x-auto`) — 7 pages (BillingSettings, Expenses, Products, Inventory, Customers, and Admin.jsx's 6 tables).
+Step 2: 5 of those pages (Customers, Products, Inventory, Expenses, BillingSettings) got a proper mobile card-fallback view — `hidden md:block` on the table, a separate stacked-card list shown only below `md`, following `TrustFund.jsx`'s existing reference pattern. Each card reuses the same pre-built row data the table already computes.
+`Admin.jsx` deliberately excluded from the card-fallback step — 6 different tables (users/businesses/plans/transactions/support/referrals) would need 6 bespoke card layouts, for a backoffice/superadmin tool nobody operates from a phone. The overflow-x-auto fix from step 1 is judged proportionate there; a full redesign wasn't, per §72's "use judgment" guidance.
 
 ### EmptyState sweep — done (2026-08-11)
 All pages flagged by the original audit checked and migrated where applicable, across 9 verified batches (each: lint 0 errors, node suite 630 passing, render-smoke 56 passing, committed+pushed separately): Customers, Suppliers, Purchases, Pharmacy, Inventory, Products, Results, Deliveries, Expenses, Bookings, Attendance, Patients, Consultations, LogisticsOps, ServiceOps, BeautyOps, Rooms, MobileAgentOps, Production, WholesaleOps, BuildingMaterialsOps, Reports (fixed at the shared `ReportListCard` level, covering 4 panels in one change), BillingSettings, Portfolio, Partners (also consolidated a local duplicate `EmptyPanel` component into `EmptyState` instead of leaving a second copy - the exact "duplicate components" risk the audit flagged), POS.
