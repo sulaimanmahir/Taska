@@ -15,12 +15,12 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'robots.txt'],
+      includeAssets: ['favicon.svg', 'icon-192.svg', 'robots.txt'],
       manifest: {
         name: 'Taska - Business Operating System',
         short_name: 'Taska',
         description: 'Business Operating System by Result Seekers Ltd',
-        theme_color: '#0ea5e9',
+        theme_color: '#6D28D9',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
@@ -28,14 +28,16 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/favicon.svg',
+            src: '/icon-192.svg',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
           },
           {
-            src: '/favicon.svg',
+            src: '/icon-192.svg',
             sizes: '512x512',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
           }
         ]
       },

@@ -11,31 +11,13 @@ import {
   resolveLogoOptions,
 } from './logoConfig.js';
 
-const wordmarkGradientClass = 'bg-[linear-gradient(135deg,#7C3AED_0%,#A855F7_52%,#E9D5FF_100%)] bg-clip-text text-transparent';
-const iconShadowClass = 'shrink-0 drop-shadow-[0_10px_30px_rgba(124,58,237,0.28)]';
-const brandNodes = [
-  { x: 18, y: 20, r: 5 },
-  { x: 49, y: 16, r: 4.5 },
-  { x: 20, y: 44, r: 5 },
-  { x: 48, y: 41, r: 6.5 },
-  { x: 32, y: 32, r: 4.8 },
-  { x: 31, y: 53, r: 4 },
-];
-const brandPaths = [
-  {
-    d: 'M18 20c6 2 12 6 18 12 5 5 12 8 21 9',
-    strokeWidth: '2.5',
-  },
-  {
-    d: 'M22 46c4-9 8-16 13-21 7-7 15-10 24-10',
-    strokeWidth: '2.5',
-    opacity: '0.9',
-  },
-  {
-    d: 'M31 18l5 12M24 34l11-4M35 30l11 3M32 32l2 13',
-    strokeWidth: '2.3',
-  },
-];
+// Official Taska mark (2026-08): a stylised ribbon "T" in a purple-to-blue
+// gradient, plus an orange gradient reserved for the "ka" of the wordmark -
+// matching the approved logo artwork. See docs/TASKA_DESIGN_CONSTITUTION.md.
+const TASKA_T_PATH = 'M25.946 44.938c-.664.845-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.287c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.497 0-3.578-1.842-3.578H1.237c-.92 0-1.456-1.04-.92-1.788L10.013.474c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.579 1.842 3.579h11.377c.943 0 1.473 1.088.89 1.83L25.947 44.94z';
+const tGradientClass = 'bg-[linear-gradient(160deg,#8B5CF6_0%,#6D28D9_45%,#2563EB_100%)] bg-clip-text text-transparent';
+const kaGradientClass = 'bg-[linear-gradient(135deg,#F97316_0%,#EA580C_60%,#C2410C_100%)] bg-clip-text text-transparent';
+const iconShadowClass = 'shrink-0 drop-shadow-[0_10px_30px_rgba(109,40,217,0.28)]';
 
 function joinClasses(...tokens) {
   return tokens.filter(Boolean).join(' ');
@@ -55,24 +37,22 @@ function getAccessibleLockupProps(decorative, label) {
 function BrandWordmark({ palette, wordColor, className = '' }) {
   return (
     <span className={joinClasses('font-black tracking-tight leading-[0.92]', palette.text, wordColor, className)}>
-      <span className={wordmarkGradientClass}>
-        T
-      </span>
-      aska
+      <span className={tGradientClass}>T</span>
+      as
+      <span className={kaGradientClass}>ka</span>
     </span>
   );
 }
 
 function BrandIcon({ size = defaultLogoIconSize, className = '', decorative = true, label = defaultLogoLabel }) {
   const gradientId = useId().replace(/:/g, '');
-  const orbitId = `taska-orbit-${gradientId}`;
-  const nodeId = `taska-node-${gradientId}`;
+  const tId = `taska-t-${gradientId}`;
   const titleId = decorative ? undefined : `taska-title-${gradientId}`;
   const accessibleLabel = decorative ? undefined : resolveLogoLabel(label);
 
   return (
     <svg
-      viewBox="0 0 64 64"
+      viewBox="0 0 48 46"
       width={size}
       height={size}
       className={className}
@@ -83,34 +63,14 @@ function BrandIcon({ size = defaultLogoIconSize, className = '', decorative = tr
     >
       {decorative ? null : <title id={titleId}>{accessibleLabel}</title>}
       <defs>
-        <linearGradient id={orbitId} x1="14%" y1="14%" x2="86%" y2="86%">
-          <stop offset="0%" stopColor="#7C3AED" />
-          <stop offset="55%" stopColor="#A855F7" />
-          <stop offset="100%" stopColor="#E9D5FF" />
+        <linearGradient id={tId} x1="8%" y1="0%" x2="70%" y2="100%">
+          <stop offset="0%" stopColor="#8B5CF6" />
+          <stop offset="45%" stopColor="#6D28D9" />
+          <stop offset="100%" stopColor="#2563EB" />
         </linearGradient>
-        <radialGradient id={nodeId} cx="40%" cy="30%" r="80%">
-          <stop offset="0%" stopColor="#F5D0FE" />
-          <stop offset="40%" stopColor="#C084FC" />
-          <stop offset="100%" stopColor="#7C3AED" />
-        </radialGradient>
       </defs>
 
-      <circle cx="32" cy="32" r="22" fill="none" stroke={`url(#${orbitId})`} strokeWidth="2.8" opacity="0.92" />
-      {brandPaths.map((path) => (
-        <path
-          key={path.d}
-          d={path.d}
-          fill="none"
-          stroke={`url(#${orbitId})`}
-          strokeWidth={path.strokeWidth}
-          strokeLinecap="round"
-          opacity={path.opacity}
-        />
-      ))}
-
-      {brandNodes.map((node) => (
-        <circle key={`${node.x}-${node.y}`} cx={node.x} cy={node.y} r={node.r} fill={`url(#${nodeId})`} />
-      ))}
+      <path d={TASKA_T_PATH} fill={`url(#${tId})`} />
     </svg>
   );
 }
