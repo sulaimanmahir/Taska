@@ -431,6 +431,27 @@ The user supplied the official Taska logo (stylised ribbon T in a purple/blue gr
 
 **Explicitly out of scope / not achievable in this environment**: true vector tracing of the supplied PNG artwork, and PNG raster fallback generation — no image-editing tooling (ImageMagick, Inkscape, rsvg-convert, sharp) was available. This is a faithful from-scratch SVG recreation of the mark's shape/colour treatment matching the brief's hierarchy and colour direction, not a pixel-perfect trace. Also not attempted: email-template branding, PDF/report/invoice logo placement, print/monochrome variant, Open Graph/social images, dark-mode-specific logo variant (moot — dark theme was removed from Taska earlier this session), command-palette/loading-screen T-mark animation. The old moodboard PNGs were deliberately left in place (confirmed unreferenced, but not deleted without being asked to).
 
+---
+
+## Gamification data model — done (2026-08-12)
+
+Phase 9 (business health, progress, levels, achievements, milestones, streaks, recommendations, progress centre) needed a schema/design pass before any frontend work, flagged as a risk back when the codebase audit first ran. This is that pass, scoped deliberately to the **data model only** — no controllers, no API endpoints, no frontend UI. Confirmed via `php artisan test`: full backend suite green (268 passing, 5 new).
+
+**Design principle** (constitution §77: "never use childish gamification"): every achievement/milestone/streak must tie to a real, checkable business signal already in the data model — never an arbitrary points currency invented for its own sake. That's why the catalog (`backend/config/gamification.php`) is business-type-agnostic: it reads from models every vertical already has (`Order`, `Expense`, `Customer`, `InventoryItem`), not vertical-specific tables, following the same "code defines the catalog, a table stores tenant state" split already established by `config/business_types.php`.
+
+**What shipped**:
+- `business_health_snapshots` — one row per business per day (`health_score` 0–100 plus 4 component scores: revenue trend, expense control, stock health, receivables health), stored rather than recomputed on every page load so a level/trend chart has a stable historical value — the same reasoning `ai_insights` already uses for persisting rather than computing live.
+- `business_streaks` — per business per streak type, `current_count`/`best_count`/`last_active_date`. `BusinessStreak::recordActivity()` implements real consecutive-day logic (extends on the next calendar day, resets to 1 after a gap, no-ops if called twice the same day) — covered by dedicated tests.
+- `business_achievement_unlocks` — one-time unlock events, shared by both achievements and milestones (a `category` column distinguishes them; same shape, no need for two tables) with a `meta` JSON column storing the actual business value that crossed the threshold (e.g. `{"orders_count": 100}`), so an achievement can be displayed with the real number behind it, not just a badge name.
+- `config/gamification.php` — starter catalog: 7 achievements (first sale, first customer, first expense, inventory set up, 100 sales, debt-free, multi-branch), 4 milestones (₦1M/₦10M lifetime revenue, 100 customers, one year on Taska), 3 streaks (daily sales logged, zero overdue receivables, expense discipline).
+- All 3 models use `BelongsToBusiness` like every other tenant-owned model in the codebase; verified tenant-scoped and unique-per-business/day via `tests/Unit/GamificationModelsTest.php` (5 tests).
+
+**Deliberately not built yet** (this was a data-model design pass, not the full feature):
+- The scoring service that actually computes `health_score` from real Order/Expense/InventoryItem/Customer data — the config file defines *what counts*, not the weighting formula, which is a product decision (how much should stock health vs. receivables health matter?) that needs a decision, not an invented default.
+- Event wiring that calls `BusinessStreak::recordActivity()` and unlocks achievements when thresholds are crossed (would hook into the existing Order/Expense creation flow).
+- API endpoints (`GET /api/gamification/overview` or similar) and the frontend "progress centre" UI.
+- "Levels" specifically: intentionally left as a *computed* concept (a function of unlocked achievements + health score + account age), not a stored table, to avoid a level number drifting out of sync with the achievements/score it's supposed to represent — but the actual formula wasn't picked for the same reason the health-score weighting wasn't: it's a product decision.
+
 ## Implementation notes for whoever picks this up
 
 - This is a **platform-wide** design direction, not a single-page task. Do not attempt it as one big rewrite — the existing session's pattern of small, verified, incremental changes (proven across the `BelongsToBusiness` tenant-scoping sweep, the render-smoke test sweep, and the 3 new business-type verticals) is the right execution model here too.
