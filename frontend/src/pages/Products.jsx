@@ -258,7 +258,7 @@ export default function Products() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -340,6 +340,75 @@ export default function Products() {
               : null}
           </tbody>
         </table>
+        </div>
+
+        <div className="space-y-3 p-4 md:hidden">
+          {isLoading ? (
+            Array(3).fill(0).map((_, index) => (
+              <div key={index} className="h-24 animate-pulse rounded-2xl bg-slate-100"></div>
+            ))
+          ) : !products.length ? (
+            <EmptyState
+              icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+              title={search || categoryFilter ? 'No products matched your filters' : 'No products yet'}
+              description={
+                search || categoryFilter
+                  ? 'Try a different search term or clear the category filter.'
+                  : 'Add your products to start selling, tracking stock, and pricing with confidence.'
+              }
+              action={
+                search || categoryFilter
+                  ? null
+                  : {
+                    label: 'New product',
+                    onClick: () => {
+                      clearToast();
+                      resetProductForm();
+                      setShowModal(true);
+                    },
+                  }
+              }
+            />
+          ) : products.map((product) => {
+            const productRow = buildProductRow(product, inventorySummary, formatCurrencyNGN);
+            const stockToneClass = productRow.stockTone === 'rose'
+              ? 'text-rose-700'
+              : productRow.stockTone === 'amber'
+                ? 'text-amber-700'
+                : 'text-emerald-700';
+
+            return (
+              <div key={productRow.id} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-slate-900">{productRow.title}</p>
+                    <p className="text-sm text-slate-500">{productRow.skuLabel}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${product.is_active !== false ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                    {productRow.statusLabel}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-slate-500">Category</p>
+                    <p className="mt-0.5 font-medium text-slate-900">{productRow.categoryLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Type</p>
+                    <p className="mt-0.5 font-medium capitalize text-slate-900">{productRow.typeLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Stock</p>
+                    <p className={`mt-0.5 font-medium ${stockToneClass}`}>{productRow.stockLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Pricing</p>
+                    <p className="mt-0.5 font-medium text-slate-900">{productRow.pricingLabel}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
 

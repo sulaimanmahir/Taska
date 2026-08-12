@@ -248,7 +248,7 @@ export default function Inventory() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -311,6 +311,60 @@ export default function Inventory() {
               }) : null}
             </tbody>
           </table>
+          </div>
+
+          <div className="space-y-3 p-4 md:hidden">
+            {isLoading ? (
+              Array(3).fill(0).map((_, index) => (
+                <div key={index} className="h-24 animate-pulse rounded-2xl bg-slate-100"></div>
+              ))
+            ) : !filteredItems.length ? (
+              <EmptyState
+                icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                title={inventoryItems.length ? 'No inventory lines matched your filters' : 'No inventory lines yet'}
+                description={
+                  inventoryItems.length
+                    ? 'Try a different search or clear the stock filter to see everything.'
+                    : 'Inventory lines appear here once products have stock recorded against a warehouse.'
+                }
+              />
+            ) : filteredItems.map((item) => {
+              const row = buildInventoryRow(item);
+              const toneClass = row.statusTone === 'rose'
+                ? 'bg-rose-50 text-rose-700'
+                : row.statusTone === 'amber'
+                  ? 'bg-amber-50 text-amber-700'
+                  : 'bg-emerald-50 text-emerald-700';
+
+              return (
+                <div key={row.id} className="rounded-2xl border border-slate-200 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-slate-900">{row.title}</p>
+                      <p className="text-sm text-slate-500">{row.skuLabel}</p>
+                      <p className="text-sm text-slate-500">{row.warehouseLabel}</p>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${toneClass}`}>
+                      {row.statusLabel}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                    <div>
+                      <p className="text-slate-500">On hand</p>
+                      <p className="mt-0.5 font-semibold text-slate-900">{row.quantityLabel}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Reserved</p>
+                      <p className="mt-0.5 font-medium text-slate-900">{row.reservedLabel}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Available</p>
+                      <p className="mt-0.5 font-medium text-slate-900">{row.availableLabel}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Card>
 

@@ -363,7 +363,7 @@ export default function BillingSettings() {
         </div>
 
         {invoices.length > 0 ? (
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
@@ -395,13 +395,39 @@ export default function BillingSettings() {
             </tbody>
           </table>
           </div>
-        ) : (
+        ) : null}
+
+        {invoices.length > 0 ? (
+          <div className="space-y-3 p-4 md:hidden">
+            {invoiceRows.map((invoice) => (
+              <div key={invoice.id} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-slate-900">{invoice.invoiceNumber}</p>
+                    <p className="mt-1 text-sm text-slate-500">{invoice.dateLabel}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${invoice.statusClassName}`}>
+                    {invoice.status}
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="font-medium text-slate-900">{invoice.totalLabel}</p>
+                  <a href={invoice.viewHref} className="text-sm font-semibold text-violet-600 transition hover:text-violet-700">
+                    View
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {invoices.length === 0 ? (
           <EmptyState
             icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             title="No invoices yet"
             description="Billing invoices will appear here once they're generated."
           />
-        )}
+        ) : null}
       </Card>
 
       <ConfirmDialog

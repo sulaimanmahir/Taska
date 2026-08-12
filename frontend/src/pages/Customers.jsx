@@ -183,7 +183,7 @@ export default function Customers() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -262,6 +262,70 @@ export default function Customers() {
             })}
           </tbody>
         </table>
+        </div>
+
+        <div className="space-y-3 p-4 md:hidden">
+          {isLoading ? (
+            Array(3).fill(0).map((_, index) => (
+              <div key={index} className="h-24 animate-pulse rounded-2xl bg-slate-100"></div>
+            ))
+          ) : filteredCustomers.length === 0 ? (
+            <EmptyState
+              icon="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-4-4"
+              title={customerRecords.length ? 'No customers matched your search' : 'No customers yet'}
+              description={
+                customerRecords.length
+                  ? 'Try a different name, phone number, or clear the search to see everyone.'
+                  : 'Add your customers to track balances, credit, and collection history in one place.'
+              }
+              action={
+                customerRecords.length
+                  ? null
+                  : {
+                    label: 'New customer',
+                    onClick: () => {
+                      clearToast();
+                      resetCustomerForm();
+                      setShowModal(true);
+                    },
+                  }
+              }
+            />
+          ) : filteredCustomers.map((customer) => {
+            const customerRow = buildCustomerRow(customer, formatCurrencyNGN);
+
+            return (
+              <div key={customerRow.id} className="rounded-2xl border border-slate-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-slate-900">{customerRow.title}</p>
+                    <p className="text-sm text-slate-500">{customerRow.phoneLabel}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${customer.is_active !== false ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                    {customerRow.statusLabel}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-slate-500">Type</p>
+                    <p className="mt-0.5 font-medium capitalize text-slate-900">{customerRow.typeLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Group</p>
+                    <p className="mt-0.5 font-medium text-slate-900">{customerRow.groupLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Balance</p>
+                    <p className={`mt-0.5 font-medium ${parseFloat(customer.balance || 0) > 0 ? 'text-amber-600' : 'text-slate-900'}`}>{customerRow.balanceLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500">Credit Limit</p>
+                    <p className="mt-0.5 font-medium text-slate-900">{customerRow.creditLimitLabel}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
 
