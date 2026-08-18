@@ -9,7 +9,7 @@ export const businessTypeGroups = {
   },
   services: {
     name: 'Services',
-    types: ['restaurant', 'hotel', 'clinic', 'laboratory', 'service', 'school', 'beauty']
+    types: ['restaurant', 'hotel', 'clinic', 'laboratory', 'service', 'school', 'beauty', 'property_management']
   },
   agriculture: {
     name: 'Agriculture',
@@ -178,6 +178,15 @@ export const businessTypes = {
     icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l2 3H9m2 3l2 3H7.5a2 2 0 01-2-2V3.5M8 13l2 3h3m-3 0l2-3h3m-3 0l2 3h3m-3 0l2-3',
     color: '#78350F',
     description: 'Hide intake, tanning batches, finished leather output and rejects',
+  },
+  property_management: {
+    id: 'property_management',
+    name: 'Property Management / Rent Collection',
+    slug: 'property_management',
+    group: 'services',
+    icon: 'M3 12l2-2m0 0l7-7 7 7m-9-2v10a1 1 0 001 1h3m6-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+    color: '#0F766E',
+    description: 'Units, leases, rent collection, and maintenance requests',
   },
   livestock: {
     id: 'livestock',
