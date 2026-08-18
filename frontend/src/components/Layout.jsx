@@ -478,6 +478,17 @@ export default function Layout() {
               ) : null}
             </div>
 
+            <Link
+              to="/progress"
+              aria-label="Business progress"
+              title="Business progress"
+              className="app-panel rounded-2xl p-2.5 text-[var(--color-text-muted)] hover:text-[var(--color-brand)]"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14" />
+              </svg>
+            </Link>
+
             <button
               type="button"
               aria-label="Notifications"

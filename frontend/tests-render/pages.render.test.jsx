@@ -59,6 +59,7 @@ const fakeAdminUser = {
 const pagesUnderTest = [
   ['Dashboard', () => import('../src/pages/Dashboard.jsx')],
   ['Portfolio', () => import('../src/pages/Portfolio.jsx')],
+  ['ProgressCentre', () => import('../src/pages/ProgressCentre.jsx')],
   ['Adashe', () => import('../src/pages/Adashe.jsx')],
   ['TrustFund', () => import('../src/pages/TrustFund.jsx')],
   ['TaskaCooperative', () => import('../src/pages/TaskaCooperative.jsx')],
