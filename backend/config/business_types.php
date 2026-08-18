@@ -92,6 +92,11 @@ return [
             'group' => 'manufacturing',
             'modules' => ['dashboard', 'tanning', 'inventory', 'suppliers', 'purchases', 'customers', 'expenses', 'reports', 'yield_tracking', 'reject_tracking'],
         ],
+        'property_management' => [
+            'name' => 'Property Management / Rent Collection',
+            'group' => 'services',
+            'modules' => ['dashboard', 'units', 'leases', 'rent_ledger', 'maintenance_requests', 'customers', 'reports'],
+        ],
         'livestock' => [
             'name' => 'Livestock Farm',
             'group' => 'agriculture',

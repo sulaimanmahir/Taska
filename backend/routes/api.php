@@ -290,6 +290,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/leather-trading/batches', [\App\Http\Controllers\API\LeatherTradingController::class, 'index']);
     Route::post('/leather-trading/batches', [\App\Http\Controllers\API\LeatherTradingController::class, 'store']);
 
+    // Property Management / Rent Collection
+    Route::get('/property-management/overview', [\App\Http\Controllers\API\PropertyManagementController::class, 'overview']);
+    Route::get('/property-management/units', [\App\Http\Controllers\API\PropertyManagementController::class, 'units']);
+    Route::post('/property-management/units', [\App\Http\Controllers\API\PropertyManagementController::class, 'storeUnit']);
+    Route::get('/property-management/leases', [\App\Http\Controllers\API\PropertyManagementController::class, 'leases']);
+    Route::post('/property-management/leases', [\App\Http\Controllers\API\PropertyManagementController::class, 'storeLease']);
+    Route::post('/property-management/leases/{lease}/payments', [\App\Http\Controllers\API\PropertyManagementController::class, 'recordPayment']);
+    Route::get('/property-management/maintenance-requests', [\App\Http\Controllers\API\PropertyManagementController::class, 'maintenanceRequests']);
+    Route::post('/property-management/maintenance-requests', [\App\Http\Controllers\API\PropertyManagementController::class, 'storeMaintenanceRequest']);
+
     // Warehouses
     Route::get('/warehouses', [\App\Http\Controllers\API\WarehouseController::class, 'index']);
     Route::post('/warehouses', [\App\Http\Controllers\API\WarehouseController::class, 'store']);
