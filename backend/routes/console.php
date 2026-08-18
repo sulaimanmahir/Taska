@@ -3,11 +3,44 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Business;
+use App\Models\BusinessStreak;
+use App\Models\Customer;
+use App\Services\BusinessHealthScoringService;
 use App\Services\BusinessProvisioningService;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Artisan::command('taska:compute-gamification-snapshots', function (BusinessHealthScoringService $healthScoringService) {
+    $businesses = Business::query()->orderBy('id')->get();
+    $this->info("Computing gamification snapshots for {$businesses->count()} business(es)...");
+
+    foreach ($businesses as $business) {
+        $healthScoringService->computeAndStoreFor($business);
+
+        // zero_overdue_receivables is a state check ("is the ledger clean
+        // right now"), not a discrete created-event like a sale or expense,
+        // so it belongs in the daily snapshot job rather than
+        // GamificationObserver (see docs/TASKA_DESIGN_CONSTITUTION.md).
+        $hasOutstandingBalance = Customer::where('business_id', $business->id)
+            ->where('balance', '>', 0)
+            ->exists();
+
+        if (!$hasOutstandingBalance) {
+            $streak = BusinessStreak::firstOrCreate([
+                'business_id' => $business->id,
+                'streak_type' => 'zero_overdue_receivables',
+            ]);
+
+            $streak->recordActivity();
+        }
+
+        $this->line("Business #{$business->id}: snapshot stored.");
+    }
+
+    $this->info('Done.');
+})->purpose('Compute and store daily health snapshots, and extend the zero-overdue-receivables streak for businesses with no outstanding customer balance');
 
 Artisan::command('taska:repair-business-state {--business_id=} {--dry-run}', function (BusinessProvisioningService $provisioningService) {
     $businessId = $this->option('business_id');
