@@ -1,6 +1,6 @@
 # Northern Nigeria market expansion — new business types
 
-Status: **candidates 1-3 (grain milling, livestock trading market, leather trading) implemented and shipped. Candidate 4 (property management) remains research/design only.**
+Status: **all 4 candidates implemented and shipped** (grain milling, livestock trading market, leather trading, property management).
 Created: 2026-08-06.
 
 ## Why this exists
@@ -40,11 +40,13 @@ Taska already supports 27 business types (`backend/config/business_types.php`), 
 - **What shipped**: `leather_processing_batches` migration + model (tenant-scoped via `BelongsToBusiness`), `LeatherTradingController` (overview/index/store), `LeatherTradingOps.jsx` page at `/leather-trading`, dedicated nav preset, `businessTypes.js` entry. 3 backend feature tests, 8 frontend unit tests, added to the render-smoke suite.
 - **No repeat of the grain-milling SQLite division bug**: `average_reject_rate_percent` is computed via a PHP-level Collection average over each batch's own `rejectRatePercent()` (not raw SQL, not even Eloquent's `->avg()`), fully sidestepping any repeat of the NUMERIC-affinity integer-division issue. Live-verified via Playwright walkthrough — all overview metrics correct on first check once the verification script's hardcoded date was corrected to use the actual current date.
 
-### 4. Property management / rent collection (`property_management`)
+### 4. Property management / rent collection (`property_management`) — Done (2026-08-18)
 - **Group**: `services`
 - **Not Northern-specific** (real estate is nationwide — Nigeria's real estate market was valued at ~$29.2B in 2024, growing toward ~$40B by 2030 per NextMSC), but flagged here because it's an unusually strong *architectural* fit, not because of regional demand data: it reuses more of Taska's existing building blocks than almost any other candidate.
-- **Why it fits so well**: a landlord/agency managing multiple units collecting recurring rent + service charges is structurally near-identical to the `TrustAccount`/`TrustTransaction` running-balance ledger already built for Adashe/Trust Fund (`Customer` → tenant, due dates, balance, payment history), and maintenance requests already have a working template in `HotelMaintenanceRequest`. Lowest-risk, fastest build of any candidate in this doc.
-- **Core workflow**: property/unit registry (non-fungible, one row per unit rather than stock quantity) → tenant assignment + lease terms → recurring rent/service-charge ledger (reuse `TrustAccount`/`TrustTransaction` shape) → maintenance request tracking (reuse `HotelMaintenanceRequest` shape).
+- **Why it fits so well**: a landlord/agency managing multiple units collecting recurring rent + service charges is structurally near-identical to the `TrustAccount`/`TrustTransaction` running-balance ledger already built for Adashe/Trust Fund (`Customer` → tenant, due dates, balance, payment history), and maintenance requests already have a working template in `HotelMaintenanceRequest`. Lowest-risk, fastest build of any candidate in this doc — confirmed true in practice, this was the smoothest build of the four.
+- **Core workflow, as built**: `PropertyUnit` registry (non-fungible, one row per unit rather than stock quantity) → `PropertyLease` (tenant assignment + terms, with a cached running `balance` column) → `PropertyRentLedgerEntry` (charge/payment log, reusing `TrustAccount`/`TrustTransaction`'s *shape*, not the literal tables, to avoid coupling to Adashe/Cooperative's unrelated business logic — same principle as `grain_milling` reusing `pure_water_factory`'s batch-tracking shape) → `PropertyMaintenanceRequest` (direct shape-copy of `HotelMaintenanceRequest`).
+- **What shipped**: 4 migrations/models, `PropertyManagementController` (overview/units/leases/payments/maintenance-requests), 3 Form Requests with cross-model tenant-scoped `Rule::exists()` checks, 3 API Resources, `PropertyManagementOps.jsx` page at `/property-management`, dedicated nav preset, `businessTypes.js` entry. 3 backend feature tests, 13 frontend unit tests, added to the render-smoke suite.
+- **Live-verified**: created a unit, created a lease (confirmed the initial rent+service-charge amount posts as a charge immediately, and the unit flips to occupied), recorded a partial payment (confirmed the balance dropped by exactly the payment amount), logged a maintenance request — all 5 overview metrics matched real state.
 - **Deliberately scoped to management/rent collection only** — see below for why the other two real-estate flavors are excluded for now.
 
 ### Real estate flavors explicitly excluded from `property_management`
