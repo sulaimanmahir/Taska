@@ -6,6 +6,7 @@ use App\Models\AiInsight;
 use App\Models\Business;
 use App\Models\BusinessStreak;
 use App\Models\Customer;
+use App\Models\User;
 use App\Services\AiService;
 use App\Services\BusinessHealthScoringService;
 use App\Services\BusinessProvisioningService;
@@ -109,3 +110,27 @@ Artisan::command('taska:repair-business-state {--business_id=} {--dry-run}', fun
 
     $this->info($dryRun ? 'Dry run complete.' : 'Repair complete.');
 })->purpose('Backfill role permissions and trial subscriptions for existing businesses');
+
+Artisan::command('taska:grant-platform-admin {email}', function (string $email) {
+    $user = User::where('email', $email)->first();
+
+    if (! $user) {
+        $this->error("No user found with email {$email}.");
+        return 1;
+    }
+
+    $user->forceFill(['is_platform_admin' => true])->save();
+    $this->info("Granted platform admin to {$user->email} (#{$user->id}).");
+})->purpose('Grant the platform-wide /api/admin/* dashboard to a specific user by email - this is separate from the tenant-scoped "admin" business role every owner already has');
+
+Artisan::command('taska:revoke-platform-admin {email}', function (string $email) {
+    $user = User::where('email', $email)->first();
+
+    if (! $user) {
+        $this->error("No user found with email {$email}.");
+        return 1;
+    }
+
+    $user->forceFill(['is_platform_admin' => false])->save();
+    $this->info("Revoked platform admin from {$user->email} (#{$user->id}).");
+})->purpose('Revoke a user\'s platform-wide admin dashboard access');

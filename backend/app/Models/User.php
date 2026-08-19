@@ -36,6 +36,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            // Deliberately not in $fillable - a platform-wide privilege, not
+            // something any registration/profile-update payload can set.
+            'is_platform_admin' => 'boolean',
         ];
     }
 

@@ -570,8 +570,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logistics/maintenance-logs', [LogisticsController::class, 'storeMaintenanceLog']);
     Route::post('/logistics/trip-sheets/{tripSheet}/settle', [LogisticsController::class, 'settleTrip']);
 
-    // Admin Routes
-    Route::middleware('role:admin')->group(function () {
+    // Admin Routes - platform-wide, cross-tenant. Gated on the explicit
+    // is_platform_admin flag (see EnsurePlatformAdmin), not the tenant-scoped
+    // `role:admin` check used above for /auth/team - every self-registered
+    // business owner passes that one by default.
+    Route::middleware('platform.admin')->group(function () {
         Route::get('/admin/stats', [AdminController::class, 'stats']);
         Route::get('/admin/users', [AdminController::class, 'users']);
         Route::get('/admin/businesses', [AdminController::class, 'businesses']);

@@ -78,7 +78,10 @@ export default function Admin() {
   const [search, setSearch] = useState('');
   const [pendingAction, setPendingAction] = useState(null);
   const { toast, setToast, clearToast } = useToast(3600);
-  const isAdmin = user?.role === 'admin';
+  // Platform-wide admin dashboard - gated on is_platform_admin, not the
+  // tenant-scoped business `role`, which every self-registered business
+  // owner already has as "admin" of their own business.
+  const isAdmin = Boolean(user?.is_platform_admin);
 
   useEffect(() => {
     if (!isAdmin) {
