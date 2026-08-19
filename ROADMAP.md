@@ -74,7 +74,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 ### Platform Hardening
 
 - Tenant isolation is enforced mainly through business-context scoping in services and controllers; a unified global-scope pattern now exists (`app/Concerns/BelongsToBusiness.php`) and is applied to every model originally flagged as high-risk (`Order`, `Product`, `InventoryItem`, `Customer`, `Supplier`, `Purchase`, `PurchasePayment`, `Expense`, `InventoryMovement`, `Warehouse`). Line-item-only models (`OrderItem`, `PurchaseItem`) are intentionally excluded since they have no `business_id` of their own and are scoped through their parent relation instead. Apply the same trait+test pattern to any new high-risk model added later.
-- Notification center and push notifications are not live yet.
+- In-app alert center is live (2026-08-19): the header bell is a real dropdown backed by the existing AI Insights engine (`GET /api/ai/insights?unread_only=1`), with mark-as-read wired to the existing endpoint. Push notifications (device-level, outside the app) are still not live.
 - Access-change audit history for workspace team and branch administration is still ahead.
 
 ### Workflow Depth
@@ -100,7 +100,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
    - Add purchase orders, goods received notes, supplier balances, and payment workflows.
 
 3. Notifications
-   - Add in-app alert center first.
+   - In-app alert center — done (header bell, backed by AI Insights).
    - Add push notifications after the in-app model is stable.
 
 4. Admin and access polish
