@@ -5,6 +5,7 @@ export const settingsTabs = [
   { key: 'branches', label: 'Branches' },
   { key: 'warehouses', label: 'Warehouses' },
   { key: 'modules', label: 'Modules' },
+  { key: 'approvals', label: 'Approvals' },
   { key: 'activity', label: 'Activity' },
 ];
 
@@ -99,14 +100,14 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       calloutTitle: 'Access model',
       calloutCopy:
         'Roles are business-scoped, branch-aware, and intentionally separate from personal profile settings so multi-tenant access stays clean and explainable.',
-      roadmapTitle: 'Still ahead',
-      roadmapSubtitle: 'High-value access controls that build on this foundation',
+      roadmapTitle: 'Also live',
+      roadmapSubtitle: 'Access controls already built on this foundation',
       roadmapItems: [
         'Email-based invite acceptance instead of owner-set initial passwords',
-        'Branch-level approval rules for sensitive finance and stock actions',
+        'Approval rules for large expenses, inventory adjustments, and order discounts - see the Approvals tab',
       ],
-      roadmapClassName: 'border-amber-200 bg-amber-50/60',
-      roadmapTextClassName: 'text-amber-900',
+      roadmapClassName: 'border-emerald-200 bg-emerald-50/60',
+      roadmapTextClassName: 'text-emerald-900',
     };
   }
 
@@ -121,7 +122,7 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       roadmapSubtitle: 'Higher-order location controls that build on this foundation',
       roadmapItems: [
         'Automatic branch-aware inventory routing (sales currently always use the one business-wide default warehouse - see the Warehouses tab to assign warehouses to branches in the meantime)',
-        'Location-specific approval rules for stock and finance actions',
+        'Approval thresholds are business-wide today (see the Approvals tab) - per-branch thresholds are a possible future refinement',
         'AI-led branch comparison alerts for performance, demand, and staffing',
       ],
       roadmapClassName: 'border-emerald-200 bg-emerald-50/60',
@@ -136,6 +137,16 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       calloutTitle: 'What warehouse assignment does today',
       calloutCopy:
         'Assigning a warehouse to a branch here makes the relationship visible and manageable, but sales and purchases still resolve stock through the single business-wide default warehouse rather than automatically picking the warehouse for the current branch - see the Branches tab for that still-ahead item.',
+    };
+  }
+
+  if (tab === 'approvals') {
+    return {
+      intro:
+        'Require a business owner to review large expenses, manual inventory adjustments, and discounted sales before they take effect. Each threshold is optional - leave it blank and that action always goes through immediately.',
+      calloutTitle: 'How this works',
+      calloutCopy:
+        'A queued action never happens on its own - the expense is not posted, the stock quantity is not changed, and the sale is not completed until an active business owner approves it here. Declining a request leaves everything exactly as it was.',
     };
   }
 

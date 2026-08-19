@@ -26,13 +26,24 @@ class Business extends Model
         'currency',
         'timezone',
         'is_active',
+        'expense_approval_threshold',
+        'discount_approval_threshold',
+        'require_inventory_adjustment_approval',
     ];
 
     protected $casts = [
         'modules' => 'array',
         'active_business_types' => 'array',
         'is_active' => 'boolean',
+        'expense_approval_threshold' => 'decimal:2',
+        'discount_approval_threshold' => 'decimal:2',
+        'require_inventory_adjustment_approval' => 'boolean',
     ];
+
+    public function approvalRequests(): HasMany
+    {
+        return $this->hasMany(ApprovalRequest::class);
+    }
 
     public function users(): BelongsToMany
     {

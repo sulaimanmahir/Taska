@@ -17,6 +17,7 @@ test('settings tabs stay aligned with the available workspace sections', () => {
     { key: 'branches', label: 'Branches' },
     { key: 'warehouses', label: 'Warehouses' },
     { key: 'modules', label: 'Modules' },
+    { key: 'approvals', label: 'Approvals' },
     { key: 'activity', label: 'Activity' },
   ]);
 });
@@ -93,15 +94,16 @@ test('settings tab content helpers keep live settings copy aligned', () => {
   assert.equal(getSettingsTabContent('business', { linkedBusinesses: 1 })?.multiBusinessCopy.includes('1 linked business'), true);
   assert.deepEqual(getSettingsTabContent('users')?.roadmapItems, [
     'Email-based invite acceptance instead of owner-set initial passwords',
-    'Branch-level approval rules for sensitive finance and stock actions',
+    'Approval rules for large expenses, inventory adjustments, and order discounts - see the Approvals tab',
   ]);
   assert.equal(getSettingsTabContent('branches')?.calloutTitle, 'Branch operating model');
   assert.deepEqual(getSettingsTabContent('branches')?.roadmapItems, [
     'Automatic branch-aware inventory routing (sales currently always use the one business-wide default warehouse - see the Warehouses tab to assign warehouses to branches in the meantime)',
-    'Location-specific approval rules for stock and finance actions',
+    'Approval thresholds are business-wide today (see the Approvals tab) - per-branch thresholds are a possible future refinement',
     'AI-led branch comparison alerts for performance, demand, and staffing',
   ]);
   assert.equal(getSettingsTabContent('warehouses')?.calloutTitle, 'What warehouse assignment does today');
+  assert.equal(getSettingsTabContent('approvals')?.calloutTitle, 'How this works');
   assert.equal(getSettingsTabContent('modules')?.calloutTitle, 'Feature modules');
   assert.equal(getSettingsTabContent('activity')?.calloutTitle, 'Why this exists');
   assert.equal(getSettingsTabContent('missing'), null);

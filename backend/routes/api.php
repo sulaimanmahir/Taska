@@ -170,6 +170,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/expense-categories', [ExpenseCategoryController::class, 'store']);
     Route::patch('/expense-categories/{category}', [ExpenseCategoryController::class, 'update']);
 
+    // Approval requests - deferred actions (expense creation, inventory
+    // adjustments, order discounts) queued when they exceed a business's
+    // configured threshold. Review/decide is admin-only; the deferred
+    // action itself is created by whichever route triggered it (see
+    // ExpenseController::store, InventoryController::adjust,
+    // OrderController::store).
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/approvals', [\App\Http\Controllers\API\ApprovalController::class, 'index']);
+        Route::post('/approvals/{approval}/approve', [\App\Http\Controllers\API\ApprovalController::class, 'approve']);
+        Route::post('/approvals/{approval}/decline', [\App\Http\Controllers\API\ApprovalController::class, 'decline']);
+        Route::get('/approvals/settings', [\App\Http\Controllers\API\ApprovalController::class, 'settings']);
+        Route::patch('/approvals/settings', [\App\Http\Controllers\API\ApprovalController::class, 'updateSettings']);
+    });
+
     // Trust Fund
     Route::get('/trust-accounts', [TrustFundController::class, 'index']);
     Route::post('/trust-accounts', [TrustFundController::class, 'createAccount']);

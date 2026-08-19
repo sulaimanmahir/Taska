@@ -105,10 +105,19 @@ export default function Inventory() {
 
   const adjustInventory = useMutation({
     mutationFn: (payload) => api.post('/inventory/adjust', payload).then((response) => response.data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
       queryClient.invalidateQueries({ queryKey: ['inventory-movements'] });
       setAdjustmentForm(createInventoryAdjustmentForm());
+
+      if (data?.approval_pending) {
+        setToast({
+          tone: 'success',
+          message: data.message || 'This business requires approval for manual inventory adjustments. Your request is pending review.',
+        });
+        return;
+      }
+
       clearToast();
     },
     onError: (mutationError) => {

@@ -70,7 +70,7 @@ class OrderService
             }
 
             // Update customer balance if credit sale
-            if ($data['customer_id'] && ($data['total'] - $data['paid']) > 0) {
+            if (($data['customer_id'] ?? null) && ($data['total'] - $data['paid']) > 0) {
                 $customer = Customer::where('business_id', $data['business_id'])->findOrFail($data['customer_id']);
                 $customer->balance += ($data['total'] - $data['paid']);
                 $customer->save();

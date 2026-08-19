@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Orders\ReturnOrderRequest;
 use App\Http\Requests\Orders\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Models\ApprovalRequest;
 use App\Models\Order;
+use App\Services\ApprovalService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,14 +38,31 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    public function store(StoreOrderRequest $request, OrderService $orderService)
+    public function store(StoreOrderRequest $request, OrderService $orderService, ApprovalService $approvalService)
     {
-        $businessId = $request->user()->current_business_id;
+        $business = $request->user()->currentBusiness;
         $validated = $request->validated();
 
-        $validated['business_id'] = $businessId;
+        $validated['business_id'] = $business->id;
         $validated['branch_id'] = $request->user()->current_branch_id;
-        $validated['warehouse_id'] = $this->getDefaultWarehouse($businessId);
+        $validated['warehouse_id'] = $this->getDefaultWarehouse($business->id);
+
+        if ($approvalService->discountRequiresApproval($business, (float) ($validated['discount'] ?? 0))) {
+            $approval = $approvalService->createRequest(
+                $business,
+                $request->user(),
+                ApprovalRequest::TYPE_ORDER_DISCOUNT,
+                $validated,
+                "Sale with a {$validated['discount']} discount pending approval",
+                $validated['branch_id'],
+            );
+
+            return response()->json([
+                'message' => 'This discount exceeds the approval threshold. The sale is pending review by a business owner before it completes.',
+                'approval_pending' => true,
+                'approval' => $approval,
+            ], 202);
+        }
 
         try {
             $order = $orderService->createOrder($validated, $request->user()->id);

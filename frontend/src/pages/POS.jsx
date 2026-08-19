@@ -90,7 +90,15 @@ export default function POS() {
 
   const saleMutation = useMutation({
     mutationFn: async (payload) => api.post('/orders', payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      if (response?.data?.approval_pending) {
+        setToast({
+          tone: 'error',
+          message: response.data.message || 'This discount exceeds the approval threshold. The sale is pending review before it completes - do not hand over the goods yet.',
+        });
+        return;
+      }
+
       setToast({
         tone: 'success',
         message: 'Sale completed successfully.',

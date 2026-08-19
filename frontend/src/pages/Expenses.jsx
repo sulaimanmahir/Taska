@@ -34,6 +34,7 @@ export default function Expenses() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [expenseForm, setExpenseForm] = useState(() => createExpenseForm());
   const [categoryForm, setCategoryForm] = useState(() => createExpenseCategoryForm());
+  const [approvalPendingMessage, setApprovalPendingMessage] = useState('');
   const [filters, setFilters] = useState({
     categoryId: '',
     dateFrom: datePresets.monthStart,
@@ -98,10 +99,16 @@ export default function Expenses() {
 
   const createExpense = useMutation({
     mutationFn: (payload) => api.post('/expenses', payload).then((response) => response.data),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data?.approval_pending) {
+        setApprovalPendingMessage(data.message || 'This expense exceeds the approval threshold and is pending review.');
+        return;
+      }
+
       invalidateExpenses();
       setShowExpenseModal(false);
       setExpenseForm(createExpenseForm());
+      setApprovalPendingMessage('');
     },
   });
 
@@ -378,15 +385,18 @@ export default function Expenses() {
           onClose={() => {
             setShowExpenseModal(false);
             setExpenseForm(createExpenseForm());
+            setApprovalPendingMessage('');
           }}
         >
           <ExpenseModalForm
             categories={categories}
             errorMessage={createExpense.error ? getErrorMessage(createExpense.error, 'Unable to save expense right now.') : ''}
+            pendingMessage={approvalPendingMessage}
             form={expenseForm}
             isPending={createExpense.isPending}
             onSubmit={(event) => {
               event.preventDefault();
+              setApprovalPendingMessage('');
               createExpense.mutate(buildExpensePayload(expenseForm));
             }}
             setForm={setExpenseForm}
@@ -446,11 +456,14 @@ function QueryErrorPanel({ message, onRetry }) {
   );
 }
 
-function ExpenseModalForm({ categories, errorMessage, form, isPending, onSubmit, setForm }) {
+function ExpenseModalForm({ categories, errorMessage, pendingMessage, form, isPending, onSubmit, setForm }) {
   const modal = useModalShell();
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {pendingMessage ? (
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{pendingMessage}</p>
+      ) : null}
       {errorMessage ? (
         <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{errorMessage}</p>
       ) : null}
