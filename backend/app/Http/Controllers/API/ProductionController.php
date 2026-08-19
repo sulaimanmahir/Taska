@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Production\AdjustRawMaterialRequest;
 use App\Http\Requests\Production\CompleteProductionBatchRequest;
@@ -13,10 +14,11 @@ use App\Services\ProductionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class ProductionController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request): JsonResponse
     {
         $businessId = $request->user()->current_business_id;
@@ -338,10 +340,5 @@ class ProductionController extends Controller
             'message' => 'Wastage log recorded',
             'log' => $productionService->recordWastageLog($validated, $businessId),
         ], 201);
-    }
-
-    private function businessOwnedRule(string $table, int $businessId)
-    {
-        return Rule::exists($table, 'id')->where(fn ($query) => $query->where('business_id', $businessId));
     }
 }

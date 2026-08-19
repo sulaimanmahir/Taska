@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pharmacy\ApplyBatchDiscountRequest;
 use App\Http\Requests\Pharmacy\DispensePharmacyProductRequest;
@@ -17,10 +18,11 @@ use App\Models\RefillReminder;
 use App\Services\PharmacyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class PharmacyController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -245,10 +247,5 @@ class PharmacyController extends Controller
                 $pharmacyService->applyNearExpiryDiscount($batch, (float) $validated['near_expiry_discount_percent'], (float) $validated['discounted_price'])
             ))->resolve()
         );
-    }
-
-    private function businessOwnedRule(string $table, int $businessId)
-    {
-        return Rule::exists($table, 'id')->where(fn ($query) => $query->where('business_id', $businessId));
     }
 }

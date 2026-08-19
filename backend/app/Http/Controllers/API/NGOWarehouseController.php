@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NGO\StoreNGODistributionRequest;
 use App\Http\Requests\NGO\StoreNGODistributionSignatureRequest;
@@ -10,11 +11,11 @@ use App\Http\Resources\NGODistributionSignatureResource;
 use App\Models\NGODistribution;
 use App\Services\NGOWarehouseService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class NGOWarehouseController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function __construct(
         private NGOWarehouseService $service,
     ) {
@@ -65,12 +66,5 @@ class NGOWarehouseController extends Controller
         return (new NGODistributionSignatureResource(
             $this->service->captureSignature($distribution, $request->validated())
         ))->response()->setStatusCode(201);
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
-        );
     }
 }

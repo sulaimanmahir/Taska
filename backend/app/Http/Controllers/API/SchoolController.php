@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\School\PromoteEnrollmentRequest;
 use App\Http\Requests\School\StoreAttendanceRequest;
@@ -22,10 +23,11 @@ use App\Models\StudentResult;
 use App\Services\SchoolService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class SchoolController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -412,23 +414,5 @@ class SchoolController extends Controller
             ->values();
 
         return response()->json($debtors);
-    }
-
-    private function businessOwnedRule(string $table, int $businessId)
-    {
-        return Rule::exists($table, 'id')->where(fn ($query) => $query->where('business_id', $businessId));
-    }
-
-    private function activeBusinessUserRule(int $businessId)
-    {
-        return Rule::exists('users', 'id')->where(function ($query) use ($businessId) {
-            $query->whereExists(function ($subQuery) use ($businessId) {
-                $subQuery->selectRaw('1')
-                    ->from('business_user')
-                    ->whereColumn('business_user.user_id', 'users.id')
-                    ->where('business_user.business_id', $businessId)
-                    ->where('business_user.status', 'active');
-            });
-        });
     }
 }

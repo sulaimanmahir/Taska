@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Restaurant\CloseRestaurantTicketRequest;
 use App\Http\Requests\Restaurant\UpdateKitchenTicketStatusRequest;
@@ -15,10 +16,11 @@ use App\Models\RestaurantWaiterShift;
 use App\Models\TableReservation;
 use App\Services\RestaurantService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class RestaurantController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -340,23 +342,5 @@ class RestaurantController extends Controller
             $restaurantService->logWaste($validated, $businessId),
             201
         );
-    }
-
-    private function businessOwnedRule(string $table, int $businessId)
-    {
-        return Rule::exists($table, 'id')->where(fn ($query) => $query->where('business_id', $businessId));
-    }
-
-    private function activeBusinessUserRule(int $businessId)
-    {
-        return Rule::exists('users', 'id')->where(function ($query) use ($businessId) {
-            $query->whereExists(function ($subQuery) use ($businessId) {
-                $subQuery->selectRaw('1')
-                    ->from('business_user')
-                    ->whereColumn('business_user.user_id', 'users.id')
-                    ->where('business_user.business_id', $businessId)
-                    ->where('business_user.status', 'active');
-            });
-        });
     }
 }

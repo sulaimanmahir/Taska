@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Livestock\StoreLivestockBreedingRequest;
 use App\Http\Requests\Livestock\StoreLivestockMilkRequest;
@@ -11,11 +12,11 @@ use App\Http\Resources\LivestockMilkLogResource;
 use App\Http\Resources\LivestockWeightLogResource;
 use App\Services\LivestockService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class LivestockController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function __construct(private LivestockService $livestockService)
     {
     }
@@ -147,12 +148,5 @@ class LivestockController extends Controller
         return response()->json([
             'sale' => $this->livestockService->recordSale($businessId, $validated),
         ], 201);
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
-        );
     }
 }

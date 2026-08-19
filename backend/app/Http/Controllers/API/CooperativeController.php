@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cooperative\UpdateCooperativeFinancingStatusRequest;
 use App\Http\Resources\CooperativeFinancingResource;
@@ -12,11 +13,11 @@ use App\Models\CooperativeGovernanceRecord;
 use App\Models\CooperativeProfitCycle;
 use App\Services\CooperativeService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class CooperativeController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function __construct(private CooperativeService $cooperativeService)
     {
     }
@@ -367,27 +368,6 @@ class CooperativeController extends Controller
     private function resolveCooperative(int $businessId): Cooperative
     {
         return Cooperative::where('business_id', $businessId)->firstOrFail();
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
-        );
-    }
-
-    private function activeBusinessUserRule(int $businessId): Exists
-    {
-        return Rule::exists('users', 'id')->where(function ($query) use ($businessId) {
-            $query->whereExists(function ($membershipQuery) use ($businessId) {
-                $membershipQuery
-                    ->selectRaw('1')
-                    ->from('business_user')
-                    ->whereColumn('business_user.user_id', 'users.id')
-                    ->where('business_user.business_id', $businessId)
-                    ->where('business_user.status', 'active');
-            });
-        });
     }
 
     private function authorizeFinancing(CooperativeFinancing $financing): void

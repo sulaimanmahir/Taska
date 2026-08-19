@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Fuel\StoreFuelNozzleReadingRequest;
 use App\Http\Requests\Fuel\StoreFuelShiftRequest;
@@ -16,11 +17,11 @@ use App\Models\FuelTankDip;
 use App\Models\FuelVarianceAlert;
 use App\Services\FuelService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class FuelController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -208,13 +209,6 @@ class FuelController extends Controller
     {
         return response()->json(
             FuelVarianceAlert::where('business_id', $request->user()->current_business_id)->with(['tank', 'pump'])->latest('detected_at')->get()
-        );
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
         );
     }
 }

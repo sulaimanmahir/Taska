@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Agro\StoreAgroSubsidySaleRequest;
 use App\Http\Requests\Agro\UpdateAgroRecoveryRequest;
@@ -14,11 +15,11 @@ use App\Models\AgroSeasonalForecast;
 use App\Models\AgroSubsidySale;
 use App\Services\AgroDealerService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class AgroDealerController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -201,12 +202,5 @@ class AgroDealerController extends Controller
         ]);
 
         return response()->json($service->createRegionalTrend($validated, $request->user()->current_business_id), 201);
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
-        );
     }
 }

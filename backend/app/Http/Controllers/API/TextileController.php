@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Textile\UpdateTailoringJobRequest;
 use App\Http\Resources\TailoringJobResource;
@@ -13,11 +14,11 @@ use App\Models\TextileInvoice;
 use App\Models\TextileStyleOrder;
 use App\Services\TextileService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class TextileController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -211,12 +212,5 @@ class TextileController extends Controller
         ]);
 
         return response()->json($service->createInvoice($validated, $request->user()->current_business_id), 201);
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
-        );
     }
 }

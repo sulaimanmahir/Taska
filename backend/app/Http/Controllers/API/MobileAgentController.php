@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Concerns\ValidatesBusinessOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MobileAgent\ApproveMobileAgentFloatRequest;
 use App\Http\Requests\MobileAgent\StoreMobileAgentReversalRequest;
@@ -19,11 +20,11 @@ use App\Models\MobileAgentShortageLog;
 use App\Models\MobileAgentTransaction;
 use App\Services\MobileAgentService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
 
 class MobileAgentController extends Controller
 {
+    use ValidatesBusinessOwnership;
+
     public function overview(Request $request)
     {
         $businessId = $request->user()->current_business_id;
@@ -186,26 +187,5 @@ class MobileAgentController extends Controller
                 ->latest('flagged_at')
                 ->get()
         );
-    }
-
-    private function businessOwnedRule(string $table, int $businessId): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            fn ($query) => $query->where('business_id', $businessId)
-        );
-    }
-
-    private function activeBusinessUserRule(int $businessId): Exists
-    {
-        return Rule::exists('users', 'id')->where(function ($query) use ($businessId) {
-            $query->whereExists(function ($membershipQuery) use ($businessId) {
-                $membershipQuery
-                    ->selectRaw('1')
-                    ->from('business_user')
-                    ->whereColumn('business_user.user_id', 'users.id')
-                    ->where('business_user.business_id', $businessId)
-                    ->where('business_user.status', 'active');
-            });
-        });
     }
 }
