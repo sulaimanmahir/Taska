@@ -121,7 +121,6 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       roadmapTitle: 'Still ahead',
       roadmapSubtitle: 'Higher-order location controls that build on this foundation',
       roadmapItems: [
-        'Automatic branch-aware inventory routing (sales currently always use the one business-wide default warehouse - see the Warehouses tab to assign warehouses to branches in the meantime)',
         'Approval thresholds are business-wide today (see the Approvals tab) - per-branch thresholds are a possible future refinement',
         'AI-led branch comparison alerts for performance, demand, and staffing',
       ],
@@ -136,7 +135,7 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
         'Register warehouses and tie each one to a branch, so stock has a clear home as the business grows beyond a single location.',
       calloutTitle: 'What warehouse assignment does today',
       calloutCopy:
-        'Assigning a warehouse to a branch here makes the relationship visible and manageable, but sales and purchases still resolve stock through the single business-wide default warehouse rather than automatically picking the warehouse for the current branch - see the Branches tab for that still-ahead item.',
+        'Sales now route to whichever warehouse is assigned to the branch making the sale - if a branch has more than one, Taska picks whichever currently holds more of the specific item being sold. A branch with no warehouse assigned still falls back to the single business-wide default.',
     };
   }
 

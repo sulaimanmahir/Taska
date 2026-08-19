@@ -98,7 +98,6 @@ test('settings tab content helpers keep live settings copy aligned', () => {
   ]);
   assert.equal(getSettingsTabContent('branches')?.calloutTitle, 'Branch operating model');
   assert.deepEqual(getSettingsTabContent('branches')?.roadmapItems, [
-    'Automatic branch-aware inventory routing (sales currently always use the one business-wide default warehouse - see the Warehouses tab to assign warehouses to branches in the meantime)',
     'Approval thresholds are business-wide today (see the Approvals tab) - per-branch thresholds are a possible future refinement',
     'AI-led branch comparison alerts for performance, demand, and staffing',
   ]);

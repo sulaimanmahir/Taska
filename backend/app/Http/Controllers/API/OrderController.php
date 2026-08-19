@@ -45,7 +45,9 @@ class OrderController extends Controller
 
         $validated['business_id'] = $business->id;
         $validated['branch_id'] = $request->user()->current_branch_id;
-        $validated['warehouse_id'] = $this->getDefaultWarehouse($business->id);
+        // No warehouse_id here - OrderService resolves it per item based on
+        // which warehouse is assigned to this branch (falling back to the
+        // business-wide default when the branch has none assigned).
 
         if ($approvalService->discountRequiresApproval($business, (float) ($validated['discount'] ?? 0))) {
             $approval = $approvalService->createRequest(
@@ -135,16 +137,4 @@ class OrderController extends Controller
         ]);
     }
 
-    private function getDefaultWarehouse(int $businessId): int
-    {
-        $warehouse = \App\Models\Warehouse::where('business_id', $businessId)
-            ->where('is_default', true)
-            ->first();
-        
-        if (!$warehouse) {
-            $warehouse = \App\Models\Warehouse::where('business_id', $businessId)->first();
-        }
-        
-        return $warehouse?->id ?? 1;
-    }
 }

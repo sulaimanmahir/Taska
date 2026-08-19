@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\Customer;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -15,11 +16,20 @@ class OrderService
     public function createOrder(array $data, int $userId): Order
     {
         return DB::transaction(function () use ($data, $userId) {
-            $warehouseId = $data['warehouse_id'] ?? $this->getDefaultWarehouse($data['business_id']);
+            $businessId = $data['business_id'];
+            $branchId = $data['branch_id'] ?? null;
+            // An explicit warehouse_id (some verticals resolve their own,
+            // e.g. ConstructionMaterialsService) always wins for the whole
+            // order, preserving their existing behavior. Otherwise each
+            // item routes through whichever warehouse is assigned to the
+            // sale's branch - see resolveWarehouseForItem().
+            $explicitWarehouseId = $data['warehouse_id'] ?? null;
 
             foreach ($data['items'] as $item) {
+                $warehouseId = $this->resolveWarehouseForItem($businessId, $branchId, $item['product_id'], $item['variant_id'] ?? null, $explicitWarehouseId);
+
                 $this->ensureInventoryAvailable(
-                    $data['business_id'],
+                    $businessId,
                     $warehouseId,
                     $item['product_id'],
                     $item['variant_id'] ?? null,
@@ -56,8 +66,10 @@ class OrderService
                     'total' => $item['total'],
                 ]);
 
+                $warehouseId = $this->resolveWarehouseForItem($businessId, $branchId, $item['product_id'], $item['variant_id'] ?? null, $explicitWarehouseId);
+
                 $this->deductInventory(
-                    $data['business_id'],
+                    $businessId,
                     $warehouseId,
                     $item['product_id'],
                     $item['variant_id'] ?? null,
@@ -100,8 +112,6 @@ class OrderService
                 'notes' => 'Return for order: ' . $original->order_number,
             ]);
 
-            $warehouseId = $this->getDefaultWarehouse($original->business_id);
-
             foreach ($original->items as $item) {
                 OrderItem::create([
                     'order_id' => $return->id,
@@ -111,6 +121,8 @@ class OrderService
                     'unit_price' => $item->unit_price,
                     'total' => $item->total,
                 ]);
+
+                $warehouseId = $this->resolveOriginalSaleWarehouse($original->id, $item->product_id, $item->variant_id, $original->business_id);
 
                 // Add back to inventory
                 $this->addInventory(
@@ -150,7 +162,6 @@ class OrderService
                 'notes' => 'Partial return for order: ' . $original->order_number,
             ]);
 
-            $warehouseId = $this->getDefaultWarehouse($original->business_id);
             $refundTotal = 0;
 
             foreach ($lines as $line) {
@@ -172,6 +183,8 @@ class OrderService
                     'unit_price' => $item->unit_price,
                     'total' => $lineTotal,
                 ]);
+
+                $warehouseId = $this->resolveOriginalSaleWarehouse($original->id, $item->product_id, $item->variant_id, $original->business_id);
 
                 $this->addInventory(
                     $original->business_id,
@@ -267,6 +280,68 @@ class OrderService
             'reference_id' => $refId,
             'created_by' => $userId,
         ]);
+    }
+
+    /**
+     * A branch with one assigned warehouse (Settings > Warehouses) always
+     * uses it. A branch with several picks whichever currently holds the
+     * most stock of the specific product/variant being sold, so a sale
+     * doesn't fail against an empty warehouse while a sibling warehouse on
+     * the same branch has plenty. A branch with none assigned - or no
+     * branch context at all - falls back to the single business-wide
+     * default warehouse, exactly like before this routing existed.
+     */
+    private function resolveWarehouseForItem(int $businessId, ?int $branchId, int $productId, ?int $variantId, ?int $explicitWarehouseId): int
+    {
+        if ($explicitWarehouseId) {
+            return $explicitWarehouseId;
+        }
+
+        if (!$branchId) {
+            return $this->getDefaultWarehouse($businessId);
+        }
+
+        $branchWarehouseIds = Warehouse::where('business_id', $businessId)
+            ->where('branch_id', $branchId)
+            ->where('is_active', true)
+            ->pluck('id');
+
+        if ($branchWarehouseIds->isEmpty()) {
+            return $this->getDefaultWarehouse($businessId);
+        }
+
+        if ($branchWarehouseIds->count() === 1) {
+            return $branchWarehouseIds->first();
+        }
+
+        $bestWarehouseId = InventoryItem::where('business_id', $businessId)
+            ->whereIn('warehouse_id', $branchWarehouseIds)
+            ->where('product_id', $productId)
+            ->where('variant_id', $variantId)
+            ->orderByDesc('quantity')
+            ->value('warehouse_id');
+
+        return $bestWarehouseId ?? $branchWarehouseIds->first();
+    }
+
+    /**
+     * A return restocks wherever the original sale actually drew from, not
+     * a freshly re-resolved "most stock" warehouse - that would put items
+     * back somewhere unrelated to where they left from.
+     */
+    private function resolveOriginalSaleWarehouse(int $orderId, int $productId, ?int $variantId, int $fallbackBusinessId): int
+    {
+        // deductInventory()'s reference_type is 'sale' (the label it was
+        // called with), not the referenced table - reference_id is what
+        // actually points at the order.
+        $warehouseId = InventoryMovement::where('movement_type', 'sale')
+            ->where('reference_id', $orderId)
+            ->where('product_id', $productId)
+            ->where('variant_id', $variantId)
+            ->orderByDesc('id')
+            ->value('warehouse_id');
+
+        return $warehouseId ?? $this->getDefaultWarehouse($fallbackBusinessId);
     }
 
     private function getDefaultWarehouse(int $businessId): int
