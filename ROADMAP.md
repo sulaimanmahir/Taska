@@ -75,7 +75,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 
 - Tenant isolation is enforced mainly through business-context scoping in services and controllers; a unified global-scope pattern now exists (`app/Concerns/BelongsToBusiness.php`) and is applied to every model originally flagged as high-risk (`Order`, `Product`, `InventoryItem`, `Customer`, `Supplier`, `Purchase`, `PurchasePayment`, `Expense`, `InventoryMovement`, `Warehouse`). Line-item-only models (`OrderItem`, `PurchaseItem`) are intentionally excluded since they have no `business_id` of their own and are scoped through their parent relation instead. Apply the same trait+test pattern to any new high-risk model added later.
 - In-app alert center is live (2026-08-19): the header bell is a real dropdown backed by the existing AI Insights engine (`GET /api/ai/insights?unread_only=1`), with mark-as-read wired to the existing endpoint. Push notifications (device-level, outside the app) are still not live.
-- Access-change audit history for workspace team and branch administration is still ahead.
+- Access-change audit history is live (2026-08-19): `access_audit_logs` tracks who changed team member roles/branches/status and who created/updated branches, viewable on Settings > Activity.
 
 ### Workflow Depth
 
@@ -105,7 +105,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 
 4. Admin and access polish
    - Email-based invite acceptance instead of owner-set initial passwords.
-   - Access change history and audit visibility.
+   - Access change history and audit visibility — done.
    - Branch-level approval rules for sensitive finance and inventory actions.
 
 5. Branch and warehouse routing
