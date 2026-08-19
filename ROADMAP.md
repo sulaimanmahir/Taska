@@ -87,7 +87,8 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 - A general purchase-order, receive, and supplier-payment workflow exists end to end (`Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` models, `PurchaseController`/`SupplierController`, `Purchases.jsx`), including stock updates into inventory on receipt.
   - Production input purchases exist.
   - Pharmacy purchase history exists.
-- Warehouse-to-branch admin UX is live (2026-08-19): Settings > Warehouses lets an owner create warehouses and assign/reassign each one to a branch, using the pre-existing `WarehouseController`/`BusinessWarehouseService` (which already had default-warehouse invariants; it just had no frontend). Still open: `OrderController::getDefaultWarehouse()` always resolves the single business-wide default warehouse regardless of branch context - automatic branch-aware routing is a bigger, riskier change (touches every sale in the app) deliberately left as a product decision, not built here.
+- Warehouse-to-branch admin UX is live (2026-08-19): Settings > Warehouses lets an owner create warehouses and assign/reassign each one to a branch, using the pre-existing `WarehouseController`/`BusinessWarehouseService` (which already had default-warehouse invariants; it just had no frontend).
+- **Branch-aware warehouse routing is live (2026-08-19).** `OrderController::getDefaultWarehouse()` used to always resolve the single business-wide default warehouse regardless of which branch made the sale. `OrderService` now resolves a warehouse per line item: a branch with one assigned warehouse uses it; a branch with several picks whichever currently holds more of the specific product/variant being sold (so a sale doesn't fail against an empty warehouse while a sibling has stock); a branch with none assigned falls back to the business-wide default exactly like before, so businesses that haven't assigned branch warehouses see no change. `ConstructionMaterialsService` (which resolves its own explicit `warehouse_id`) is unaffected. Returns restock wherever the original sale actually drew from (via the `InventoryMovement` row it created), not a freshly re-resolved warehouse. Verified with 4 new feature tests; full existing order/retail/wholesale suite unaffected since every existing tenant has no branch warehouse assignment yet. No frontend change needed - transparent to the order-creation payload.
 - Tenant-scoping hardening (the `BelongsToBusiness` trait) is now applied to every originally-flagged model — see Platform Hardening above.
 
 ### Intelligence and Offline Maturity
@@ -110,9 +111,9 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
    - Access change history and audit visibility — done.
    - Branch-level approval rules for sensitive finance and inventory actions — done (2026-08-19), see Platform Hardening above.
 
-5. Branch and warehouse routing
+5. Branch and warehouse routing — done, see Workflow Depth above
    - Strengthen location setup flows — done (Settings > Warehouses).
-   - Improve module-aware branch/warehouse defaults for inventory-heavy workflows — still open, see Workflow Depth above (automatic branch-aware order routing).
+   - Automatic branch-aware order routing — done (2026-08-19).
 
 6. Intelligence expansion — done, see Intelligence and Offline Maturity above
    - Demand forecasting — done (stockout/reorder/pharmacy demand checks)
