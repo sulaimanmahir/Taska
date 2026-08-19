@@ -92,6 +92,29 @@ class ProductWorkflowStateTest extends TestCase
             ->assertJsonPath('data.0.stock_status', 'out_of_stock');
     }
 
+    public function test_a_non_inventory_tracked_product_reports_unlimited_stock_not_out_of_stock(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'product-no-track@example.com');
+        Sanctum::actingAs($tenant['user']);
+
+        $service = Product::create([
+            'business_id' => $tenant['business']->id,
+            'name' => 'Consulting Service',
+            'selling_price' => 15000,
+            'track_inventory' => 'no',
+            'is_active' => true,
+        ]);
+
+        // A service has no inventory_items row at all - the resource must
+        // not report it as "out of stock" (available_quantity: 0), which
+        // would block it from being added to a cart in the frontend.
+        $this->getJson('/api/products')
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $service->id)
+            ->assertJsonPath('data.0.available_quantity', null)
+            ->assertJsonPath('data.0.stock_status', 'in_stock');
+    }
+
     public function test_it_rejects_foreign_tenant_product_category_links_and_actions(): void
     {
         $tenant = $this->createTenantContext('retail', 'product-scope@example.com');

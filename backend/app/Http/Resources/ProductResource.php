@@ -9,13 +9,24 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $availableQuantity = $this->relationLoaded('inventoryItems')
-            ? (float) $this->inventoryItems->sum('quantity')
-            : (float) $this->inventoryItems()->sum('quantity');
+        // A product with track_inventory = 'no' (a service, fee, or
+        // anything sold without a stock count) never has inventory_items
+        // rows, so summing them would always read 0/"out_of_stock" - null
+        // tells the frontend (getRetailProductStockState) to treat it as
+        // unlimited, matching how OrderService skips stock checks for it.
+        $isTracked = $this->track_inventory !== 'no';
 
-        $stockStatus = $availableQuantity <= 0
-            ? 'out_of_stock'
-            : ($availableQuantity <= (float) ($this->low_stock_alert ?? 0) ? 'low_stock' : 'in_stock');
+        $availableQuantity = $isTracked
+            ? ($this->relationLoaded('inventoryItems')
+                ? (float) $this->inventoryItems->sum('quantity')
+                : (float) $this->inventoryItems()->sum('quantity'))
+            : null;
+
+        $stockStatus = !$isTracked
+            ? 'in_stock'
+            : ($availableQuantity <= 0
+                ? 'out_of_stock'
+                : ($availableQuantity <= (float) ($this->low_stock_alert ?? 0) ? 'low_stock' : 'in_stock'));
 
         return [
             'id' => $this->id,

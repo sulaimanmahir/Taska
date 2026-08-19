@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -26,6 +27,10 @@ class OrderService
             $explicitWarehouseId = $data['warehouse_id'] ?? null;
 
             foreach ($data['items'] as $item) {
+                if (!$this->isInventoryTracked($item['product_id'])) {
+                    continue;
+                }
+
                 $warehouseId = $this->resolveWarehouseForItem($businessId, $branchId, $item['product_id'], $item['variant_id'] ?? null, $explicitWarehouseId);
 
                 $this->ensureInventoryAvailable(
@@ -65,6 +70,10 @@ class OrderService
                     'discount' => $item['discount'] ?? 0,
                     'total' => $item['total'],
                 ]);
+
+                if (!$this->isInventoryTracked($item['product_id'])) {
+                    continue;
+                }
 
                 $warehouseId = $this->resolveWarehouseForItem($businessId, $branchId, $item['product_id'], $item['variant_id'] ?? null, $explicitWarehouseId);
 
@@ -121,6 +130,10 @@ class OrderService
                     'unit_price' => $item->unit_price,
                     'total' => $item->total,
                 ]);
+
+                if (!$this->isInventoryTracked($item->product_id)) {
+                    continue;
+                }
 
                 $warehouseId = $this->resolveOriginalSaleWarehouse($original->id, $item->product_id, $item->variant_id, $original->business_id);
 
@@ -184,6 +197,10 @@ class OrderService
                     'total' => $lineTotal,
                 ]);
 
+                if (!$this->isInventoryTracked($item->product_id)) {
+                    continue;
+                }
+
                 $warehouseId = $this->resolveOriginalSaleWarehouse($original->id, $item->product_id, $item->variant_id, $original->business_id);
 
                 $this->addInventory(
@@ -207,6 +224,18 @@ class OrderService
 
             return $return;
         });
+    }
+
+    /**
+     * Products marked track_inventory = 'no' (services, fees, anything sold
+     * without a stock count) never had an InventoryItem row, so the
+     * unconditional stock check below used to fail every sale of one with
+     * "Insufficient stock for this product." - this skips stock
+     * checking/deduction/restocking for them entirely instead.
+     */
+    private function isInventoryTracked(int $productId): bool
+    {
+        return Product::where('id', $productId)->value('track_inventory') !== 'no';
     }
 
     private function ensureInventoryAvailable(int $businessId, int $warehouseId, int $productId, ?int $variantId, float $quantity): void
