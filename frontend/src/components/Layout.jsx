@@ -1,16 +1,26 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useId, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import { useBusinessType } from '../config/useBusinessType';
+import api from '../lib/api';
 import {
   getFocusTrapWrapIndex,
   getInitialFocusTrapIndex,
   getInitialMenuItemIndex,
   getNextMenuItemIndex,
 } from '../lib/layoutKeyboard';
+import { buildNotificationPreviewItems } from '../lib/notifications';
 import SyncIndicator from './SyncIndicator';
 import Logo from './Logo';
 import { logoPropPresets } from './logoConfig.js';
+
+const NOTIFICATION_DOT_CLASS = {
+  rose: 'bg-rose-500',
+  amber: 'bg-amber-500',
+  sky: 'bg-sky-500',
+  slate: 'bg-slate-400',
+};
 
 export default function Layout() {
   const location = useLocation();
@@ -20,16 +30,37 @@ export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const mobileSidebarTitleId = useId();
   const mobileSidebarDescriptionId = useId();
   const switcherRef = useRef(null);
   const switcherButtonRef = useRef(null);
   const switcherMenuRef = useRef(null);
+  const notificationsRef = useRef(null);
+  const notificationsButtonRef = useRef(null);
   const mobileMenuButtonRef = useRef(null);
   const sidebarRef = useRef(null);
   const mobileCloseButtonRef = useRef(null);
   const hadMobileOpenRef = useRef(false);
   const hadSwitcherOpenRef = useRef(false);
+  const hadNotificationsOpenRef = useRef(false);
+  const queryClient = useQueryClient();
+
+  const notificationsQuery = useQuery({
+    queryKey: ['header-notifications'],
+    queryFn: () => api.get('/ai/insights?unread_only=1').then((response) => response.data ?? []),
+    staleTime: 60_000,
+  });
+
+  const markNotificationRead = useMutation({
+    mutationFn: (insightId) => api.post(`/ai/insights/${insightId}/read`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['header-notifications'] });
+    },
+  });
+
+  const notificationItems = buildNotificationPreviewItems(notificationsQuery.data ?? []);
+  const unreadNotificationCount = notificationItems.length;
 
   const isActive = (path) => {
     if (path === '/') {
@@ -128,6 +159,44 @@ export default function Layout() {
       menuElement?.removeEventListener('keydown', handleMenuKeyDown);
     };
   }, [switcherOpen]);
+
+  useEffect(() => {
+    if (!notificationsOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (!notificationsRef.current?.contains(event.target)) {
+        setNotificationsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [notificationsOpen]);
+
+  useEffect(() => {
+    if (notificationsOpen) {
+      hadNotificationsOpenRef.current = true;
+      return;
+    }
+
+    if (hadNotificationsOpenRef.current) {
+      notificationsButtonRef.current?.focus();
+      hadNotificationsOpenRef.current = false;
+    }
+  }, [notificationsOpen]);
 
   useEffect(() => {
     if (!mobileOpen) {
@@ -489,16 +558,71 @@ export default function Layout() {
               </svg>
             </Link>
 
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="app-panel relative rounded-2xl p-2.5 text-[var(--color-text-muted)]"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M15 17h5l-1.405-1.405A2.03 2.03 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-rose-200" />
-            </button>
+            <div className="relative" ref={notificationsRef}>
+              <button
+                ref={notificationsButtonRef}
+                type="button"
+                aria-label="Notifications"
+                aria-haspopup="true"
+                aria-expanded={notificationsOpen}
+                onClick={() => setNotificationsOpen((open) => !open)}
+                className="app-panel relative rounded-2xl p-2.5 text-[var(--color-text-muted)]"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M15 17h5l-1.405-1.405A2.03 2.03 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {unreadNotificationCount > 0 ? (
+                  <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-rose-500" />
+                ) : null}
+              </button>
+
+              {notificationsOpen ? (
+                <div
+                  role="menu"
+                  aria-label="Notifications"
+                  className="app-panel absolute right-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl p-3 shadow-[var(--shadow-lg)]"
+                >
+                  <div className="flex items-center justify-between px-1 pb-2">
+                    <p className="text-sm font-semibold text-[var(--color-text)]">Notifications</p>
+                    <Link
+                      to="/ai-insights"
+                      onClick={() => setNotificationsOpen(false)}
+                      className="text-xs font-medium text-[var(--color-brand)] hover:underline"
+                    >
+                      View all
+                    </Link>
+                  </div>
+
+                  {notificationsQuery.isLoading ? (
+                    <p className="px-1 py-4 text-sm text-[var(--color-text-muted)]">Loading...</p>
+                  ) : notificationItems.length === 0 ? (
+                    <p className="px-1 py-4 text-sm text-[var(--color-text-muted)]">You're all caught up.</p>
+                  ) : (
+                    <ul className="max-h-96 space-y-1 overflow-y-auto">
+                      {notificationItems.map((item) => (
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => markNotificationRead.mutate(item.id)}
+                            className="w-full rounded-xl px-2 py-2 text-left transition hover:bg-[var(--color-surface-subtle)]"
+                          >
+                            <div className="flex items-start gap-2">
+                              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${NOTIFICATION_DOT_CLASS[item.tone] || NOTIFICATION_DOT_CLASS.slate}`} />
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold text-[var(--color-text)]">{item.title}</p>
+                                <p className="line-clamp-2 text-xs text-[var(--color-text-muted)]">{item.description}</p>
+                                <p className="mt-0.5 text-[11px] text-[var(--color-text-faint)]">{item.timeLabel}</p>
+                              </div>
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : null}
+            </div>
 
             <button type="button" onClick={logout} className="app-panel rounded-2xl p-2.5 text-[var(--color-text-muted)] hover:text-rose-500">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
