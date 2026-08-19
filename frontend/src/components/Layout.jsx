@@ -62,6 +62,27 @@ export default function Layout() {
   const notificationItems = buildNotificationPreviewItems(notificationsQuery.data ?? []);
   const unreadNotificationCount = notificationItems.length;
 
+  // Clicking a push notification (public/push-handler.js's notificationclick
+  // handler) focuses/opens the app and posts {type: 'navigate', url} to it -
+  // this is what actually moves the already-open app to that page.
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) {
+      return undefined;
+    }
+
+    const handleMessage = (event) => {
+      if (event.data?.type === 'navigate' && event.data.url) {
+        navigate(event.data.url);
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('message', handleMessage);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleMessage);
+    };
+  }, [navigate]);
+
   const isActive = (path) => {
     if (path === '/') {
       return location.pathname === '/' || location.pathname === '/dashboard';

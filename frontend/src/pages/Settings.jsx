@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
+import PushNotificationToggle from '../components/PushNotificationToggle';
 import SettingsAuditLogPanel from '../components/SettingsAuditLogPanel';
 import SettingsBranchesPanel from '../components/SettingsBranchesPanel';
 import SettingsModulesPanel from '../components/SettingsModulesPanel';
@@ -296,6 +297,8 @@ export default function Settings() {
                 ))}
               </div>
             </Card>
+
+            <PushNotificationToggle />
           </div>
         </div>
       ) : null}

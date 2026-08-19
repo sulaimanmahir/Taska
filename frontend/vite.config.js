@@ -44,6 +44,10 @@ export default defineConfig({
       workbox: {
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        // Adds push/notificationclick handling to the generated service
+        // worker without switching PWA strategy away from generateSW - see
+        // public/push-handler.js.
+        importScripts: ['push-handler.js'],
         runtimeCaching: [
           {
             urlPattern: /^http:\/\/127\.0\.0\.1:8000\/api\.*/i,
@@ -74,6 +78,19 @@ export default defineConfig({
   ],
   server: {
     port: 5176,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+    },
+  },
+  // `vite preview` (serving a real dist/ build, needed to exercise the
+  // actual generated service worker - `vite dev` doesn't register one
+  // unless devOptions.enabled is set) has its own proxy config separate
+  // from `server`, so it had no working API proxy at all until this.
+  preview: {
+    port: 4173,
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',
