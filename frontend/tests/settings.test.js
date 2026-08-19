@@ -16,6 +16,7 @@ test('settings tabs stay aligned with the available workspace sections', () => {
     { key: 'users', label: 'Users & Roles' },
     { key: 'branches', label: 'Branches' },
     { key: 'modules', label: 'Modules' },
+    { key: 'activity', label: 'Activity' },
   ]);
 });
 
@@ -91,7 +92,6 @@ test('settings tab content helpers keep live settings copy aligned', () => {
   assert.equal(getSettingsTabContent('business', { linkedBusinesses: 1 })?.multiBusinessCopy.includes('1 linked business'), true);
   assert.deepEqual(getSettingsTabContent('users')?.roadmapItems, [
     'Email-based invite acceptance instead of owner-set initial passwords',
-    'Owner visibility into recent access changes and audit history',
     'Branch-level approval rules for sensitive finance and stock actions',
   ]);
   assert.equal(getSettingsTabContent('branches')?.calloutTitle, 'Branch operating model');
@@ -101,5 +101,6 @@ test('settings tab content helpers keep live settings copy aligned', () => {
     'AI-led branch comparison alerts for performance, demand, and staffing',
   ]);
   assert.equal(getSettingsTabContent('modules')?.calloutTitle, 'Feature modules');
+  assert.equal(getSettingsTabContent('activity')?.calloutTitle, 'Why this exists');
   assert.equal(getSettingsTabContent('missing'), null);
 });

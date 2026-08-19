@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
+import SettingsAuditLogPanel from '../components/SettingsAuditLogPanel';
 import SettingsBranchesPanel from '../components/SettingsBranchesPanel';
 import SettingsModulesPanel from '../components/SettingsModulesPanel';
 import SettingsTeamPanel from '../components/SettingsTeamPanel';
@@ -485,6 +486,10 @@ export default function Settings() {
 
       {activeTab === 'modules' ? (
         <SettingsModulesPanel content={activeTabContent} />
+      ) : null}
+
+      {activeTab === 'activity' ? (
+        <SettingsAuditLogPanel content={activeTabContent} />
       ) : null}
     </div>
   );

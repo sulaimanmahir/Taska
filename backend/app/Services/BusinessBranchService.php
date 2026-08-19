@@ -14,6 +14,7 @@ class BusinessBranchService
 {
     public function __construct(
         private BusinessContextService $businessContextService,
+        private AccessAuditLogger $accessAuditLogger,
     ) {
     }
 
@@ -63,7 +64,7 @@ class BusinessBranchService
             ]);
         }
 
-        DB::transaction(function () use ($business, $payload, $isPrimary, $isActive) {
+        $branch = DB::transaction(function () use ($business, $payload, $isPrimary, $isActive) {
             if ($isPrimary) {
                 Branch::query()
                     ->where('business_id', $business->id)
@@ -71,7 +72,7 @@ class BusinessBranchService
                     ->update(['is_primary' => false]);
             }
 
-            Branch::create([
+            return Branch::create([
                 'business_id' => $business->id,
                 'name' => $payload['name'],
                 'slug' => $payload['slug'] ?? $this->generateUniqueBranchSlug($business->id, $payload['name']),
@@ -83,6 +84,19 @@ class BusinessBranchService
                 'is_active' => $isActive,
             ]);
         });
+
+        $this->accessAuditLogger->log(
+            $business,
+            $actor,
+            'branch_created',
+            'branch',
+            $branch->id,
+            $branch->name,
+            $this->accessAuditLogger->diff([], [
+                'is_primary' => $isPrimary,
+                'is_active' => $isActive,
+            ], ['is_primary', 'is_active']),
+        );
 
         return [
             'message' => 'Branch created successfully.',
@@ -137,6 +151,13 @@ class BusinessBranchService
             }
         }
 
+        $beforeState = [
+            'name' => $branch->name,
+            'is_primary' => (bool) $branch->is_primary,
+            'is_active' => (bool) $branch->is_active,
+        ];
+        $finalIsPrimary = $replacementPrimary ? false : $nextIsPrimary;
+
         DB::transaction(function () use ($branch, $business, $payload, $nextIsActive, $nextIsPrimary, $replacementPrimary) {
             if ($nextIsPrimary) {
                 Branch::query()
@@ -166,6 +187,20 @@ class BusinessBranchService
                 'is_active' => $nextIsActive,
             ]);
         });
+
+        $this->accessAuditLogger->log(
+            $business,
+            $actor,
+            'branch_updated',
+            'branch',
+            $branch->id,
+            $payload['name'] ?? $beforeState['name'],
+            $this->accessAuditLogger->diff($beforeState, [
+                'name' => $payload['name'] ?? $beforeState['name'],
+                'is_primary' => $finalIsPrimary,
+                'is_active' => $nextIsActive,
+            ], ['name', 'is_primary', 'is_active']),
+        );
 
         return [
             'message' => 'Branch updated successfully.',

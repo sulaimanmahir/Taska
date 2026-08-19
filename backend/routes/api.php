@@ -76,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/branches', [\App\Http\Controllers\API\BranchController::class, 'index']);
         Route::post('/branches', [\App\Http\Controllers\API\BranchController::class, 'store']);
         Route::patch('/branches/{branch}', [\App\Http\Controllers\API\BranchController::class, 'update']);
+        Route::get('/access-audit-log', [\App\Http\Controllers\API\AccessAuditLogController::class, 'index']);
     });
 
     // Dashboard

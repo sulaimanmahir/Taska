@@ -16,6 +16,7 @@ class BusinessTeamService
     public function __construct(
         private BusinessContextService $businessContextService,
         private BusinessProvisioningService $businessProvisioningService,
+        private AccessAuditLogger $accessAuditLogger,
     ) {
     }
 
@@ -91,6 +92,22 @@ class BusinessTeamService
                 ])->save();
             }
         });
+
+        $addedUser = $existingUser ?: User::where('email', $payload['email'])->first();
+
+        $this->accessAuditLogger->log(
+            $business,
+            $actor,
+            'member_added',
+            'user',
+            $addedUser->id,
+            $addedUser->name,
+            $this->accessAuditLogger->diff([], [
+                'role_slug' => $role->slug,
+                'branch_id' => $branch->id,
+                'status' => 'active',
+            ], ['role_slug', 'branch_id', 'status']),
+        );
 
         return [
             'message' => $createdNewUser
@@ -175,6 +192,28 @@ class BusinessTeamService
                 ])->save();
             }
         });
+
+        $this->accessAuditLogger->log(
+            $business,
+            $actor,
+            'member_updated',
+            'user',
+            $member->id,
+            $member->name,
+            $this->accessAuditLogger->diff(
+                [
+                    'role_slug' => $membership->role_slug,
+                    'branch_id' => $membership->branch_id,
+                    'status' => $this->normalizeStatus($membership->status),
+                ],
+                [
+                    'role_slug' => $role->slug,
+                    'branch_id' => $branch->id,
+                    'status' => $status,
+                ],
+                ['role_slug', 'branch_id', 'status'],
+            ),
+        );
 
         return [
             'message' => 'Workspace member access updated successfully.',

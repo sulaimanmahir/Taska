@@ -4,6 +4,7 @@ export const settingsTabs = [
   { key: 'users', label: 'Users & Roles' },
   { key: 'branches', label: 'Branches' },
   { key: 'modules', label: 'Modules' },
+  { key: 'activity', label: 'Activity' },
 ];
 
 export function buildSettingsMetrics({ user = null, business = null, linkedBusinesses = 0 } = {}) {
@@ -101,7 +102,6 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       roadmapSubtitle: 'High-value access controls that build on this foundation',
       roadmapItems: [
         'Email-based invite acceptance instead of owner-set initial passwords',
-        'Owner visibility into recent access changes and audit history',
         'Branch-level approval rules for sensitive finance and stock actions',
       ],
       roadmapClassName: 'border-amber-200 bg-amber-50/60',
@@ -134,6 +134,16 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       calloutSubtitle: 'Turn optional workflows on or off without changing your business type',
       calloutCopy:
         'Modules are feature toggles within your current business type - they control which optional workflows (like loyalty, refunds, or barcode labels) show up in navigation, not which industry your workspace is set up as.',
+    };
+  }
+
+  if (tab === 'activity') {
+    return {
+      intro:
+        'A record of who added or changed team member access, and who created or updated branches - the changes that affect what other people can do in this workspace.',
+      calloutTitle: 'Why this exists',
+      calloutCopy:
+        'Only the fields that actually changed are recorded, not a full snapshot, so the log stays readable as the team grows.',
     };
   }
 
