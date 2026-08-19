@@ -23,12 +23,12 @@ Status: Complete
 - [x] Prevent quantity increases beyond available stock
 
 ## Milestone 3 — Workflow reliability and testing
-Status: In progress
+Status: Complete
 
 ### Tasks
 - [x] Add frontend tests for POS checkout behavior
 - [x] Add backend tests for failed sale submissions and inventory edge cases
-- [ ] Document the core sales workflow for demo use
+- [x] Document the core sales workflow for demo use
 
 ## Milestone 4 — Product readiness and polish
 Status: Planned

@@ -39,16 +39,16 @@ Completed:
 - surfaced a specific message when quantity exceeds available stock
 
 ### Milestone 3 — Workflow reliability and testing
-Status: In progress
+Status: Complete
 
 Goals:
 - build confidence around the most important business flow
 - reduce regressions as the product grows
 
-Planned work:
-- add frontend tests for the POS checkout behavior — done
-- add backend tests for inventory validation and sale creation failures — done (2026-08-19): `OrderInventoryEdgeCaseTest`/`BranchAwareOrderRoutingTest` cover atomic multi-item rejection, exact-quantity boundaries, never-stocked rejection, and non-inventory-tracked products. Found and fixed a real bug along the way - `track_inventory: 'no'` products (services, fees) were completely unsellable because both `OrderService` and `ProductResource` assumed every product has an inventory row; see ROADMAP.md Platform Hardening.
-- document the happy path for demo and onboarding use
+Completed:
+- added frontend tests for the POS checkout behavior
+- added backend tests for inventory validation and sale creation failures (2026-08-19): `OrderInventoryEdgeCaseTest`/`BranchAwareOrderRoutingTest` cover atomic multi-item rejection, exact-quantity boundaries, never-stocked rejection, and non-inventory-tracked products. Found and fixed a real bug along the way - `track_inventory: 'no'` products (services, fees) were completely unsellable because both `OrderService` and `ProductResource` assumed every product has an inventory row; see ROADMAP.md Platform Hardening.
+- documented the happy path for demo and onboarding use (2026-08-19): [CORE_SALES_WORKFLOW_DEMO.md](CORE_SALES_WORKFLOW_DEMO.md), verified end to end against the real seeded `retail@taska.local` demo account (login, POS sale, low-stock badge, return, non-tracked service sale, approval rules) in an isolated database copy so the walkthrough's claims are actually true, not just described.
 
 ### Milestone 4 — Product readiness and polish
 Status: Planned
