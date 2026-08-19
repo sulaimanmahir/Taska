@@ -74,7 +74,8 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 ### Platform Hardening
 
 - Tenant isolation is enforced mainly through business-context scoping in services and controllers; a unified global-scope pattern now exists (`app/Concerns/BelongsToBusiness.php`) and is applied to every model originally flagged as high-risk (`Order`, `Product`, `InventoryItem`, `Customer`, `Supplier`, `Purchase`, `PurchasePayment`, `Expense`, `InventoryMovement`, `Warehouse`). Line-item-only models (`OrderItem`, `PurchaseItem`) are intentionally excluded since they have no `business_id` of their own and are scoped through their parent relation instead. Apply the same trait+test pattern to any new high-risk model added later.
-- In-app alert center is live (2026-08-19): the header bell is a real dropdown backed by the existing AI Insights engine (`GET /api/ai/insights?unread_only=1`), with mark-as-read wired to the existing endpoint. Push notifications (device-level, outside the app) are still not live.
+- In-app alert center is live (2026-08-19): the header bell is a real dropdown backed by the existing AI Insights engine (`GET /api/ai/insights?unread_only=1`), with mark-as-read wired to the existing endpoint.
+- Push notifications are built (2026-08-19): subscription storage, a `taska:send-critical-alerts` scheduled command, and a Settings > Profile toggle. Backend fully verified via feature tests. Frontend verified as far as this environment allows - confirmed correct up to the point where Chromium needs outbound network access to Google's real push service (not available in this sandbox); production needs its own VAPID key pair (a dev-only pair is documented in `.env.example`) and a live device to confirm actual delivery.
 - Access-change audit history is live (2026-08-19): `access_audit_logs` tracks who changed team member roles/branches/status and who created/updated branches, viewable on Settings > Activity.
 
 ### Workflow Depth
@@ -101,7 +102,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 
 3. Notifications
    - In-app alert center — done (header bell, backed by AI Insights).
-   - Add push notifications after the in-app model is stable.
+   - Push notifications — built, see Platform Hardening above for what's verified vs. what needs a production VAPID pair and a real device.
 
 4. Admin and access polish
    - Email-based invite acceptance instead of owner-set initial passwords.
