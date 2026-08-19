@@ -67,6 +67,7 @@ import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
+import AcceptInvite from './pages/AcceptInvite';
 import DemoAccounts from './pages/DemoAccounts';
 import DemoLanding from './pages/DemoLanding';
 import DemoIndustry from './pages/DemoIndustry';
@@ -145,6 +146,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/demo" element={<DemoLanding />} />
           <Route path="/demo/retail" element={<DemoIndustry industry="retail" />} />
           <Route path="/demo/pharmacy" element={<DemoIndustry industry="pharmacy" />} />

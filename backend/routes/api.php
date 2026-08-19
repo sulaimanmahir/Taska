@@ -54,7 +54,12 @@ Route::middleware('throttle:5,1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/team-invites/accept', [\App\Http\Controllers\API\TeamInviteController::class, 'accept']);
 });
+
+// Public lookup for the accept-invite page (display only - the token itself
+// is the secret, no auth needed to view who invited you).
+Route::get('/team-invites/{token}', [\App\Http\Controllers\API\TeamInviteController::class, 'show']);
 
 Route::get('/tracking/{trackingCode}', [DeliveryController::class, 'trackByCode']);
 
@@ -73,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/team', [BusinessTeamController::class, 'index']);
         Route::post('/auth/team', [BusinessTeamController::class, 'store']);
         Route::patch('/auth/team/{member}', [BusinessTeamController::class, 'update']);
+        Route::post('/auth/team/{member}/resend-invite', [BusinessTeamController::class, 'resendInvite']);
         Route::get('/branches', [\App\Http\Controllers\API\BranchController::class, 'index']);
         Route::post('/branches', [\App\Http\Controllers\API\BranchController::class, 'store']);
         Route::patch('/branches/{branch}', [\App\Http\Controllers\API\BranchController::class, 'update']);

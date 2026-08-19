@@ -42,7 +42,6 @@ test('team defaults prefer a non-owner role and the first active branch', () => 
       phone: '',
       role_slug: 'manager',
       branch_id: '3',
-      password: '',
     },
   );
 });
@@ -67,6 +66,24 @@ test('team member drafts mirror editable access state and detect changes safely'
     hasSettingsTeamDraftChanges(members[0], { ...drafts[7], status: 'suspended' }),
     true,
   );
+});
+
+test('team member drafts default an invited member to their pending status, not active', () => {
+  const members = [
+    { id: 9, role_slug: 'cashier', branch_id: 4, status: 'invited' },
+  ];
+
+  const drafts = buildSettingsTeamMemberDrafts(members);
+
+  assert.deepEqual(drafts, {
+    9: {
+      role_slug: 'cashier',
+      branch_id: '4',
+      status: 'invited',
+    },
+  });
+
+  assert.equal(hasSettingsTeamDraftChanges(members[0], drafts[9]), false);
 });
 
 test('team metrics and member sorting stay aligned with owner-facing priorities', () => {

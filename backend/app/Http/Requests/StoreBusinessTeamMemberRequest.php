@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +18,6 @@ class StoreBusinessTeamMemberRequest extends FormRequest
             'name' => is_string($this->name) ? trim($this->name) : $this->name,
             'email' => is_string($this->email) ? trim($this->email) : $this->email,
             'phone' => is_string($this->phone) ? trim($this->phone) : $this->phone,
-            'password' => is_string($this->password) ? trim($this->password) : $this->password,
         ]);
     }
 
@@ -41,22 +39,6 @@ class StoreBusinessTeamMemberRequest extends FormRequest
                 'integer',
                 Rule::exists('branches', 'id')->where(fn ($query) => $query->where('business_id', $businessId)),
             ],
-            'password' => ['nullable', 'string', 'min:8', 'max:255'],
         ];
-    }
-
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            $email = $this->input('email');
-
-            if (!$email || User::where('email', $email)->exists()) {
-                return;
-            }
-
-            if (!$this->filled('password')) {
-                $validator->errors()->add('password', 'Initial password is required when creating a brand-new login.');
-            }
-        });
     }
 }

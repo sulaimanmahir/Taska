@@ -49,6 +49,7 @@ export default function SettingsTeamPanel({ content }) {
   const [memberDrafts, setMemberDrafts] = useState({});
   const [creating, setCreating] = useState(false);
   const [savingMemberId, setSavingMemberId] = useState(null);
+  const [resendingMemberId, setResendingMemberId] = useState(null);
   const { toast, setToast, clearToast } = useToast();
 
   const metrics = useMemo(
@@ -143,7 +144,6 @@ export default function SettingsTeamPanel({ content }) {
         phone: createForm.phone.trim(),
         role_slug: createForm.role_slug,
         branch_id: Number(createForm.branch_id),
-        ...(createForm.password.trim() ? { password: createForm.password.trim() } : {}),
       };
       const { data } = await api.post('/auth/team', payload);
       syncTeamState(data, { resetCreateForm: true });
@@ -202,6 +202,27 @@ export default function SettingsTeamPanel({ content }) {
       });
     } finally {
       setSavingMemberId(null);
+    }
+  };
+
+  const handleResendInvite = async (member) => {
+    clearToast();
+    setResendingMemberId(member.id);
+
+    try {
+      const { data } = await api.post(`/auth/team/${member.id}/resend-invite`);
+      syncTeamState(data);
+      setToast({
+        tone: 'success',
+        message: data.message || 'Invite resent successfully.',
+      });
+    } catch (error) {
+      setToast({
+        tone: 'error',
+        message: getSettingsSubmitError(error, 'We could not resend that invite right now.'),
+      });
+    } finally {
+      setResendingMemberId(null);
     }
   };
 
@@ -318,22 +339,12 @@ export default function SettingsTeamPanel({ content }) {
                     </select>
                   </label>
 
-                  <label className="space-y-2 text-sm font-semibold text-slate-700">
-                    <span>Initial password</span>
-                    <input
-                      className="input"
-                      type="password"
-                      value={createForm.password}
-                      onChange={(event) => handleCreateChange('password', event.target.value)}
-                      autoComplete="new-password"
-                    />
-                  </label>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
                   <p className="font-semibold text-slate-900">How member creation works</p>
                   <p className="mt-1">
-                    If the email already belongs to an existing Taska user, this will attach that login to the current workspace and ignore the initial password. If it is a brand-new email, the password becomes the first sign-in credential for that member.
+                    If the email already belongs to an existing Taska user, this will attach that login to the current workspace immediately. If it is a brand-new email, Taska sends them an invite email so they can accept and choose their own password - they won&apos;t be able to sign in until they do.
                   </p>
                 </div>
 
@@ -467,8 +478,9 @@ export default function SettingsTeamPanel({ content }) {
                             className="input"
                             value={draft?.status ?? 'active'}
                             onChange={(event) => handleDraftChange(member.id, 'status', event.target.value)}
-                            disabled={member.is_current_user}
+                            disabled={member.is_current_user || member.status === 'invited'}
                           >
+                            {member.status === 'invited' ? <option value="invited">Invited</option> : null}
                             <option value="active">Active</option>
                             <option value="suspended">Suspended</option>
                           </select>
@@ -476,19 +488,33 @@ export default function SettingsTeamPanel({ content }) {
 
                         <div className="md:col-span-3 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
                           <p className="text-sm text-slate-500">
-                            {member.is_current_user
-                              ? 'Use another active business owner account if you need to change your own role or workspace status.'
-                              : member.is_last_active_admin
-                                ? 'This person is the last active business owner, so owner access cannot be removed until another owner is active.'
-                                : 'Changes here update only this workspace and keep other businesses on the login untouched.'}
+                            {member.status === 'invited'
+                              ? 'This invite hasn’t been accepted yet - status becomes Active automatically once they set a password.'
+                              : member.is_current_user
+                                ? 'Use another active business owner account if you need to change your own role or workspace status.'
+                                : member.is_last_active_admin
+                                  ? 'This person is the last active business owner, so owner access cannot be removed until another owner is active.'
+                                  : 'Changes here update only this workspace and keep other businesses on the login untouched.'}
                           </p>
-                          <Button
-                            type="button"
-                            onClick={() => void handleSaveMember(member)}
-                            disabled={isSaving || !hasChanges}
-                          >
-                            {isSaving ? 'Saving access...' : 'Save access'}
-                          </Button>
+                          <div className="flex gap-3">
+                            {member.status === 'invited' ? (
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => void handleResendInvite(member)}
+                                disabled={resendingMemberId === member.id}
+                              >
+                                {resendingMemberId === member.id ? 'Resending...' : 'Resend invite'}
+                              </Button>
+                            ) : null}
+                            <Button
+                              type="button"
+                              onClick={() => void handleSaveMember(member)}
+                              disabled={isSaving || !hasChanges}
+                            >
+                              {isSaving ? 'Saving access...' : 'Save access'}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -94,6 +94,34 @@ export const useAuthStore = create(
         }
       },
 
+      acceptInvite: async (token, password, passwordConfirmation) => {
+        set({ isLoading: true });
+        try {
+          const { data } = await api.post('/team-invites/accept', {
+            token,
+            password,
+            password_confirmation: passwordConfirmation,
+          });
+          localStorage.setItem('token', data.token);
+          const activeBusiness = data.requires_business_selection ? null : data.current_business;
+          persistActiveBusiness(activeBusiness);
+          set({
+            user: { ...data.user, role: data.user?.role || 'admin' },
+            business: activeBusiness,
+            businesses: data.businesses,
+            permissions: data.permissions || [],
+            token: data.token,
+            isLoading: false,
+            needsBusinessSelection: Boolean(data.requires_business_selection),
+            needsBusinessOnboarding: Boolean(data.needs_business_onboarding),
+          });
+          return data;
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
       logout: async () => {
         try {
           await api.post('/auth/logout');

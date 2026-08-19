@@ -63,7 +63,6 @@ export function buildSettingsTeamCreateDefaults(roles = [], branches = []) {
     phone: '',
     role_slug: preferredRole?.slug ?? '',
     branch_id: preferredBranch?.id ? String(preferredBranch.id) : '',
-    password: '',
   };
 }
 

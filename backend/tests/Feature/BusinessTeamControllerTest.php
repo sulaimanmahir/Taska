@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\TeamInviteMail;
 use App\Models\Branch;
 use App\Models\Business;
 use App\Models\Role;
@@ -9,6 +10,8 @@ use App\Models\User;
 use App\Services\BusinessProvisioningService;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -47,8 +50,10 @@ class BusinessTeamControllerTest extends TestCase
             ->assertJsonPath('members.0.is_current_user', true);
     }
 
-    public function test_admin_can_create_a_brand_new_workspace_member(): void
+    public function test_admin_can_invite_a_brand_new_workspace_member(): void
     {
+        Mail::fake();
+
         ['owner' => $owner, 'business' => $business, 'branch' => $branch] = $this->createProvisionedWorkspace();
         $token = $owner->createToken('test-token')->plainTextToken;
 
@@ -59,12 +64,12 @@ class BusinessTeamControllerTest extends TestCase
                 'phone' => '08031110000',
                 'role_slug' => 'cashier',
                 'branch_id' => $branch->id,
-                'password' => 'securePass123',
             ]);
 
         $response->assertCreated()
             ->assertJsonPath('created_new_user', true)
-            ->assertJsonPath('summary.member_count', 2);
+            ->assertJsonPath('summary.member_count', 2)
+            ->assertJsonPath('summary.active_member_count', 1);
 
         $memberId = User::where('email', 'cashier@example.com')->value('id');
         $cashierRoleId = Role::where('business_id', $business->id)->where('slug', 'cashier')->value('id');
@@ -81,7 +86,7 @@ class BusinessTeamControllerTest extends TestCase
             'user_id' => $memberId,
             'role_id' => $cashierRoleId,
             'branch_id' => $branch->id,
-            'status' => 'active',
+            'status' => 'invited',
         ]);
 
         $this->assertDatabaseHas('role_user', [
@@ -89,6 +94,91 @@ class BusinessTeamControllerTest extends TestCase
             'user_id' => $memberId,
             'role_id' => $cashierRoleId,
         ]);
+
+        Mail::assertSent(TeamInviteMail::class, fn ($mail) => $mail->hasTo('cashier@example.com'));
+
+        // The placeholder password is unusable - the invitee cannot sign in
+        // until they accept the invite and choose their own password.
+        $this->postJson('/api/auth/login', [
+            'email' => 'cashier@example.com',
+            'password' => 'securePass123',
+        ])->assertStatus(422);
+    }
+
+    public function test_invited_member_can_accept_and_the_owner_can_resend_the_invite(): void
+    {
+        Mail::fake();
+
+        ['owner' => $owner, 'business' => $business, 'branch' => $branch] = $this->createProvisionedWorkspace();
+        $token = $owner->createToken('test-token')->plainTextToken;
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/auth/team', [
+                'name' => 'Cashier Grace',
+                'email' => 'cashier@example.com',
+                'role_slug' => 'cashier',
+                'branch_id' => $branch->id,
+            ])->assertCreated();
+
+        $member = User::where('email', 'cashier@example.com')->firstOrFail();
+
+        $capturedToken = null;
+        Mail::assertSent(TeamInviteMail::class, function ($mail) use (&$capturedToken) {
+            $capturedToken = Str::after($mail->acceptUrl, 'token=');
+            return true;
+        });
+
+        $this->getJson("/api/team-invites/{$capturedToken}")
+            ->assertOk()
+            ->assertJsonPath('business_name', $business->name)
+            ->assertJsonPath('role_name', 'Cashier');
+
+        $acceptResponse = $this->postJson('/api/team-invites/accept', [
+            'token' => $capturedToken,
+            'password' => 'newSecurePass123',
+            'password_confirmation' => 'newSecurePass123',
+        ]);
+
+        $acceptResponse->assertOk()
+            ->assertJsonPath('current_business.id', $business->id);
+
+        $this->assertDatabaseHas('business_user', [
+            'business_id' => $business->id,
+            'user_id' => $member->id,
+            'status' => 'active',
+            'invitation_token' => null,
+        ]);
+
+        // The token is single-use - accepting again must fail.
+        $this->postJson('/api/team-invites/accept', [
+            'token' => $capturedToken,
+            'password' => 'anotherPass123',
+            'password_confirmation' => 'anotherPass123',
+        ])->assertStatus(404);
+
+        // Now they can actually sign in with the password they chose.
+        $this->postJson('/api/auth/login', [
+            'email' => 'cashier@example.com',
+            'password' => 'newSecurePass123',
+        ])->assertOk();
+
+        // A separate invite can still be resent for a still-pending member.
+        $secondInvite = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/auth/team', [
+                'name' => 'Manager Musa',
+                'email' => 'musa@example.com',
+                'role_slug' => 'manager',
+                'branch_id' => $branch->id,
+            ]);
+        $secondInvite->assertCreated();
+        $pendingMember = User::where('email', 'musa@example.com')->firstOrFail();
+
+        $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson("/api/auth/team/{$pendingMember->id}/resend-invite")
+            ->assertOk();
+
+        // cashier invite + musa invite + musa resend = 3 sends total.
+        Mail::assertSent(TeamInviteMail::class, 3);
     }
 
     public function test_admin_can_attach_existing_taska_user_without_creating_another_login(): void

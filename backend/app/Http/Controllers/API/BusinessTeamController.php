@@ -35,4 +35,11 @@ class BusinessTeamController extends Controller
             $this->businessTeamService->updateMember($request->user(), $member, $request->validated())
         );
     }
+
+    public function resendInvite(Request $request, User $member)
+    {
+        return response()->json(
+            $this->businessTeamService->resendInvite($request->user(), $member)
+        );
+    }
 }

@@ -112,7 +112,7 @@ class BusinessProvisioningService
         });
     }
 
-    public function attachUserToBusiness(User $user, Business $business, Role $role, Branch $branch, ?int $createdBy = null): void
+    public function attachUserToBusiness(User $user, Business $business, Role $role, Branch $branch, ?int $createdBy = null, string $status = 'active'): void
     {
         DB::table('business_user')->updateOrInsert(
             [
@@ -122,9 +122,12 @@ class BusinessProvisioningService
             [
                 'role_id' => $role->id,
                 'branch_id' => $branch->id,
-                'status' => 'active',
+                'status' => $status,
                 'created_by' => $createdBy,
-                'joined_at' => now(),
+                // An invited member hasn't actually joined yet - joined_at is
+                // set for real once they accept the invite (see
+                // BusinessTeamService::acceptInvite()).
+                'joined_at' => $status === 'active' ? now() : null,
             ]
         );
 
