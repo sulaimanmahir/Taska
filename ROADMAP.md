@@ -83,7 +83,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 - A general purchase-order, receive, and supplier-payment workflow exists end to end (`Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment` models, `PurchaseController`/`SupplierController`, `Purchases.jsx`), including stock updates into inventory on receipt.
   - Production input purchases exist.
   - Pharmacy purchase history exists.
-- Warehouse CRUD exists, but branch-to-warehouse setup and routing still need a stronger admin UX.
+- Warehouse-to-branch admin UX is live (2026-08-19): Settings > Warehouses lets an owner create warehouses and assign/reassign each one to a branch, using the pre-existing `WarehouseController`/`BusinessWarehouseService` (which already had default-warehouse invariants; it just had no frontend). Still open: `OrderController::getDefaultWarehouse()` always resolves the single business-wide default warehouse regardless of branch context - automatic branch-aware routing is a bigger, riskier change (touches every sale in the app) deliberately left as a product decision, not built here.
 - Tenant-scoping hardening (the `BelongsToBusiness` trait) is now applied to every originally-flagged model — see Platform Hardening above.
 
 ### Intelligence and Offline Maturity
@@ -110,8 +110,8 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
    - Branch-level approval rules for sensitive finance and inventory actions.
 
 5. Branch and warehouse routing
-   - Strengthen location setup flows.
-   - Improve module-aware branch/warehouse defaults for inventory-heavy workflows.
+   - Strengthen location setup flows — done (Settings > Warehouses).
+   - Improve module-aware branch/warehouse defaults for inventory-heavy workflows — still open, see Workflow Depth above (automatic branch-aware order routing).
 
 6. Intelligence expansion — done, see Intelligence and Offline Maturity above
    - Demand forecasting — done (stockout/reorder/pharmacy demand checks)
