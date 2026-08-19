@@ -87,7 +87,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 
 ### Intelligence and Offline Maturity
 
-- AI insights are live, but deeper forecasting, anomaly detection, and branch-vs-branch comparison layers are still in progress.
+- AI insights are live and substantially more mature than this line previously suggested (confirmed 2026-08-19 by reading `AiService::generateInsights()` directly): 34 wired-in checks already run on every call, covering demand/stockout/reorder forecasting, branch-vs-branch performance comparison, fraud/risk pressure (mobile agent, fuel shrinkage, credit default), and vertical-specific forecasts across pharmacy, delivery, production, hotel, school, agro, livestock, construction, and restaurant. Every insight already carries an explainable `recommendation` field. Nothing further queued here for now — this line was stale, not a real gap.
 - Offline queueing exists, but richer conflict handling and module-specific replay/reconciliation rules still need work.
 
 ## Next Priorities
@@ -112,11 +112,11 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
    - Strengthen location setup flows.
    - Improve module-aware branch/warehouse defaults for inventory-heavy workflows.
 
-6. Intelligence expansion
-   - Demand forecasting
-   - Anomaly detection
-   - Branch comparisons
-   - Explainable next-best-action recommendations
+6. Intelligence expansion — done, see Intelligence and Offline Maturity above
+   - Demand forecasting — done (stockout/reorder/pharmacy demand checks)
+   - Anomaly detection — done (fraud pressure, shrinkage, credit default, margin erosion checks)
+   - Branch comparisons — done (`checkBranchPerformance`)
+   - Explainable next-best-action recommendations — done (every insight carries a `recommendation` field)
 
 ## Delivery Phases
 
