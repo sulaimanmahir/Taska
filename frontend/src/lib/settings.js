@@ -3,6 +3,7 @@ export const settingsTabs = [
   { key: 'business', label: 'Business' },
   { key: 'users', label: 'Users & Roles' },
   { key: 'branches', label: 'Branches' },
+  { key: 'warehouses', label: 'Warehouses' },
   { key: 'modules', label: 'Modules' },
   { key: 'activity', label: 'Activity' },
 ];
@@ -119,12 +120,22 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       roadmapTitle: 'Still ahead',
       roadmapSubtitle: 'Higher-order location controls that build on this foundation',
       roadmapItems: [
-        'Branch-level inventory routing and warehouse setup flows',
+        'Automatic branch-aware inventory routing (sales currently always use the one business-wide default warehouse - see the Warehouses tab to assign warehouses to branches in the meantime)',
         'Location-specific approval rules for stock and finance actions',
         'AI-led branch comparison alerts for performance, demand, and staffing',
       ],
       roadmapClassName: 'border-emerald-200 bg-emerald-50/60',
       roadmapTextClassName: 'text-emerald-900',
+    };
+  }
+
+  if (tab === 'warehouses') {
+    return {
+      intro:
+        'Register warehouses and tie each one to a branch, so stock has a clear home as the business grows beyond a single location.',
+      calloutTitle: 'What warehouse assignment does today',
+      calloutCopy:
+        'Assigning a warehouse to a branch here makes the relationship visible and manageable, but sales and purchases still resolve stock through the single business-wide default warehouse rather than automatically picking the warehouse for the current branch - see the Branches tab for that still-ahead item.',
     };
   }
 

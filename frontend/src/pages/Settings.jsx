@@ -9,6 +9,7 @@ import SettingsAuditLogPanel from '../components/SettingsAuditLogPanel';
 import SettingsBranchesPanel from '../components/SettingsBranchesPanel';
 import SettingsModulesPanel from '../components/SettingsModulesPanel';
 import SettingsTeamPanel from '../components/SettingsTeamPanel';
+import SettingsWarehousesPanel from '../components/SettingsWarehousesPanel';
 import { FinanceFormError } from '../components/FinanceFormFeedback';
 import OpsMetricCard from '../components/OpsMetricCard';
 import { PageHeader, ResponsiveCardGrid, SectionShell } from '../components/PageShell';
@@ -489,6 +490,10 @@ export default function Settings() {
 
       {activeTab === 'modules' ? (
         <SettingsModulesPanel content={activeTabContent} />
+      ) : null}
+
+      {activeTab === 'warehouses' ? (
+        <SettingsWarehousesPanel content={activeTabContent} />
       ) : null}
 
       {activeTab === 'activity' ? (

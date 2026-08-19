@@ -15,6 +15,7 @@ test('settings tabs stay aligned with the available workspace sections', () => {
     { key: 'business', label: 'Business' },
     { key: 'users', label: 'Users & Roles' },
     { key: 'branches', label: 'Branches' },
+    { key: 'warehouses', label: 'Warehouses' },
     { key: 'modules', label: 'Modules' },
     { key: 'activity', label: 'Activity' },
   ]);
@@ -96,10 +97,11 @@ test('settings tab content helpers keep live settings copy aligned', () => {
   ]);
   assert.equal(getSettingsTabContent('branches')?.calloutTitle, 'Branch operating model');
   assert.deepEqual(getSettingsTabContent('branches')?.roadmapItems, [
-    'Branch-level inventory routing and warehouse setup flows',
+    'Automatic branch-aware inventory routing (sales currently always use the one business-wide default warehouse - see the Warehouses tab to assign warehouses to branches in the meantime)',
     'Location-specific approval rules for stock and finance actions',
     'AI-led branch comparison alerts for performance, demand, and staffing',
   ]);
+  assert.equal(getSettingsTabContent('warehouses')?.calloutTitle, 'What warehouse assignment does today');
   assert.equal(getSettingsTabContent('modules')?.calloutTitle, 'Feature modules');
   assert.equal(getSettingsTabContent('activity')?.calloutTitle, 'Why this exists');
   assert.equal(getSettingsTabContent('missing'), null);
