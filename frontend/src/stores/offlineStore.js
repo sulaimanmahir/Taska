@@ -127,6 +127,10 @@ export const useOfflineStore = create(
         connectivityState: 'review_required',
       })),
 
+      dismissConflict: (actionId) => set((state) => ({
+        conflicts: state.conflicts.filter((conflict) => conflict.actionId !== actionId),
+      })),
+
       removeAction: (actionId) => set((state) => {
         const pendingActionsByBusiness = removeActionFromMap(state.pendingActionsByBusiness, actionId);
 
@@ -198,6 +202,18 @@ export const useOfflineStore = create(
   )
 );
 
+function toReplayPayload(action, extra = {}) {
+  return {
+    id: action.id,
+    endpoint: action.endpoint,
+    method: action.method,
+    resource_type: action.resourceType,
+    payload: action.payload,
+    base_updated_at: action.baseUpdatedAt ?? null,
+    ...extra,
+  };
+}
+
 export async function syncPendingActions(api) {
   const {
     pendingActionsByBusiness,
@@ -214,39 +230,91 @@ export async function syncPendingActions(api) {
     return { synced: 0, failed: 0, conflicts: 0 };
   }
 
+  pendingActions.forEach((action) => markActionProcessing(action.id));
+
   let synced = 0;
   let failed = 0;
   let conflicts = 0;
 
-  for (const action of pendingActions) {
-    markActionProcessing(action.id);
+  try {
+    const { data } = await api.post('/offline/replay', {
+      actions: pendingActions.map((action) => toReplayPayload(action)),
+    });
 
-    try {
-      await api.request({
-        url: action.endpoint,
-        method: action.method,
-        data: action.payload,
-      });
+    for (const result of data?.results ?? []) {
+      const action = pendingActions.find((item) => item.id === result.id);
 
-      removeAction(action.id);
-      synced += 1;
-    } catch (error) {
-      if (error?.response?.status === 409) {
+      if (result.status === 'synced') {
+        removeAction(result.id);
+        synced += 1;
+      } else if (result.status === 'conflict') {
         conflicts += 1;
         resolveConflict({
-          actionId: action.id,
-          resourceType: action.resourceType,
-          payload: action.payload,
-          reason: error?.response?.data?.message ?? 'Conflict detected during sync',
+          actionId: result.id,
+          resourceType: action?.resourceType,
+          endpoint: action?.endpoint,
+          method: action?.method,
+          payload: action?.payload,
+          current: result.current,
+          strategy: result.strategy,
         });
       } else {
         failed += 1;
-        markActionFailed(action.id, error);
+        markActionFailed(result.id, { message: result.message ?? 'Sync failed' });
       }
     }
+  } catch (error) {
+    pendingActions.forEach((action) => markActionFailed(action.id, error));
+    failed = pendingActions.length;
   }
 
   registerSyncResult({ synced, failed, conflicts });
 
   return { synced, failed, conflicts };
+}
+
+export async function forceSyncConflict(api, actionId) {
+  const {
+    pendingActionsByBusiness,
+    markActionProcessing,
+    markActionFailed,
+    removeAction,
+    dismissConflict,
+  } = useOfflineStore.getState();
+
+  const action = flattenPendingActions(pendingActionsByBusiness).find((item) => item.id === actionId);
+  if (!action) return { status: 'missing' };
+
+  markActionProcessing(actionId);
+
+  try {
+    const { data } = await api.post('/offline/replay', {
+      actions: [toReplayPayload(action, { force: true })],
+    });
+
+    const result = data?.results?.[0];
+
+    if (result?.status === 'synced') {
+      removeAction(actionId);
+      dismissConflict(actionId);
+      useOfflineStore.getState().registerSyncResult({
+        synced: 1,
+        conflicts: useOfflineStore.getState().conflicts.length,
+      });
+      return result;
+    }
+
+    markActionFailed(actionId, { message: result?.message ?? 'Force sync failed' });
+    return result ?? { status: 'failed' };
+  } catch (error) {
+    markActionFailed(actionId, error);
+    return { status: 'failed' };
+  }
+}
+
+export function discardConflict(actionId) {
+  const { removeAction, dismissConflict, registerSyncResult, conflicts } = useOfflineStore.getState();
+  removeAction(actionId);
+  dismissConflict(actionId);
+  registerSyncResult({ conflicts: conflicts.filter((conflict) => conflict.actionId !== actionId).length });
 }

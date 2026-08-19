@@ -89,7 +89,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 ### Intelligence and Offline Maturity
 
 - AI insights are live and substantially more mature than this line previously suggested (confirmed 2026-08-19 by reading `AiService::generateInsights()` directly): 34 wired-in checks already run on every call, covering demand/stockout/reorder forecasting, branch-vs-branch performance comparison, fraud/risk pressure (mobile agent, fuel shrinkage, credit default), and vertical-specific forecasts across pharmacy, delivery, production, hotel, school, agro, livestock, construction, and restaurant. Every insight already carries an explainable `recommendation` field. Nothing further queued here for now — this line was stale, not a real gap.
-- Offline queueing exists, but richer conflict handling and module-specific replay/reconciliation rules still need work.
+- Offline conflict handling is live (2026-08-19): a new `POST /api/offline/replay` endpoint wires up `OfflineSyncService`'s pre-existing (previously dead) conflict-strategy logic — `resolveConflict()`/`determineConflictStrategy()` — instead of duplicating it. Each queued action replays through the real internal routing/middleware/controller stack (same auth, validation, and tenant scoping as a live request), so no endpoint-specific logic had to be reimplemented. For resource types whose strategy isn't `last_write_wins` (`inventory`/`stock_transfer`/`stock_count` → `review_queue`, `finance`/`cashbook`/`settlement` → `manual_review`), a client-supplied `base_updated_at` snapshot is compared against the record's current `updated_at` before the write is applied; a real change wins is returned as a structured conflict instead of silently overwriting. `frontend/src/stores/offlineStore.js`'s `syncPendingActions` now batches the whole queue through this endpoint in one request instead of replaying one-by-one against each action's own endpoint, and `SyncIndicator.jsx` renders each conflict with "Discard my change" / "Keep my change anyway" (forced retry) actions. Verified with 4 new backend feature tests (last-write-wins passthrough, conflict detection, forced override, per-action failure isolation within a batch) and 4 new frontend store tests, plus a live Playwright walkthrough that reproduced a real cross-device conflict and resolved it through the actual UI button. Scoped intentionally: only the offline-replay path changed, no normal live endpoint was touched; none of today's actual queued resourceTypes (`delivery`, `fleet`, `logistics`, `general`) map to a conflict-sensitive strategy yet, so in practice this is forward-looking scaffolding for the day a conflict-sensitive module (e.g. inventory) queues real offline writes.
 
 ## Next Priorities
 
@@ -137,7 +137,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 ### Phase 3: Next
 
 - Deeper AI forecasting and branch intelligence
-- Offline conflict resolution maturity
+- Offline conflict resolution maturity — done, see Intelligence and Offline Maturity above
 - Cross-module polish and workflow depth parity
 
 ## Notes

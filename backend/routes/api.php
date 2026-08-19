@@ -262,6 +262,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/push-subscriptions', [\App\Http\Controllers\API\PushSubscriptionController::class, 'destroy']);
     Route::get('/push-subscriptions/public-key', [\App\Http\Controllers\API\PushSubscriptionController::class, 'publicKey']);
 
+    // Offline queue replay - wires OfflineSyncService's existing conflict
+    // strategy map to a real endpoint. Replays each queued action through
+    // the normal internal routing stack (same auth/validation/tenant
+    // scoping as a live request) instead of duplicating that logic here.
+    Route::post('/offline/replay', [\App\Http\Controllers\API\OfflineSyncController::class, 'replay']);
+
     // Inventory
     Route::get('/inventory', [\App\Http\Controllers\API\InventoryController::class, 'index']);
     Route::get('/inventory/low-stock', [\App\Http\Controllers\API\InventoryController::class, 'lowStock']);

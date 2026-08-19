@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useState } from 'react';
-import { useOfflineStore, syncPendingActions } from '../stores/offlineStore';
+import { useOfflineStore, syncPendingActions, forceSyncConflict, discardConflict } from '../stores/offlineStore';
 import api from '../lib/api';
 import { flattenPendingActions } from '../lib/offlineContext';
 
@@ -12,6 +12,44 @@ function formatRelativeTime(timestamp) {
   if (elapsedMinutes === 1) return '1 min ago';
 
   return `${elapsedMinutes} mins ago`;
+}
+
+const STRATEGY_LABEL = {
+  review_queue: 'Needs review before it can sync (inventory/stock change)',
+  manual_review: 'Needs manual review before it can sync (finance change)',
+  last_write_wins: 'The record changed on the server since you edited it offline',
+};
+
+function ConflictRow({ conflict, onForce, onDiscard, busy }) {
+  const label = STRATEGY_LABEL[conflict.strategy] ?? 'This change conflicts with a newer server change';
+
+  return (
+    <li className="rounded-[var(--field-radius)] border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-slate-200">
+      <p className="font-semibold text-white">{conflict.resourceType ?? 'Record'} update conflict</p>
+      <p className="mt-0.5 text-slate-300">{label}</p>
+      {conflict.current?.name ? (
+        <p className="mt-1 text-slate-400">Server currently has: <span className="text-slate-200">{conflict.current.name}</span></p>
+      ) : null}
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onDiscard(conflict.actionId)}
+          className="rounded-[var(--field-radius)] border border-white/12 bg-white/6 px-2.5 py-1 font-medium text-slate-200 transition hover:border-white/20 hover:bg-white/10 disabled:opacity-50"
+        >
+          Discard my change
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onForce(conflict.actionId)}
+          className="rounded-[var(--field-radius)] border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 font-medium text-amber-200 transition hover:border-amber-300/50 hover:bg-amber-400/20 disabled:opacity-50"
+        >
+          Keep my change anyway
+        </button>
+      </div>
+    </li>
+  );
 }
 
 export default function SyncIndicator({
@@ -31,6 +69,7 @@ export default function SyncIndicator({
   const statusTitleId = useId();
   const statusDetailId = useId();
   const [syncing, setSyncing] = useState(false);
+  const [resolvingActionId, setResolvingActionId] = useState(null);
   const totalPendingActions = flattenPendingActions(pendingActionsByBusiness).length;
 
   const syncNow = useCallback(async () => {
@@ -45,6 +84,20 @@ export default function SyncIndicator({
       setSyncing(false);
     }
   }, [setConnectivityState, syncing]);
+
+  const handleForceConflict = useCallback(async (actionId) => {
+    setResolvingActionId(actionId);
+
+    try {
+      await forceSyncConflict(api, actionId);
+    } finally {
+      setResolvingActionId(null);
+    }
+  }, []);
+
+  const handleDiscardConflict = useCallback((actionId) => {
+    discardConflict(actionId);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -119,6 +172,20 @@ export default function SyncIndicator({
             </button>
           ) : null}
         </div>
+
+        {conflicts.length > 0 ? (
+          <ul className="space-y-2 border-t border-white/10 px-[var(--card-padding)] py-3">
+            {conflicts.map((conflict) => (
+              <ConflictRow
+                key={conflict.actionId}
+                conflict={conflict}
+                busy={resolvingActionId === conflict.actionId}
+                onForce={handleForceConflict}
+                onDiscard={handleDiscardConflict}
+              />
+            ))}
+          </ul>
+        ) : null}
       </section>
     </div>
   );
