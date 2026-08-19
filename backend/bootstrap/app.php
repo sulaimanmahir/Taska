@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // `php artisan schedule:run` every minute, which is a deployment/ops
         // decision outside this codebase, not something code alone can turn on.
         $schedule->command('taska:compute-gamification-snapshots')->dailyAt('02:00');
+        $schedule->command('taska:send-critical-alerts')->everyFifteenMinutes();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

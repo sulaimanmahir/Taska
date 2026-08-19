@@ -17,12 +17,14 @@ class AiInsight extends Model
         'data',
         'is_read',
         'is_dismissed',
+        'notified_at',
     ];
 
     protected $casts = [
         'data' => 'array',
         'is_read' => 'boolean',
         'is_dismissed' => 'boolean',
+        'notified_at' => 'datetime',
     ];
 
     public function business(): BelongsTo

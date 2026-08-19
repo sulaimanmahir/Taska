@@ -256,6 +256,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Gamification (data model - see docs/TASKA_DESIGN_CONSTITUTION.md)
     Route::get('/gamification/overview', [\App\Http\Controllers\API\GamificationController::class, 'overview']);
 
+    // Web Push subscriptions - any authenticated team member manages their
+    // own device subscriptions, not admin-only.
+    Route::post('/push-subscriptions', [\App\Http\Controllers\API\PushSubscriptionController::class, 'store']);
+    Route::delete('/push-subscriptions', [\App\Http\Controllers\API\PushSubscriptionController::class, 'destroy']);
+    Route::get('/push-subscriptions/public-key', [\App\Http\Controllers\API\PushSubscriptionController::class, 'publicKey']);
+
     // Inventory
     Route::get('/inventory', [\App\Http\Controllers\API\InventoryController::class, 'index']);
     Route::get('/inventory/low-stock', [\App\Http\Controllers\API\InventoryController::class, 'lowStock']);

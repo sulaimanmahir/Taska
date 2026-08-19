@@ -2,11 +2,14 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\AiInsight;
 use App\Models\Business;
 use App\Models\BusinessStreak;
 use App\Models\Customer;
+use App\Services\AiService;
 use App\Services\BusinessHealthScoringService;
 use App\Services\BusinessProvisioningService;
+use App\Services\PushNotificationService;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -41,6 +44,38 @@ Artisan::command('taska:compute-gamification-snapshots', function (BusinessHealt
 
     $this->info('Done.');
 })->purpose('Compute and store daily health snapshots, and extend the zero-overdue-receivables streak for businesses with no outstanding customer balance');
+
+Artisan::command('taska:send-critical-alerts', function (AiService $aiService, PushNotificationService $pushService) {
+    if (!$pushService->isConfigured()) {
+        $this->warn('VAPID keys are not configured - skipping (see .env.example).');
+        return;
+    }
+
+    $businesses = Business::query()->orderBy('id')->get();
+    $this->info("Checking {$businesses->count()} business(es) for critical alerts...");
+    $totalSent = 0;
+
+    foreach ($businesses as $business) {
+        // generateInsights() is idempotent (syncInsight() upserts by type,
+        // see AiService) - safe to call from a scheduled job even though
+        // it's normally triggered lazily by a user viewing /ai/insights.
+        $aiService->generateInsights($business->id);
+
+        $criticalInsights = AiInsight::where('business_id', $business->id)
+            ->where('severity', 'critical')
+            ->where('is_dismissed', false)
+            ->whereNull('notified_at')
+            ->get();
+
+        foreach ($criticalInsights as $insight) {
+            $result = $pushService->sendToBusiness($business, $insight->title, $insight->description, '/ai-insights');
+            $insight->update(['notified_at' => now()]);
+            $totalSent += $result['sent'];
+        }
+    }
+
+    $this->info("Done. Sent {$totalSent} push notification(s).");
+})->purpose('Push a notification for any new critical AI insight across every business');
 
 Artisan::command('taska:repair-business-state {--business_id=} {--dry-run}', function (BusinessProvisioningService $provisioningService) {
     $businessId = $this->option('business_id');
