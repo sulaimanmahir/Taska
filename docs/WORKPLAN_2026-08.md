@@ -39,15 +39,15 @@ Completed:
 - surfaced a specific message when quantity exceeds available stock
 
 ### Milestone 3 — Workflow reliability and testing
-Status: Planned
+Status: In progress
 
 Goals:
 - build confidence around the most important business flow
 - reduce regressions as the product grows
 
 Planned work:
-- add frontend tests for the POS checkout behavior
-- add backend tests for inventory validation and sale creation failures
+- add frontend tests for the POS checkout behavior — done
+- add backend tests for inventory validation and sale creation failures — done (2026-08-19): `OrderInventoryEdgeCaseTest`/`BranchAwareOrderRoutingTest` cover atomic multi-item rejection, exact-quantity boundaries, never-stocked rejection, and non-inventory-tracked products. Found and fixed a real bug along the way - `track_inventory: 'no'` products (services, fees) were completely unsellable because both `OrderService` and `ProductResource` assumed every product has an inventory row; see ROADMAP.md Platform Hardening.
 - document the happy path for demo and onboarding use
 
 ### Milestone 4 — Product readiness and polish
