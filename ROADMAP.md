@@ -97,8 +97,7 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
    - Audit branch, warehouse, and business ownership checks across controllers and validators.
    - Centralize enforcement where possible into shared services and policies.
 
-2. Purchases and payables
-   - Add purchase orders, goods received notes, supplier balances, and payment workflows.
+2. Purchases and payables — done, see Workflow Depth above (`Supplier`/`Purchase`/`PurchaseItem`/`PurchasePayment`, `PurchaseController`/`SupplierController`, stock updates on receipt). This line was stale, not a real gap.
 
 3. Notifications
    - In-app alert center — done (header bell, backed by AI Insights).
