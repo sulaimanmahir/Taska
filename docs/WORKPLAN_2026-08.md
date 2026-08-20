@@ -51,13 +51,13 @@ Completed:
 - documented the happy path for demo and onboarding use (2026-08-19): [CORE_SALES_WORKFLOW_DEMO.md](CORE_SALES_WORKFLOW_DEMO.md), verified end to end against the real seeded `retail@taska.local` demo account (login, POS sale, low-stock badge, return, non-tracked service sale, approval rules) in an isolated database copy so the walkthrough's claims are actually true, not just described.
 
 ### Milestone 4 — Product readiness and polish
-Status: Planned
+Status: In progress
 
 Goals:
 - move the platform from broad scaffolding to dependable demo readiness
 - improve maintainability and operational clarity
 
 Planned work:
-- standardize validation/error handling across modules
-- tighten business rules around stock, payments, and visibility
-- prepare a concise release checklist for the core workflow
+- standardize validation/error handling across modules — in progress (2026-08-20): swept every vertical Service/Controller in two passes for unguarded balance/quantity mutations and inconsistent error shapes. Fixed 8 real instances across `WholesaleService`, `PureWaterRetailService`, `ConstructionMaterialsService` (transfers + credit payments), `ProductionService`, `TrustFundService` (both `draw()` and `repay()`), `AgroDealerService`, and `DeliveryService` — see ROADMAP.md Platform Hardening for the full list. 10 new feature tests, full backend suite still green.
+- tighten business rules around stock, payments, and visibility — see above, same fixes cover this goal directly
+- prepare a concise release checklist for the core workflow — done (2026-08-20): [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)

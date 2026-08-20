@@ -31,9 +31,9 @@ Status: Complete
 - [x] Document the core sales workflow for demo use
 
 ## Milestone 4 — Product readiness and polish
-Status: Planned
+Status: In progress
 
 ### Tasks
-- [ ] Standardize validation and error handling across core modules
-- [ ] Tighten stock, payment, and reporting consistency
-- [ ] Prepare a release checklist for the sales-to-inventory workflow
+- [x] Standardize validation and error handling across core modules — 8 unguarded stock/money mutations fixed across 7 services, see ROADMAP.md
+- [x] Tighten stock, payment, and reporting consistency — same fixes as above
+- [x] Prepare a release checklist for the sales-to-inventory workflow — [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
