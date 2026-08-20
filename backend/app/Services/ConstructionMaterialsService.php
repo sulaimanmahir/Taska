@@ -23,6 +23,7 @@ use App\Models\Warehouse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ConstructionMaterialsService
 {
@@ -469,6 +470,15 @@ class ConstructionMaterialsService
     public function recordCreditPayment(ConstructionCreditAccount $account, array $payload, User $user): ConstructionCreditPayment
     {
         return DB::transaction(function () use ($account, $payload, $user) {
+            $outstandingBalance = (float) $account->outstanding_amount;
+            $amount = (float) $payload['amount'];
+
+            if ($amount > $outstandingBalance) {
+                throw ValidationException::withMessages([
+                    'amount' => ['Payment amount cannot exceed the outstanding credit balance.'],
+                ]);
+            }
+
             $payment = ConstructionCreditPayment::create([
                 'credit_account_id' => $account->id,
                 'business_id' => $account->business_id,
@@ -570,6 +580,12 @@ class ConstructionMaterialsService
 
             $sourcePrevious = (float) $source->quantity;
             $destinationPrevious = (float) $destination->quantity;
+
+            if ($sourcePrevious < $convertedQuantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => ['The source warehouse does not have enough stock for this transfer.'],
+                ]);
+            }
 
             $source->quantity = $sourcePrevious - $convertedQuantity;
             $source->save();

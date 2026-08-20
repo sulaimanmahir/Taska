@@ -12,6 +12,7 @@ use App\Models\ProductionWastageLog;
 use App\Models\Product;
 use App\Models\RawMaterial;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ProductionService
 {
@@ -191,12 +192,19 @@ class ProductionService
     {
         $quantity = (float) $payload['quantity'];
 
-        match ($payload['type']) {
-            'add' => $material->quantity += $quantity,
-            'remove' => $material->quantity -= $quantity,
-            'set' => $material->quantity = $quantity,
+        $nextQuantity = match ($payload['type']) {
+            'add' => $material->quantity + $quantity,
+            'remove' => $material->quantity - $quantity,
+            'set' => $quantity,
         };
 
+        if ($nextQuantity < 0) {
+            throw ValidationException::withMessages([
+                'quantity' => ['Raw material quantity cannot go below zero.'],
+            ]);
+        }
+
+        $material->quantity = $nextQuantity;
         $material->save();
 
         return $material->fresh();

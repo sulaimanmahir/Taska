@@ -11,6 +11,7 @@ use App\Models\PureWaterRetailCrateLedger;
 use App\Models\PureWaterRetailPackageMovement;
 use App\Models\PureWaterRetailPriceTier;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PureWaterRetailService
 {
@@ -291,6 +292,13 @@ class PureWaterRetailService
 
             $fromPrevious = (float) ($fromWarehouse->quantity ?? 0);
             $toPrevious = (float) ($toWarehouse->quantity ?? 0);
+
+            if ($fromPrevious < $quantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => ['The source warehouse does not have enough stock for this transfer.'],
+                ]);
+            }
+
             $fromWarehouse->quantity = $fromPrevious - $quantity;
             $toWarehouse->quantity = $toPrevious + $quantity;
             $fromWarehouse->save();

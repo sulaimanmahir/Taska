@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\TrustAccount;
 use App\Models\TrustTransaction;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TrustFundService
 {
@@ -30,11 +31,13 @@ class TrustFundService
             $account = $this->resolveAccount($accountId, $businessId);
             
             if (!$account->canDraw($amount)) {
-                throw new \Exception(
-                    $account->account_type === 'contribution'
-                        ? 'Contribution exceeds the remaining cycle target'
-                        : 'Insufficient credit limit'
-                );
+                throw ValidationException::withMessages([
+                    'amount' => [
+                        $account->account_type === 'contribution'
+                            ? 'Contribution exceeds the remaining cycle target'
+                            : 'Insufficient credit limit',
+                    ],
+                ]);
             }
 
             $balanceBefore = $account->balance;

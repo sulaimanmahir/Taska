@@ -124,7 +124,13 @@ class TrustFundContributionTest extends TestCase
             'reference' => 'Overflow collection',
         ])
             ->assertStatus(422)
-            ->assertJsonPath('message', 'Contribution exceeds the remaining cycle target');
+            ->assertJsonPath('message', 'Contribution exceeds the remaining cycle target')
+            // This used to be a raw \Exception caught broadly in the
+            // controller and reported as {message} only - a real
+            // ValidationException gives the frontend an `errors.amount`
+            // entry for field-level highlighting, like every other
+            // validation failure in the API.
+            ->assertJsonPath('errors.amount.0', 'Contribution exceeds the remaining cycle target');
 
         $account->refresh();
 

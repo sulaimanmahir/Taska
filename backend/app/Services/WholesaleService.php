@@ -13,6 +13,7 @@ use App\Models\WholesaleRouteStop;
 use App\Models\WholesaleSalesRep;
 use App\Models\WholesaleStockTransfer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class WholesaleService
 {
@@ -196,6 +197,12 @@ class WholesaleService
 
             $fromPrevious = (float) ($fromInventory->quantity ?? 0);
             $toPrevious = (float) ($toInventory->quantity ?? 0);
+
+            if ($fromPrevious < $quantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => ['The source warehouse does not have enough stock for this transfer.'],
+                ]);
+            }
 
             $fromInventory->quantity = $fromPrevious - $quantity;
             $toInventory->quantity = $toPrevious + $quantity;

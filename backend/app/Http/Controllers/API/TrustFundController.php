@@ -105,21 +105,23 @@ class TrustFundController extends Controller
         $this->authorize('update', $trustAccount);
         $validated = $request->validated();
 
-        try {
-            $account = $this->trustFund->draw(
-                $trustAccount->id,
-                $request->user()->current_business_id,
-                $validated['amount'],
-                $validated['reference'] ?? null,
-                $request->user()->id
-            );
+        // TrustFundService::draw() throws ValidationException for a real
+        // business-rule violation (limit/cycle target exceeded) - Laravel's
+        // default exception handler already formats that as the standard
+        // {message, errors} 422 shape, so no catch is needed here. A raw
+        // \Exception used to be caught broadly and misreported as 422,
+        // which also silently masked genuine 500-level bugs as user error.
+        $account = $this->trustFund->draw(
+            $trustAccount->id,
+            $request->user()->current_business_id,
+            $validated['amount'],
+            $validated['reference'] ?? null,
+            $request->user()->id
+        );
 
-            return response()->json(
-                (new TrustAccountResource($account->load('customer')))->resolve()
-            );
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
+        return response()->json(
+            (new TrustAccountResource($account->load('customer')))->resolve()
+        );
     }
 
     public function repay(RepayTrustAccountRequest $request, TrustAccount $trustAccount)
