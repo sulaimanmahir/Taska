@@ -160,7 +160,14 @@ function App() {
           <Route path="/demo/accounts" element={<DemoAccounts />} />
           <Route path="/demo-accounts" element={<Navigate to="/demo/accounts" replace />} />
           <Route path="/pricing" element={<Pricing />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route
+            path="/admin"
+            element={(
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            )}
+          />
           <Route
             path="/business-select"
             element={(

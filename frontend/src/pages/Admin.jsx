@@ -407,7 +407,7 @@ export default function Admin() {
                   <td className="px-5 py-4">
                     <StatusBadge
                       label={item.status}
-                      tone={item.status === 'success' ? 'emerald' : item.status === 'pending' ? 'amber' : 'rose'}
+                      tone={['success', 'paid'].includes(item.status) ? 'emerald' : item.status === 'pending' ? 'amber' : 'rose'}
                     />
                   </td>
                   <td className="px-5 py-4 text-slate-500">{formatShortDate(item.created_at, 'No date')}</td>

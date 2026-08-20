@@ -59,15 +59,12 @@ payment gateway keys pointed at the wrong environment).
 These are tracked in ROADMAP.md's Platform Hardening section — listed here
 so they're not rediscovered mid-launch:
 
-- `AdminController`'s `stats`, `users`, `transactions`, `supportTickets`,
-  `referrals`, and `resolveTicket` methods reference models/tables that
-  don't exist anywhere in this codebase (`App\Models\Transaction`,
-  `Subscription`, `SupportTicket`, `Referral`, a `plans` table, a
-  `partner_payouts` table) and a `Business::owner()` relation that was
-  never defined. Calling these will fatal-error. Pre-existing dead code
-  from an earlier iteration of the platform admin dashboard — `businesses`,
-  `plans`, and the suspend/activate endpoints work correctly; the rest
-  needs a real rebuild before the admin dashboard is usable end to end.
+- `AdminController` is rebuilt on real models as of 2026-08-20 (`stats`,
+  `users`, `businesses`, `plans`, `transactions`, `referrals` all return
+  real data now). `supportTickets`/`resolveTicket` are a genuine, still-open
+  gap — no support-ticket model/table exists anywhere in this codebase, so
+  those two return an honest empty list / a clear 501 rather than fake
+  data. Building a real ticket system is separate, unstarted work.
 - Approval thresholds (Settings → Approvals) are business-wide, not
   per-branch. A future refinement, not a bug.
 - Automatic branch-aware warehouse routing only engages once a business

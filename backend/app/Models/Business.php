@@ -125,6 +125,27 @@ class Business extends Model
         return in_array($type, $this->activeBusinessTypes(), true);
     }
 
+    /**
+     * The business's earliest-joined admin-role member. Derived rather than
+     * a stored column since there's no dedicated "owner" concept in the
+     * schema - a business is owned by whichever admin-role member joined
+     * business_user first, same as how AdminController used to assume a
+     * Business::owner() relation existed (it never did).
+     */
+    public function owner(): ?User
+    {
+        $adminRoleIds = Role::where('business_id', $this->id)->where('slug', 'admin')->pluck('id');
+
+        if ($adminRoleIds->isEmpty()) {
+            return null;
+        }
+
+        return $this->users()
+            ->wherePivotIn('role_id', $adminRoleIds)
+            ->orderBy('business_user.joined_at')
+            ->first();
+    }
+
     public function subscription(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(BusinessSubscription::class, 'business_id');
