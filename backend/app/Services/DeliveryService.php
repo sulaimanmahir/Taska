@@ -12,6 +12,7 @@ use App\Models\DeliveryStatusEvent;
 use App\Models\DeliveryVehicle;
 use App\Models\DeliveryWalletTransaction;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class DeliveryService
 {
@@ -175,10 +176,13 @@ class DeliveryService
     public function recordRemittance(DeliveryOrder $order, array $payload, ?int $userId = null): DeliveryOrder
     {
         return DB::transaction(function () use ($order, $payload, $userId) {
-            $amountRemitted = min(
-                (float) $order->cod_amount,
-                max((float) ($payload['amount_remitted'] ?? 0), 0)
-            );
+            $amountRemitted = (float) ($payload['amount_remitted'] ?? 0);
+
+            if ($amountRemitted > (float) $order->cod_amount) {
+                throw ValidationException::withMessages([
+                    'amount_remitted' => ['Amount remitted cannot exceed the COD amount for this delivery.'],
+                ]);
+            }
 
             $order->update([
                 'amount_remitted' => $amountRemitted,

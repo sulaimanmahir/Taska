@@ -85,8 +85,15 @@ class TrustFundService
     {
         return DB::transaction(function () use ($accountId, $businessId, $amount, $reference, $userId) {
             $account = $this->resolveAccount($accountId, $businessId);
-            
+
             $balanceBefore = $account->balance;
+
+            if ($amount > $balanceBefore) {
+                throw ValidationException::withMessages([
+                    'amount' => ['Repayment cannot exceed the outstanding balance.'],
+                ]);
+            }
+
             $balanceAfter = max(0, $balanceBefore - $amount);
 
             // Create transaction

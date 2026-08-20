@@ -8,6 +8,7 @@ use App\Models\AgroRegionalSalesTrend;
 use App\Models\AgroSeasonalForecast;
 use App\Models\AgroSubsidySale;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AgroDealerService
 {
@@ -52,6 +53,13 @@ class AgroDealerService
     {
         $creditAmount = (float) $payload['credit_amount'];
         $recoveredAmount = (float) ($payload['recovered_amount'] ?? 0);
+
+        if ($recoveredAmount > $creditAmount) {
+            throw ValidationException::withMessages([
+                'recovered_amount' => ['Recovered amount cannot exceed the credit amount.'],
+            ]);
+        }
+
         $outstandingAmount = max($creditAmount - $recoveredAmount, 0);
 
         return AgroFarmerCreditRecovery::create([
@@ -67,6 +75,13 @@ class AgroDealerService
     {
         $recoveredAmount = (float) ($payload['recovered_amount'] ?? $recovery->recovered_amount);
         $creditAmount = (float) ($payload['credit_amount'] ?? $recovery->credit_amount);
+
+        if ($recoveredAmount > $creditAmount) {
+            throw ValidationException::withMessages([
+                'recovered_amount' => ['Recovered amount cannot exceed the credit amount.'],
+            ]);
+        }
+
         $outstandingAmount = max($creditAmount - $recoveredAmount, 0);
 
         $recovery->update([
