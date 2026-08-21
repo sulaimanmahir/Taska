@@ -18,11 +18,17 @@ class Branch extends Model
         'state',
         'is_primary',
         'is_active',
+        'expense_approval_threshold',
+        'discount_approval_threshold',
+        'require_inventory_adjustment_approval',
     ];
 
     protected $casts = [
         'is_primary' => 'boolean',
         'is_active' => 'boolean',
+        'expense_approval_threshold' => 'decimal:2',
+        'discount_approval_threshold' => 'decimal:2',
+        'require_inventory_adjustment_approval' => 'boolean',
     ];
 
     public function business(): BelongsTo

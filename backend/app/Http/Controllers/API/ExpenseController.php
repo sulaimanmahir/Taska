@@ -55,7 +55,7 @@ class ExpenseController extends Controller
         $validated['branch_id'] = $request->user()->current_branch_id;
         $validated['created_by'] = $request->user()->id;
 
-        if ($this->approvalService->expenseRequiresApproval($business, (float) $validated['amount'])) {
+        if ($this->approvalService->expenseRequiresApproval($business, (float) $validated['amount'], $validated['branch_id'])) {
             $approval = $this->approvalService->createRequest(
                 $business,
                 $request->user(),

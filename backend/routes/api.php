@@ -182,6 +182,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/approvals/{approval}/decline', [\App\Http\Controllers\API\ApprovalController::class, 'decline']);
         Route::get('/approvals/settings', [\App\Http\Controllers\API\ApprovalController::class, 'settings']);
         Route::patch('/approvals/settings', [\App\Http\Controllers\API\ApprovalController::class, 'updateSettings']);
+        Route::get('/approvals/branches/{branch}/settings', [\App\Http\Controllers\API\ApprovalController::class, 'branchSettings']);
+        Route::patch('/approvals/branches/{branch}/settings', [\App\Http\Controllers\API\ApprovalController::class, 'updateBranchSettings']);
     });
 
     // Trust Fund

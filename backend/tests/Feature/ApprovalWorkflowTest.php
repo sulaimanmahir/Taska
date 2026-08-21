@@ -314,4 +314,150 @@ class ApprovalWorkflowTest extends TestCase
             'require_inventory_adjustment_approval' => true,
         ]);
     }
+
+    public function test_admin_can_read_and_update_a_branchs_approval_setting_overrides(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'approval-branch-settings@example.com');
+        Sanctum::actingAs($tenant['user']);
+
+        $this->getJson("/api/approvals/branches/{$tenant['branch']->id}/settings")
+            ->assertOk()
+            ->assertJson([
+                'expense_approval_threshold' => null,
+                'discount_approval_threshold' => null,
+                'require_inventory_adjustment_approval' => null,
+            ]);
+
+        $this->patchJson("/api/approvals/branches/{$tenant['branch']->id}/settings", [
+            'expense_approval_threshold' => 20000,
+            'require_inventory_adjustment_approval' => true,
+        ])->assertOk();
+
+        $this->assertDatabaseHas('branches', [
+            'id' => $tenant['branch']->id,
+            'expense_approval_threshold' => 20000,
+            'discount_approval_threshold' => null,
+            'require_inventory_adjustment_approval' => true,
+        ]);
+    }
+
+    public function test_a_branch_override_is_used_instead_of_the_business_wide_threshold(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'approval-branch-override@example.com');
+        $tenant['business']->update(['expense_approval_threshold' => 50000]);
+        $tenant['branch']->update(['expense_approval_threshold' => 5000]);
+        Sanctum::actingAs($tenant['user']);
+
+        $category = ExpenseCategory::create([
+            'business_id' => $tenant['business']->id,
+            'name' => 'Utilities',
+            'slug' => 'utilities',
+        ]);
+
+        // Below the business-wide threshold (50000) but above this branch's
+        // override (5000) - the override must win.
+        $this->postJson('/api/expenses', [
+            'expense_category_id' => $category->id,
+            'description' => 'Branch-level expense',
+            'amount' => 10000,
+            'payment_method' => 'cash',
+            'expense_date' => now()->toDateString(),
+        ])->assertStatus(202)->assertJsonPath('approval_pending', true);
+    }
+
+    public function test_a_null_branch_override_inherits_the_business_wide_setting(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'approval-branch-inherit@example.com');
+        $tenant['business']->update(['require_inventory_adjustment_approval' => true]);
+        Sanctum::actingAs($tenant['user']->fresh());
+
+        $product = Product::create([
+            'business_id' => $tenant['business']->id,
+            'name' => 'Inherited Item',
+            'selling_price' => 500,
+            'track_inventory' => true,
+        ]);
+
+        $item = InventoryItem::create([
+            'business_id' => $tenant['business']->id,
+            'warehouse_id' => $tenant['warehouse']->id,
+            'product_id' => $product->id,
+            'quantity' => 10,
+        ]);
+
+        // The branch has no override set (null), so it inherits the
+        // business-wide requirement of true.
+        $this->postJson('/api/inventory/adjust', [
+            'inventory_item_id' => $item->id,
+            'quantity' => 5,
+            'type' => 'add',
+            'reason' => 'Stock count correction',
+        ])->assertStatus(202)->assertJsonPath('approval_pending', true);
+
+        // Once the branch explicitly opts out (false), it no longer
+        // inherits the business's true.
+        $tenant['branch']->update(['require_inventory_adjustment_approval' => false]);
+
+        $this->postJson('/api/inventory/adjust', [
+            'inventory_item_id' => $item->id,
+            'quantity' => 3,
+            'type' => 'add',
+            'reason' => 'Restock',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('inventory_items', ['id' => $item->id, 'quantity' => 13]);
+    }
+
+    public function test_different_branches_can_have_different_effective_discount_thresholds(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'approval-branch-multi@example.com');
+        $tenant['business']->update(['discount_approval_threshold' => 1000]);
+
+        $secondBranch = \App\Models\Branch::create([
+            'business_id' => $tenant['business']->id,
+            'name' => 'Second Branch',
+            'slug' => 'second-branch',
+            'discount_approval_threshold' => 9000,
+        ]);
+
+        $product = Product::create([
+            'business_id' => $tenant['business']->id,
+            'name' => 'Discountable Item',
+            'selling_price' => 10000,
+            'track_inventory' => true,
+        ]);
+
+        InventoryItem::create([
+            'business_id' => $tenant['business']->id,
+            'warehouse_id' => $tenant['warehouse']->id,
+            'product_id' => $product->id,
+            'quantity' => 10,
+        ]);
+
+        $payload = [
+            'items' => [[
+                'product_id' => $product->id,
+                'quantity' => 1,
+                'unit_price' => 10000,
+                'total' => 8000,
+            ]],
+            'subtotal' => 10000,
+            'discount' => 2000,
+            'total' => 8000,
+            'paid' => 8000,
+            'payment_method' => 'cash',
+        ];
+
+        // First branch inherits the business's 1000 threshold - a 2000
+        // discount is queued.
+        Sanctum::actingAs($tenant['user']);
+        $this->postJson('/api/orders', $payload)
+            ->assertStatus(202)->assertJsonPath('approval_pending', true);
+
+        // Second branch overrides to 9000 - the same 2000 discount goes
+        // straight through.
+        $tenant['user']->forceFill(['current_branch_id' => $secondBranch->id])->save();
+        Sanctum::actingAs($tenant['user']->fresh());
+        $this->postJson('/api/orders', $payload)->assertCreated();
+    }
 }

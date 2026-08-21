@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateApprovalSettingsRequest;
+use App\Http\Requests\UpdateBranchApprovalSettingsRequest;
 use App\Http\Resources\ApprovalRequestResource;
 use App\Models\ApprovalRequest;
+use App\Models\Branch;
 use App\Services\ApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -38,6 +40,30 @@ class ApprovalController extends Controller
             'expense_approval_threshold' => $business->expense_approval_threshold,
             'discount_approval_threshold' => $business->discount_approval_threshold,
             'require_inventory_adjustment_approval' => (bool) $business->require_inventory_adjustment_approval,
+        ]);
+    }
+
+    public function branchSettings(Request $request, Branch $branch)
+    {
+        $this->authorizeSameBusinessBranch($request, $branch);
+
+        return response()->json([
+            'expense_approval_threshold' => $branch->expense_approval_threshold,
+            'discount_approval_threshold' => $branch->discount_approval_threshold,
+            'require_inventory_adjustment_approval' => $branch->require_inventory_adjustment_approval,
+        ]);
+    }
+
+    public function updateBranchSettings(UpdateBranchApprovalSettingsRequest $request, Branch $branch)
+    {
+        $this->authorizeSameBusinessBranch($request, $branch);
+        $branch->update($request->validated());
+
+        return response()->json([
+            'message' => 'Branch approval settings updated successfully.',
+            'expense_approval_threshold' => $branch->expense_approval_threshold,
+            'discount_approval_threshold' => $branch->discount_approval_threshold,
+            'require_inventory_adjustment_approval' => $branch->require_inventory_adjustment_approval,
         ]);
     }
 
@@ -102,5 +128,10 @@ class ApprovalController extends Controller
     private function authorizeSameBusiness(Request $request, ApprovalRequest $approval): void
     {
         abort_if((int) $approval->business_id !== (int) $request->user()->current_business_id, 404);
+    }
+
+    private function authorizeSameBusinessBranch(Request $request, Branch $branch): void
+    {
+        abort_if((int) $branch->business_id !== (int) $request->user()->current_business_id, 404);
     }
 }

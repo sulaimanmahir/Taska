@@ -53,7 +53,7 @@ class InventoryController extends Controller
 
         $business = $request->user()->currentBusiness;
 
-        if ($this->approvalService->inventoryAdjustmentRequiresApproval($business)) {
+        if ($this->approvalService->inventoryAdjustmentRequiresApproval($business, $request->user()->current_branch_id)) {
             $approval = $this->approvalService->createRequest(
                 $business,
                 $request->user(),

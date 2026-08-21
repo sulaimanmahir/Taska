@@ -65,8 +65,9 @@ so they're not rediscovered mid-launch:
   gap — no support-ticket model/table exists anywhere in this codebase, so
   those two return an honest empty list / a clear 501 rather than fake
   data. Building a real ticket system is separate, unstarted work.
-- Approval thresholds (Settings → Approvals) are business-wide, not
-  per-branch. A future refinement, not a bug.
+- Approval thresholds (Settings → Approvals) are business-wide by default,
+  with optional per-branch overrides as of 2026-08-20 (a branch left
+  unconfigured just inherits the business-wide setting).
 - Automatic branch-aware warehouse routing only engages once a business
   actually assigns warehouses to branches (Settings → Warehouses) — a
   business that hasn't done this keeps using the single business-wide

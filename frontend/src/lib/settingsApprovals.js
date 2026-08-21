@@ -38,6 +38,44 @@ export function buildApprovalSettingsPayload(draft) {
   };
 }
 
+// Branch overrides are tri-state ('inherit' | 'true' | 'false') because
+// null on the branch column means "inherit the business setting," a
+// distinct state from an explicit false override - unlike the business-wide
+// setting, which only has true/false.
+export function buildBranchApprovalSettingsDefaults(settings = {}) {
+  return {
+    expense_approval_threshold: settings.expense_approval_threshold != null ? String(settings.expense_approval_threshold) : '',
+    discount_approval_threshold: settings.discount_approval_threshold != null ? String(settings.discount_approval_threshold) : '',
+    require_inventory_adjustment_approval: settings.require_inventory_adjustment_approval == null
+      ? 'inherit'
+      : String(Boolean(settings.require_inventory_adjustment_approval)),
+  };
+}
+
+export function hasBranchApprovalSettingsChanges(saved, draft) {
+  if (!saved || !draft) {
+    return false;
+  }
+
+  const savedDraft = buildBranchApprovalSettingsDefaults(saved);
+
+  return (
+    savedDraft.expense_approval_threshold !== draft.expense_approval_threshold
+    || savedDraft.discount_approval_threshold !== draft.discount_approval_threshold
+    || savedDraft.require_inventory_adjustment_approval !== draft.require_inventory_adjustment_approval
+  );
+}
+
+export function buildBranchApprovalSettingsPayload(draft) {
+  return {
+    expense_approval_threshold: draft.expense_approval_threshold.trim() === '' ? null : Number(draft.expense_approval_threshold),
+    discount_approval_threshold: draft.discount_approval_threshold.trim() === '' ? null : Number(draft.discount_approval_threshold),
+    require_inventory_adjustment_approval: draft.require_inventory_adjustment_approval === 'inherit'
+      ? null
+      : draft.require_inventory_adjustment_approval === 'true',
+  };
+}
+
 export function buildSettingsApprovalMetrics(approvals = []) {
   const pending = approvals.filter((approval) => approval.status === 'pending').length;
   const approved = approvals.filter((approval) => approval.status === 'approved').length;

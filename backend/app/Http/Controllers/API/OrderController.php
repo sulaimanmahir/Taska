@@ -49,7 +49,7 @@ class OrderController extends Controller
         // which warehouse is assigned to this branch (falling back to the
         // business-wide default when the branch has none assigned).
 
-        if ($approvalService->discountRequiresApproval($business, (float) ($validated['discount'] ?? 0))) {
+        if ($approvalService->discountRequiresApproval($business, (float) ($validated['discount'] ?? 0), $validated['branch_id'])) {
             $approval = $approvalService->createRequest(
                 $business,
                 $request->user(),
