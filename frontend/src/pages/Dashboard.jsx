@@ -196,12 +196,12 @@ export default function Dashboard() {
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="flex items-center gap-4 rounded-xl bg-slate-50 p-3.5">
-                  <div className="h-12 w-12 animate-pulse rounded-xl bg-slate-200" />
+                  <div className="h-12 w-12 skeleton rounded-xl" />
                   <div className="flex-1">
-                    <div className="mb-2 h-4 w-32 animate-pulse rounded bg-slate-200" />
-                    <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
+                    <div className="mb-2 h-4 w-32 skeleton rounded" />
+                    <div className="h-3 w-20 skeleton rounded" />
                   </div>
-                  <div className="h-6 w-20 animate-pulse rounded bg-slate-200" />
+                  <div className="h-6 w-20 skeleton rounded" />
                 </div>
               ))}
             </div>

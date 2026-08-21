@@ -201,7 +201,7 @@ export default function Customers() {
               Array(5).fill(0).map((_, index) => (
                 <tr key={index}>
                   <td colSpan={7} className="px-5 py-4">
-                    <div className="h-12 animate-pulse rounded-2xl bg-slate-100"></div>
+                    <div className="h-12 skeleton rounded-2xl"></div>
                   </td>
                 </tr>
               ))
@@ -267,7 +267,7 @@ export default function Customers() {
         <div className="space-y-3 p-4 md:hidden">
           {isLoading ? (
             Array(3).fill(0).map((_, index) => (
-              <div key={index} className="h-24 animate-pulse rounded-2xl bg-slate-100"></div>
+              <div key={index} className="h-24 skeleton rounded-2xl"></div>
             ))
           ) : filteredCustomers.length === 0 ? (
             <EmptyState

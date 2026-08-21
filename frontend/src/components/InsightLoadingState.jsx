@@ -32,8 +32,8 @@ export default function InsightLoadingState({
       {Array.from({ length: groups }, (_, groupIndex) => (
         <section key={groupIndex} className="space-y-4">
           <div className="space-y-2" aria-hidden="true">
-            <div className="h-6 w-40 animate-pulse rounded bg-slate-200/90" />
-            <div className="h-4 w-56 animate-pulse rounded bg-[var(--color-surface-subtle)]" />
+            <div className="h-6 w-40 skeleton rounded" />
+            <div className="h-4 w-56 skeleton rounded" />
           </div>
           <ResponsiveCardGrid as="div" variant="cards" className="xl:grid-cols-3" aria-hidden="true">
             {Array.from({ length: cardsPerGroup }, (_, cardIndex) => (

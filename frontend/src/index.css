@@ -156,6 +156,13 @@ img {
 .page-shell {
   width: 100%;
   margin-inline: auto;
+  animation: fadeIn 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-shell {
+    animation-duration: 1ms;
+  }
 }
 
 .page-shell-default {

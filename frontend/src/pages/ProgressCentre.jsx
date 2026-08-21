@@ -67,7 +67,7 @@ export default function ProgressCentre() {
       <Card>
         <CardHeader title="Business Health" subtitle="A composite score from revenue trend, expense control, stock health, and receivables." />
         {overviewQuery.isLoading ? (
-          <div className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+          <div className="h-24 skeleton rounded-2xl" />
         ) : (
           <>
             <div className={`inline-flex items-center gap-3 rounded-2xl border px-5 py-4 ${toneClass}`}>
@@ -89,7 +89,7 @@ export default function ProgressCentre() {
       <Card>
         <CardHeader title="Streaks" subtitle="Consecutive-day habits worth keeping." />
         {overviewQuery.isLoading ? (
-          <div className="h-16 animate-pulse rounded-2xl bg-slate-100" />
+          <div className="h-16 skeleton rounded-2xl" />
         ) : streakCards.length === 0 ? (
           <EmptyState
             icon="M13 10V3L4 14h7v7l9-11h-7z"
@@ -117,7 +117,7 @@ export default function ProgressCentre() {
         <Card>
           <CardHeader title="Unlocked" subtitle="Achievements and milestones your business has already earned." />
           {overviewQuery.isLoading ? (
-            <div className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+            <div className="h-24 skeleton rounded-2xl" />
           ) : unlockedCards.length === 0 ? (
             <EmptyState
               icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -143,7 +143,7 @@ export default function ProgressCentre() {
         <Card>
           <CardHeader title="In Progress" subtitle="What's next, and how close your business is." />
           {overviewQuery.isLoading ? (
-            <div className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+            <div className="h-24 skeleton rounded-2xl" />
           ) : inProgressCards.length === 0 ? (
             <EmptyState
               icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"

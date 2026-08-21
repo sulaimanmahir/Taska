@@ -36,7 +36,7 @@ function ProductSkeletonRow() {
   return (
     <tr className="border-t border-slate-100">
       <td colSpan={7} className="px-5 py-4">
-        <div className="h-12 animate-pulse rounded-2xl bg-slate-100" />
+        <div className="h-12 skeleton rounded-2xl" />
       </td>
     </tr>
   );
@@ -345,7 +345,7 @@ export default function Products() {
         <div className="space-y-3 p-4 md:hidden">
           {isLoading ? (
             Array(3).fill(0).map((_, index) => (
-              <div key={index} className="h-24 animate-pulse rounded-2xl bg-slate-100"></div>
+              <div key={index} className="h-24 skeleton rounded-2xl"></div>
             ))
           ) : !products.length ? (
             <EmptyState

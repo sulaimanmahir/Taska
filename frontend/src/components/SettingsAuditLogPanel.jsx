@@ -61,7 +61,7 @@ export default function SettingsAuditLogPanel({ content }) {
         ) : loading ? (
           <div className="space-y-3">
             {Array(3).fill(0).map((_, index) => (
-              <div key={index} className="h-16 animate-pulse rounded-2xl bg-slate-100" />
+              <div key={index} className="h-16 skeleton rounded-2xl" />
             ))}
           </div>
         ) : entries.length === 0 ? (

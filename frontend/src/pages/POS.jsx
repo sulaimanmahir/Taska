@@ -309,7 +309,7 @@ export default function POS() {
             {posQuery.isLoading ? (
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
                 {Array.from({ length: 12 }).map((_, index) => (
-                  <div key={index} className="h-40 animate-pulse rounded-3xl bg-slate-100" />
+                  <div key={index} className="h-40 skeleton rounded-3xl" />
                 ))}
               </div>
             ) : null}

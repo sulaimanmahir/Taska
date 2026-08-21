@@ -178,7 +178,7 @@ export default function Debtors() {
                   Array.from({ length: 5 }).map((_, index) => (
                     <tr key={index}>
                       <td colSpan={6} className="px-5 py-4">
-                        <div className="h-12 animate-pulse rounded-2xl bg-slate-100"></div>
+                        <div className="h-12 skeleton rounded-2xl"></div>
                       </td>
                     </tr>
                   ))
