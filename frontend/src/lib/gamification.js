@@ -27,6 +27,19 @@ export function buildHealthOverview(health) {
   };
 }
 
+export function buildLevelOverview(level) {
+  const pointsIntoLevel = level?.points_into_level ?? 0;
+  const pointsToNextLevel = level?.points_to_next_level ?? 100;
+
+  return {
+    level: level?.level ?? 1,
+    points: level?.points ?? 0,
+    pointsIntoLevel,
+    pointsToNextLevel,
+    progressPercent: Math.max(0, Math.min(100, pointsIntoLevel)),
+  };
+}
+
 export function buildStreakCard(streak) {
   const current = streak.current_count ?? 0;
 

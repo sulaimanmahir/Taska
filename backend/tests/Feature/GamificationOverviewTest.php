@@ -34,6 +34,7 @@ class GamificationOverviewTest extends TestCase
         $response->assertOk();
         $response->assertJsonStructure([
             'health' => ['health_score', 'revenue_trend_score', 'expense_control_score', 'stock_health_score', 'receivables_health_score', 'signals'],
+            'level' => ['level', 'points', 'points_into_level', 'points_to_next_level'],
             'streaks',
             'unlocked',
             'in_progress',
@@ -42,6 +43,9 @@ class GamificationOverviewTest extends TestCase
         // The Order created above already triggered GamificationObserver.
         $unlockedKeys = collect($response->json('unlocked'))->pluck('key');
         $this->assertTrue($unlockedKeys->contains('first_sale'));
+
+        // The first_sale unlock above must actually be reflected in the level's points.
+        $this->assertGreaterThanOrEqual(15, $response->json('level.points'));
 
         // Locked-but-in-progress items must not include anything already unlocked.
         $inProgressKeys = collect($response->json('in_progress'))->pluck('key');

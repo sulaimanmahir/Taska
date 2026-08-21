@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildHealthOverview,
   buildInProgressCard,
+  buildLevelOverview,
   buildStreakCard,
   buildUnlockedCard,
   formatGamificationCategory,
@@ -36,6 +37,21 @@ test('buildHealthOverview exposes the four component scores with safe fallbacks'
   });
 
   assert.deepEqual(overview.components.map((c) => c.value), [90, 70, 85, 75]);
+});
+
+test('buildLevelOverview exposes level, points, and a clamped progress percent', () => {
+  const overview = buildLevelOverview({ level: 2, points: 165, points_into_level: 65, points_to_next_level: 35 });
+  assert.equal(overview.level, 2);
+  assert.equal(overview.points, 165);
+  assert.equal(overview.pointsToNextLevel, 35);
+  assert.equal(overview.progressPercent, 65);
+});
+
+test('buildLevelOverview tolerates a missing level object', () => {
+  const overview = buildLevelOverview(undefined);
+  assert.equal(overview.level, 1);
+  assert.equal(overview.points, 0);
+  assert.equal(overview.progressPercent, 0);
 });
 
 test('buildStreakCard formats singular vs. plural day counts', () => {

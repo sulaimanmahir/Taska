@@ -6,6 +6,7 @@ import api from '../lib/api';
 import {
   buildHealthOverview,
   buildInProgressCard,
+  buildLevelOverview,
   buildStreakCard,
   buildUnlockedCard,
   sortInProgressByClosest,
@@ -46,6 +47,7 @@ export default function ProgressCentre() {
 
   const data = overviewQuery.data;
   const health = buildHealthOverview(data?.health);
+  const level = buildLevelOverview(data?.level);
   const streakCards = (data?.streaks ?? []).map(buildStreakCard);
   const unlockedCards = (data?.unlocked ?? []).map(buildUnlockedCard);
   const inProgressCards = sortInProgressByClosest(data?.in_progress ?? []).map(buildInProgressCard);
@@ -83,6 +85,31 @@ export default function ProgressCentre() {
               ))}
             </div>
           </>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader title="Level" subtitle="A running score from what you've unlocked, your current health, and time on Taska." />
+        {overviewQuery.isLoading ? (
+          <div className="h-16 skeleton rounded-2xl" />
+        ) : (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+            <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-violet-200 bg-violet-50 px-5 py-4 text-violet-700">
+              <span className="text-3xl font-bold">{level.level}</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.14em]">Level</span>
+            </div>
+            <div className="flex-1">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-violet-500 transition-[width]"
+                  style={{ width: `${level.progressPercent}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                {level.pointsToNextLevel} point{level.pointsToNextLevel === 1 ? '' : 's'} to Level {level.level + 1}
+              </p>
+            </div>
+          </div>
         )}
       </Card>
 

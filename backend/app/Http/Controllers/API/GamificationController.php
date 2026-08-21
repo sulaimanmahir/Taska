@@ -35,8 +35,16 @@ class GamificationController extends Controller
         $unlocks = BusinessAchievementUnlock::where('business_id', $business->id)->get();
         $unlockedKeys = $unlocks->pluck('achievement_key')->all();
 
+        $level = $this->gamificationService->computeLevel(
+            $health['health_score'],
+            $unlocks->where('category', BusinessAchievementUnlock::CATEGORY_ACHIEVEMENT)->count(),
+            $unlocks->where('category', BusinessAchievementUnlock::CATEGORY_MILESTONE)->count(),
+            $metrics['account_age_days'],
+        );
+
         return response()->json([
             'health' => $health,
+            'level' => $level,
             'streaks' => $streaks->map(fn (BusinessStreak $streak) => [
                 'type' => $streak->streak_type,
                 'name' => config("gamification.streaks.{$streak->streak_type}.name", $streak->streak_type),

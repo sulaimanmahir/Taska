@@ -82,6 +82,37 @@ class GamificationService
         ];
     }
 
+    /**
+     * "Level" is intentionally a *computed* value, never a stored column -
+     * storing it risks drifting out of sync with the achievements/health
+     * score it's supposed to represent. Like the health-score weighting in
+     * BusinessHealthScoringService, this exact formula is a reasonable,
+     * documented default, not a settled product decision: 100 points per
+     * level, from unlocked achievements (15pts each) + unlocked milestones
+     * (30pts each, since they represent bigger wins - ₦1M+ revenue, 100+
+     * customers) + up to 30pts from the current health score + up to 20pts
+     * from account age (1pt per 2 weeks, so a full year caps the age
+     * contribution). Flag any change here in the design doc.
+     *
+     * @return array{level: int, points: int, points_into_level: int, points_to_next_level: int}
+     */
+    public function computeLevel(int $healthScore, int $achievementsUnlocked, int $milestonesUnlocked, int $accountAgeDays): array
+    {
+        $points = ($achievementsUnlocked * 15)
+            + ($milestonesUnlocked * 30)
+            + (int) round($healthScore * 0.3)
+            + min(intdiv(max($accountAgeDays, 0), 14), 20);
+
+        $pointsIntoLevel = $points % 100;
+
+        return [
+            'level' => intdiv($points, 100) + 1,
+            'points' => $points,
+            'points_into_level' => $pointsIntoLevel,
+            'points_to_next_level' => 100 - $pointsIntoLevel,
+        ];
+    }
+
     private function crossesThreshold(float|int $value, array $definition): bool
     {
         $threshold = $definition['threshold'];

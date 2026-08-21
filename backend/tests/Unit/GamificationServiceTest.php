@@ -157,4 +157,50 @@ class GamificationServiceTest extends TestCase
         $service->computeAndStoreFor($business);
         $this->assertSame(1, $business->healthSnapshots()->count());
     }
+
+    public function test_level_starts_at_one_for_a_brand_new_business_with_no_unlocks(): void
+    {
+        $service = new GamificationService();
+
+        $result = $service->computeLevel(healthScore: 50, achievementsUnlocked: 0, milestonesUnlocked: 0, accountAgeDays: 0);
+
+        $this->assertSame(1, $result['level']);
+        $this->assertSame(15, $result['points']);
+    }
+
+    public function test_level_increases_with_unlocked_achievements_and_milestones(): void
+    {
+        $service = new GamificationService();
+
+        $withAchievements = $service->computeLevel(healthScore: 50, achievementsUnlocked: 5, milestonesUnlocked: 0, accountAgeDays: 0);
+        $withMilestones = $service->computeLevel(healthScore: 50, achievementsUnlocked: 0, milestonesUnlocked: 5, accountAgeDays: 0);
+
+        // Milestones (30pts each) are deliberately worth more than achievements (15pts each).
+        $this->assertGreaterThan($withAchievements['points'], $withMilestones['points']);
+        $this->assertSame(2, $withMilestones['level']);
+    }
+
+    public function test_account_age_contribution_is_capped_at_twenty_points(): void
+    {
+        $service = new GamificationService();
+
+        $oneYear = $service->computeLevel(healthScore: 0, achievementsUnlocked: 0, milestonesUnlocked: 0, accountAgeDays: 365);
+        $tenYears = $service->computeLevel(healthScore: 0, achievementsUnlocked: 0, milestonesUnlocked: 0, accountAgeDays: 3650);
+
+        $this->assertSame($oneYear['points'], $tenYears['points']);
+        $this->assertSame(20, $oneYear['points']);
+    }
+
+    public function test_points_to_next_level_reflects_progress_within_the_current_level(): void
+    {
+        $service = new GamificationService();
+
+        // 3 achievements (45) + health 100 * 0.3 = 30 -> 75 points, level 1, 25 to go.
+        $result = $service->computeLevel(healthScore: 100, achievementsUnlocked: 3, milestonesUnlocked: 0, accountAgeDays: 0);
+
+        $this->assertSame(75, $result['points']);
+        $this->assertSame(1, $result['level']);
+        $this->assertSame(75, $result['points_into_level']);
+        $this->assertSame(25, $result['points_to_next_level']);
+    }
 }
