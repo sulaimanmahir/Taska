@@ -181,4 +181,96 @@ class ReportControllerTest extends TestCase
             ->assertJsonPath('gross_profit', 800)
             ->assertJsonPath('net_profit', 500);
     }
+
+    public function test_expenses_report_does_not_500_when_a_category_join_makes_business_id_ambiguous(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'reports-expenses@example.com');
+        Sanctum::actingAs($tenant['user']);
+
+        $categoryId = DB::table('expense_categories')->insertGetId([
+            'business_id' => $tenant['business']->id,
+            'name' => 'Utilities',
+            'slug' => 'utilities',
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('expenses')->insert([
+            'business_id' => $tenant['business']->id,
+            'branch_id' => $tenant['branch']->id,
+            'expense_category_id' => $categoryId,
+            'created_by' => $tenant['user']->id,
+            'description' => 'Diesel',
+            'amount' => 500,
+            'payment_method' => 'cash',
+            'expense_date' => now()->toDateString(),
+            'is_approved' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // This is exactly the request the Reports page sends by default -
+        // both endpoints share the same query builder path that joins
+        // expense_categories (which also has its own business_id column).
+        $this->getJson('/api/reports/expenses?period=today')
+            ->assertOk()
+            ->assertJsonPath('total', 500)
+            ->assertJsonPath('by_category.0.name', 'Utilities')
+            ->assertJsonPath('by_category.0.total', 500);
+    }
+
+    public function test_report_period_selector_actually_changes_which_data_is_returned(): void
+    {
+        $tenant = $this->createTenantContext('retail', 'reports-period@example.com');
+        Sanctum::actingAs($tenant['user']);
+
+        DB::table('orders')->insert([
+            'business_id' => $tenant['business']->id,
+            'branch_id' => $tenant['branch']->id,
+            'customer_id' => null,
+            'created_by' => $tenant['user']->id,
+            'order_number' => 'ORD-PERIOD-OLD',
+            'order_type' => 'sale',
+            'status' => 'completed',
+            'subtotal' => 5000,
+            'discount' => 0,
+            'tax' => 0,
+            'total' => 5000,
+            'paid' => 5000,
+            'change' => 0,
+            'payment_method' => 'cash',
+            'created_at' => now()->startOfYear(),
+            'updated_at' => now()->startOfYear(),
+        ]);
+
+        DB::table('orders')->insert([
+            'business_id' => $tenant['business']->id,
+            'branch_id' => $tenant['branch']->id,
+            'customer_id' => null,
+            'created_by' => $tenant['user']->id,
+            'order_number' => 'ORD-PERIOD-TODAY',
+            'order_type' => 'sale',
+            'status' => 'completed',
+            'subtotal' => 1000,
+            'discount' => 0,
+            'tax' => 0,
+            'total' => 1000,
+            'paid' => 1000,
+            'change' => 0,
+            'payment_method' => 'cash',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // "today" excludes the order from a year ago.
+        $this->getJson('/api/reports/sales?period=today')
+            ->assertOk()
+            ->assertJsonPath('summary.revenue', 1000);
+
+        // "year" includes both.
+        $this->getJson('/api/reports/sales?period=year')
+            ->assertOk()
+            ->assertJsonPath('summary.revenue', 6000);
+    }
 }

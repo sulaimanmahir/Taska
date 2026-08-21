@@ -8,21 +8,45 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    /**
+     * Explicit date_from/date_to always win. Otherwise resolves the
+     * frontend's period selector (today/week/month/year - see
+     * frontend/src/lib/reports.js's reportPeriodOptions) into a concrete
+     * date range, defaulting to 'today' to match the page's initial state.
+     * Every report endpoint funnels through this so switching periods on
+     * the Reports page actually changes what's returned, instead of the
+     * param being silently ignored.
+     */
+    private function resolvePeriodRange(Request $request): array
+    {
+        if ($request->date_from || $request->date_to) {
+            return [
+                $request->date_from ?? now()->subYears(5)->toDateString(),
+                $request->date_to ?? now()->toDateString(),
+            ];
+        }
+
+        $today = now();
+
+        return match ($request->string('period')->toString()) {
+            'week' => [$today->copy()->startOfWeek()->toDateString(), $today->copy()->toDateString()],
+            'month' => [$today->copy()->startOfMonth()->toDateString(), $today->copy()->toDateString()],
+            'year' => [$today->copy()->startOfYear()->toDateString(), $today->copy()->toDateString()],
+            default => [$today->copy()->toDateString(), $today->copy()->toDateString()],
+        };
+    }
+
     public function sales(Request $request)
     {
         $businessId = $request->user()->current_business_id;
-        
+        [$startDate, $endDate] = $this->resolvePeriodRange($request);
+
         $query = DB::table('orders')
             ->where('business_id', $businessId)
             ->where('order_type', 'sale')
-            ->where('status', 'completed');
-
-        if ($request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        if ($request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
+            ->where('status', 'completed')
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate);
 
         $summary = (clone $query)->selectRaw('
             COUNT(*) as total_orders,
@@ -85,16 +109,12 @@ class ReportController extends Controller
     public function expenses(Request $request)
     {
         $businessId = $request->user()->current_business_id;
+        [$startDate, $endDate] = $this->resolvePeriodRange($request);
 
         $query = DB::table('expenses')
-            ->where('business_id', $businessId);
-
-        if ($request->date_from) {
-            $query->whereDate('expense_date', '>=', $request->date_from);
-        }
-        if ($request->date_to) {
-            $query->whereDate('expense_date', '<=', $request->date_to);
-        }
+            ->where('expenses.business_id', $businessId)
+            ->whereDate('expense_date', '>=', $startDate)
+            ->whereDate('expense_date', '<=', $endDate);
 
         $total = (clone $query)->sum('amount');
 
@@ -146,9 +166,7 @@ class ReportController extends Controller
     public function profitLoss(Request $request)
     {
         $businessId = $request->user()->current_business_id;
-
-        $startDate = $request->date_from ?? now()->startOfMonth()->toDateString();
-        $endDate = $request->date_to ?? now()->toDateString();
+        [$startDate, $endDate] = $this->resolvePeriodRange($request);
 
         $salesQuery = DB::table('orders')
             ->where('business_id', $businessId)
