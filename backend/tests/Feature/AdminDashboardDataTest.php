@@ -8,6 +8,7 @@ use App\Models\ReferralAgent;
 use App\Models\ReferralCommission;
 use App\Models\ReferralPayout;
 use App\Models\SubscriptionPlan;
+use App\Models\SupportTicket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\Concerns\CreatesTenantContext;
@@ -193,20 +194,47 @@ class AdminDashboardDataTest extends TestCase
         $this->assertSame('3000.00', $row['commission']);
     }
 
-    public function test_support_tickets_endpoint_returns_an_honest_empty_list_instead_of_crashing(): void
+    public function test_support_tickets_endpoint_shows_real_tickets_across_every_business(): void
     {
-        $this->actingAsPlatformAdmin();
+        $tenant = $this->actingAsPlatformAdmin();
 
-        $this->getJson('/api/admin/support-tickets')
-            ->assertOk()
-            ->assertJsonPath('data', []);
+        SupportTicket::create([
+            'business_id' => $tenant['business']->id,
+            'created_by' => $tenant['user']->id,
+            'subject' => 'Cannot print receipts',
+            'message' => 'The receipt printer stopped responding after the last update.',
+            'status' => SupportTicket::STATUS_OPEN,
+        ]);
+
+        $response = $this->getJson('/api/admin/support-tickets')->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('subject', 'Cannot print receipts');
+        $this->assertNotNull($row);
+        $this->assertSame($tenant['business']->name, $row['business_name']);
+        $this->assertSame($tenant['user']->name, $row['user_name']);
+        $this->assertSame('open', $row['status']);
     }
 
-    public function test_resolve_ticket_endpoint_reports_not_available_instead_of_crashing(): void
+    public function test_resolve_ticket_endpoint_actually_resolves_a_real_ticket(): void
     {
-        $this->actingAsPlatformAdmin();
+        $tenant = $this->actingAsPlatformAdmin();
 
-        $this->postJson('/api/admin/resolve-ticket', ['id' => 1])
-            ->assertStatus(501);
+        $ticket = SupportTicket::create([
+            'business_id' => $tenant['business']->id,
+            'created_by' => $tenant['user']->id,
+            'subject' => 'Billing question',
+            'message' => 'Why was I charged twice this month?',
+            'status' => SupportTicket::STATUS_OPEN,
+        ]);
+
+        $this->postJson('/api/admin/resolve-ticket', ['id' => $ticket->id])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('support_tickets', [
+            'id' => $ticket->id,
+            'status' => SupportTicket::STATUS_RESOLVED,
+            'resolved_by' => $tenant['user']->id,
+        ]);
     }
 }

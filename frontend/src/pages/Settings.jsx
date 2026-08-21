@@ -9,6 +9,7 @@ import SettingsApprovalsPanel from '../components/SettingsApprovalsPanel';
 import SettingsAuditLogPanel from '../components/SettingsAuditLogPanel';
 import SettingsBranchesPanel from '../components/SettingsBranchesPanel';
 import SettingsModulesPanel from '../components/SettingsModulesPanel';
+import SettingsSupportPanel from '../components/SettingsSupportPanel';
 import SettingsTeamPanel from '../components/SettingsTeamPanel';
 import SettingsWarehousesPanel from '../components/SettingsWarehousesPanel';
 import { FinanceFormError } from '../components/FinanceFormFeedback';
@@ -503,6 +504,10 @@ export default function Settings() {
 
       {activeTab === 'activity' ? (
         <SettingsAuditLogPanel content={activeTabContent} />
+      ) : null}
+
+      {activeTab === 'support' ? (
+        <SettingsSupportPanel content={activeTabContent} />
       ) : null}
     </div>
   );

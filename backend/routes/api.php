@@ -186,6 +186,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/approvals/branches/{branch}/settings', [\App\Http\Controllers\API\ApprovalController::class, 'updateBranchSettings']);
     });
 
+    // Support tickets - any team member can file one and see their own
+    // business's tickets; review/resolve is platform-admin-only (see
+    // AdminController::supportTickets()/resolveTicket() below).
+    Route::get('/support-tickets', [\App\Http\Controllers\API\SupportTicketController::class, 'index']);
+    Route::post('/support-tickets', [\App\Http\Controllers\API\SupportTicketController::class, 'store']);
+
     // Trust Fund
     Route::get('/trust-accounts', [TrustFundController::class, 'index']);
     Route::post('/trust-accounts', [TrustFundController::class, 'createAccount']);

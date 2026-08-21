@@ -19,6 +19,7 @@ test('settings tabs stay aligned with the available workspace sections', () => {
     { key: 'modules', label: 'Modules' },
     { key: 'approvals', label: 'Approvals' },
     { key: 'activity', label: 'Activity' },
+    { key: 'support', label: 'Support' },
   ]);
 });
 
@@ -98,12 +99,13 @@ test('settings tab content helpers keep live settings copy aligned', () => {
   ]);
   assert.equal(getSettingsTabContent('branches')?.calloutTitle, 'Branch operating model');
   assert.deepEqual(getSettingsTabContent('branches')?.roadmapItems, [
-    'Approval thresholds are business-wide today (see the Approvals tab) - per-branch thresholds are a possible future refinement',
+    'Approval thresholds can be overridden per branch (see the Approvals tab) instead of only business-wide',
     'AI-led branch comparison alerts for performance, demand, and staffing',
   ]);
   assert.equal(getSettingsTabContent('warehouses')?.calloutTitle, 'What warehouse assignment does today');
   assert.equal(getSettingsTabContent('approvals')?.calloutTitle, 'How this works');
   assert.equal(getSettingsTabContent('modules')?.calloutTitle, 'Feature modules');
   assert.equal(getSettingsTabContent('activity')?.calloutTitle, 'Why this exists');
+  assert.equal(getSettingsTabContent('support')?.calloutTitle, 'What happens after you send one');
   assert.equal(getSettingsTabContent('missing'), null);
 });

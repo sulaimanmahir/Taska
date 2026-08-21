@@ -7,6 +7,7 @@ export const settingsTabs = [
   { key: 'modules', label: 'Modules' },
   { key: 'approvals', label: 'Approvals' },
   { key: 'activity', label: 'Activity' },
+  { key: 'support', label: 'Support' },
 ];
 
 export function buildSettingsMetrics({ user = null, business = null, linkedBusinesses = 0 } = {}) {
@@ -121,7 +122,7 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       roadmapTitle: 'Still ahead',
       roadmapSubtitle: 'Higher-order location controls that build on this foundation',
       roadmapItems: [
-        'Approval thresholds are business-wide today (see the Approvals tab) - per-branch thresholds are a possible future refinement',
+        'Approval thresholds can be overridden per branch (see the Approvals tab) instead of only business-wide',
         'AI-led branch comparison alerts for performance, demand, and staffing',
       ],
       roadmapClassName: 'border-emerald-200 bg-emerald-50/60',
@@ -155,6 +156,16 @@ export function getSettingsTabContent(tab, { linkedBusinesses = 0 } = {}) {
       calloutSubtitle: 'Turn optional workflows on or off without changing your business type',
       calloutCopy:
         'Modules are feature toggles within your current business type - they control which optional workflows (like loyalty, refunds, or barcode labels) show up in navigation, not which industry your workspace is set up as.',
+    };
+  }
+
+  if (tab === 'support') {
+    return {
+      intro:
+        'Reach the Taska team about a bug, a billing question, or anything that isn\'t working the way it should. A platform team member reviews every ticket.',
+      calloutTitle: 'What happens after you send one',
+      calloutCopy:
+        'Your ticket goes straight to the Taska platform team, not just this business - track its status here until it\'s marked resolved.',
     };
   }
 

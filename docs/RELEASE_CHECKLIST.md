@@ -61,10 +61,9 @@ so they're not rediscovered mid-launch:
 
 - `AdminController` is rebuilt on real models as of 2026-08-20 (`stats`,
   `users`, `businesses`, `plans`, `transactions`, `referrals` all return
-  real data now). `supportTickets`/`resolveTicket` are a genuine, still-open
-  gap — no support-ticket model/table exists anywhere in this codebase, so
-  those two return an honest empty list / a clear 501 rather than fake
-  data. Building a real ticket system is separate, unstarted work.
+  real data now). `supportTickets`/`resolveTicket` are real too as of
+  2026-08-21 — see `SupportTicket`/`SupportTicketController` and the
+  Settings > Support tab.
 - Approval thresholds (Settings → Approvals) are business-wide by default,
   with optional per-branch overrides as of 2026-08-20 (a branch left
   unconfigured just inherits the business-wide setting).

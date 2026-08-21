@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\ReferralCommission;
 use App\Models\ReferralPayout;
 use App\Models\SubscriptionPlan;
+use App\Models\SupportTicket;
 use Illuminate\Http\Request;
 
 /**
@@ -18,12 +19,10 @@ use Illuminate\Http\Request;
  * Subscription/SupportTicket/Referral and a Business::owner() relation, none
  * of which existed anywhere in the codebase - every method here fatal-
  * errored. Rewired to real models: BusinessSubscription/Invoice for
- * billing, ReferralCommission/ReferralPayout for referrals, and a derived
+ * billing, ReferralCommission/ReferralPayout for referrals, SupportTicket
+ * for support (tenants file via SupportTicketController), and a derived
  * Business::owner() (earliest-joined admin-role member, since there's no
- * stored "owner" concept). Support tickets are a genuine gap, not a wiring
- * bug - no ticket model/table exists in this codebase at all, so that
- * endpoint intentionally returns an empty/not-yet-available response
- * rather than pretending data exists (see ROADMAP.md).
+ * stored "owner" concept).
  */
 class AdminController extends Controller
 {
@@ -36,6 +35,7 @@ class AdminController extends Controller
             ->whereYear('paid_at', now()->year)
             ->sum('total');
         $pendingPayouts = ReferralPayout::where('status', 'pending')->count();
+        $pendingSupport = SupportTicket::where('status', SupportTicket::STATUS_OPEN)->count();
 
         return response()->json([
             'success' => true,
@@ -43,7 +43,7 @@ class AdminController extends Controller
                 'totalUsers' => $totalUsers,
                 'activeBusinesses' => $activeBusinesses,
                 'monthlyRevenue' => $monthlyRevenue,
-                'pendingSupport' => 0,
+                'pendingSupport' => $pendingSupport,
                 'pendingPayouts' => $pendingPayouts,
             ]
         ]);
@@ -136,11 +136,25 @@ class AdminController extends Controller
 
     public function supportTickets(Request $request)
     {
-        // No support-ticket model/table exists anywhere in this codebase -
-        // this is a real, tracked gap (see ROADMAP.md), not a bug to paper
-        // over. Returning an honest empty list rather than fabricating data
-        // or fatal-erroring.
-        return response()->json(['success' => true, 'data' => []]);
+        $tickets = SupportTicket::with(['business', 'creator'])
+            ->orderByRaw("status = 'open' desc")
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get()
+            ->map(function (SupportTicket $ticket) {
+                return [
+                    'id' => $ticket->id,
+                    'subject' => $ticket->subject,
+                    'message' => $ticket->message,
+                    'business_name' => $ticket->business?->name,
+                    'user_name' => $ticket->creator?->name,
+                    'status' => $ticket->status,
+                    'created_at' => $ticket->created_at,
+                    'resolved_at' => $ticket->resolved_at,
+                ];
+            });
+
+        return response()->json(['success' => true, 'data' => $tickets]);
     }
 
     public function referrals(Request $request)
@@ -200,9 +214,11 @@ class AdminController extends Controller
 
     public function resolveTicket(Request $request)
     {
-        return response()->json([
-            'success' => false,
-            'message' => 'Support tickets are not available yet - no ticket system has been built.',
-        ], 501);
+        $request->validate(['id' => 'required|exists:support_tickets,id']);
+
+        $ticket = SupportTicket::find($request->id);
+        $ticket->resolve($request->user());
+
+        return response()->json(['success' => true, 'message' => 'Ticket resolved']);
     }
 }
