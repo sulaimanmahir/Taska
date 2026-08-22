@@ -1,6 +1,6 @@
 # TASKA Roadmap
 
-Last updated: 2026-08-05
+Last updated: 2026-08-21
 
 ## Snapshot
 
@@ -135,18 +135,18 @@ This roadmap now reflects actual build status instead of a zero-based plan. Some
 - Core sales, inventory, CRM, expenses, trust fund, reports
 - Settings, billing, offline shell, and first AI insight layer
 
-### Phase 2: Active
+### Phase 2: Complete
 
-- Tenant hardening
-- Purchases and payables
-- Notification system
-- Admin auditability and approval controls
+- Tenant hardening — done
+- Purchases and payables — done
+- Notification system — done
+- Admin auditability and approval controls — done
 
-### Phase 3: Next
+### Phase 3: Mostly done
 
-- Deeper AI forecasting and branch intelligence
+- Deeper AI forecasting and branch intelligence — done, see Intelligence and Offline Maturity above (demand forecasting, anomaly detection, branch comparisons, explainable recommendations)
 - Offline conflict resolution maturity — done, see Intelligence and Offline Maturity above
-- Cross-module polish and workflow depth parity
+- Cross-module polish and workflow depth parity — ongoing by nature, not a single checkable task; see Design Constitution phases in `docs/TASKA_DESIGN_CONSTITUTION.md` for the current polish track
 
 ## Notes
 
