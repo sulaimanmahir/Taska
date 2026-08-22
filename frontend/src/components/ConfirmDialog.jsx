@@ -237,14 +237,6 @@ function ConfirmationDetails({ details, layout = 'grid' }) {
   );
 }
 
-function ScrollCueBridge({ children }) {
-  return (
-    <div className="modal-scroll-cue-anchor" aria-hidden="true">
-      {children}
-    </div>
-  );
-}
-
 function buildConfirmDetails(detailPreset, detailContext = {}) {
   if (!detailPreset) {
     return [];
@@ -483,32 +475,30 @@ export default function ConfirmDialog({
           {children}
         </div>
       ) : null}
-      <ScrollCueBridge>
-        <ModalActions tone={resolvedTone} preset={hasHelperContent ? 'confirmation' : 'default'}>
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            fullWidth
-            onClick={onCancel}
-            disabled={isBusy}
-            data-modal-dismiss="true"
-          >
-            {resolvedCancelLabel}
-          </Button>
-          <Button
-            type="button"
-            variant={resolvedConfirmVariant}
-            size="lg"
-            fullWidth
-            onClick={onConfirm}
-            disabled={isBusy}
-            data-autofocus="true"
-          >
-            {isBusy ? resolvedBusyLabel : resolvedConfirmLabel}
-          </Button>
-        </ModalActions>
-      </ScrollCueBridge>
+      <ModalActions tone={resolvedTone} preset={hasHelperContent ? 'confirmation' : 'default'}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
+          fullWidth
+          onClick={onCancel}
+          disabled={isBusy}
+          data-modal-dismiss="true"
+        >
+          {resolvedCancelLabel}
+        </Button>
+        <Button
+          type="button"
+          variant={resolvedConfirmVariant}
+          size="lg"
+          fullWidth
+          onClick={onConfirm}
+          disabled={isBusy}
+          data-autofocus="true"
+        >
+          {isBusy ? resolvedBusyLabel : resolvedConfirmLabel}
+        </Button>
+      </ModalActions>
     </ModalShell>
   );
 }
