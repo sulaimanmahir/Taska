@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import Button from '../components/Button';
 import Card, { CardHeader } from '../components/Card';
 import PushNotificationToggle from '../components/PushNotificationToggle';
+import ThemeToggle from '../components/ThemeToggle';
 import SettingsApprovalsPanel from '../components/SettingsApprovalsPanel';
 import SettingsAuditLogPanel from '../components/SettingsAuditLogPanel';
 import SettingsBranchesPanel from '../components/SettingsBranchesPanel';
@@ -301,6 +302,7 @@ export default function Settings() {
               </div>
             </Card>
 
+            <ThemeToggle />
             <PushNotificationToggle />
           </div>
         </div>
