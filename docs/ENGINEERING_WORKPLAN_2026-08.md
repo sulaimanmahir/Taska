@@ -10,7 +10,7 @@ This workplan captures a senior-level system assessment of TASKA's frontend and 
 
 Ordered by blast radius and how much everything else depends on it, not by effort.
 
-0. **Taska Design Constitution v2.0 (design system overhaul)** — **user-prioritized 2026-08-11, ahead of everything else in this doc.** Full brief: [TASKA_DESIGN_CONSTITUTION.md](TASKA_DESIGN_CONSTITUTION.md). See item 10 below for status/next steps. Not started yet — currently just captured and prioritized per explicit instruction; the market-expansion vertical-building work (item 9's sibling doc, [NORTHERN_NIGERIA_MARKET_EXPANSION.md](NORTHERN_NIGERIA_MARKET_EXPANSION.md)) was paused to record this before resuming.
+0. **Taska Design Constitution v2.0 (design system overhaul)** — **user-prioritized 2026-08-11, ahead of everything else in this doc.** Full brief: [TASKA_DESIGN_CONSTITUTION.md](TASKA_DESIGN_CONSTITUTION.md). See item 10 below for status/next steps. As of 2026-08-21, every phase except 12 (polish, happening incrementally rather than as a dedicated pass) is done or explicitly, deliberately blocked on missing Makaranta design tokens the user hasn't supplied yet.
 1. **Version control** — the project had no `.git` repository at all. No history, no diffs, no revert path, no code review, no CI possible. Blocks everything else below.
 2. **CI pipeline** — once git exists, get both test suites running on every push so regressions are caught automatically instead of relying on manual runs.
 3. **Tenant-scoping enforcement** — currently done by convention (`where('business_id', ...)` hand-written in 44+ controllers, zero Eloquent global scopes). One missed line is a cross-tenant data leak. Already flagged in [ROADMAP.md](../ROADMAP.md) as an active gap.
@@ -135,15 +135,17 @@ See the doc's own "Open questions" section for the two still-open product decisi
 - [x] `frontend/src/pages/Purchases.jsx`, routed at `/purchases`
 - [x] Follow-up done: applied `BelongsToBusiness` to `Supplier`, `Purchase`, and `PurchasePayment` (each has its own `business_id`). `PurchaseItem` intentionally excluded — no `business_id` column of its own, scoped only via its `purchase` relation, same treatment as `OrderItem`-style line-item models elsewhere. Verified via full backend suite (242 passing) including the existing cross-tenant `PurchaseFlowTest` assertion.
 
-### 10. Taska Design Constitution v2.0 — Correction (2026-08-20): substantially further along than this section says
+### 10. Taska Design Constitution v2.0 — Correction (2026-08-21): substantially further along than this section says
 
-*This section badly understated progress — it hadn't been touched since the doc's original 2026-08-11 write-up, while [TASKA_DESIGN_CONSTITUTION.md](TASKA_DESIGN_CONSTITUTION.md) itself was kept current throughout. That file is the authoritative status source for this track; check it directly rather than trusting a summary here again.* As of 2026-08-18, per that doc:
+*This section badly understated progress — it hadn't been touched since the doc's original 2026-08-11 write-up, while [TASKA_DESIGN_CONSTITUTION.md](TASKA_DESIGN_CONSTITUTION.md) itself was kept current throughout. That file is the authoritative status source for this track; check it directly rather than trusting a summary here again.* As of 2026-08-21, per that doc:
 
 - [x] Phase 0 (foundation): dead-code removal, design-token gaps filled, `Badge` component added.
 - [x] Phase 7 (business-specific UX): all 6 flagged verticals reviewed — confirmed genuinely business-specific, no generic-template rebuild needed. Two inline-empty-state fixes found and shipped as a side effect.
-- [x] Phase 9 (gamification) — well past "design pass": full data model, scoring service, event wiring, API endpoint, and a live `/progress` frontend page all shipped and verified via Playwright (not just render-smoke). Deliberately still open: the "levels" formula (a product decision, not an engineering gap) and wiring a real production cron for the daily snapshot command (an infra/ops task).
+- [x] Phase 8 (motion) — done 2026-08-20: the existing `fadeIn`/`shimmer` keyframes, previously near-unused, now drive every page's entrance (`.page-shell`) and the 12 loading-skeleton call sites that had hand-rolled a plainer Tailwind `animate-pulse` instead.
+- [x] Phase 9 (gamification) — full data model, scoring service, event wiring, API endpoint, a live `/progress` frontend page, and (done 2026-08-20) the "levels" formula itself, all shipped and verified via Playwright. Only wiring a real production cron for the daily snapshot command remains, and that's an infra/ops task, not engineering work left undone here.
 - [x] Phase 10 (mobile tables): the measurable gap (2/69 pages with a mobile fallback) is closed.
-- [ ] Phase 8 (motion), Phase 11 (QA), Phase 12 (polish), and the full §57–60 design-system component audit / §66 8-gate review — not swept yet.
+- [x] Phase 11 (QA) — swept 2026-08-20: an automated Playwright pass hit all 65 routed pages and found one real bug (an ambiguous-column crash in the expense report, plus a Reports-page period selector that silently did nothing) — both fixed, re-swept clean.
+- [ ] Phase 12 (polish) and the full §57–60 design-system component audit / §66 8-gate review — not swept as a dedicated pass; per the design doc, polish has been happening incrementally alongside each phase above instead.
 - [ ] Still genuinely blocked, not just unstarted: Makaranta's actual production design tokens (colour hex values, spacing/radius/font scale) were never supplied — the constitution references them by name only ("Result Seekers Purple," "Makaranta orange"), and guessing values would violate the doc's own explicit instruction not to re-guess them. Get these from the user (or a Makaranta codebase/design-system reference) before any further visual token work.
 - [ ] The Phase 1–6 portion of the original master prompt (before Phase 7) was never received — the paste that seeded this doc jumped straight from framing into Phase 7. Ask the user if those turn out to matter; nothing currently blocks on them.
 

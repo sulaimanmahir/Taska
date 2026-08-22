@@ -6,7 +6,7 @@ Harden the core sales-to-inventory workflow, improve operational reliability, an
 ## Milestones
 
 ### Milestone 1 — Core workflow hardening
-Status: In progress
+Status: Complete
 
 Goals:
 - protect sales from overselling
@@ -18,10 +18,8 @@ Completed:
 - added regression tests covering insufficient inventory
 - displayed stock information in the POS product list
 - blocked out-of-stock additions at the UI layer
-
-Next actions:
-- add a clear cart-level stock warning when quantity exceeds available stock
-- provide a friendly error state for failed sale submission
+- added a clear cart-level stock warning when quantity exceeds available stock
+- provided a friendly error state for failed sale submission
 
 ### Milestone 2 — Inventory-aware checkout experience
 Status: Complete
@@ -51,7 +49,7 @@ Completed:
 - documented the happy path for demo and onboarding use (2026-08-19): [CORE_SALES_WORKFLOW_DEMO.md](CORE_SALES_WORKFLOW_DEMO.md), verified end to end against the real seeded `retail@taska.local` demo account (login, POS sale, low-stock badge, return, non-tracked service sale, approval rules) in an isolated database copy so the walkthrough's claims are actually true, not just described.
 
 ### Milestone 4 — Product readiness and polish
-Status: In progress
+Status: Complete
 
 Goals:
 - move the platform from broad scaffolding to dependable demo readiness

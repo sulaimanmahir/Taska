@@ -1,7 +1,7 @@
 # TASKA Milestone Board — 2026-08
 
 ## Milestone 1 — Core workflow hardening
-Status: In progress
+Status: Complete
 
 ### Tasks
 - [x] Add stock validation before sale order creation
@@ -31,7 +31,7 @@ Status: Complete
 - [x] Document the core sales workflow for demo use
 
 ## Milestone 4 — Product readiness and polish
-Status: In progress
+Status: Complete
 
 ### Tasks
 - [x] Standardize validation and error handling across core modules — 8 unguarded stock/money mutations fixed across 7 services, see ROADMAP.md
